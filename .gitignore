@@ -1,0 +1,113 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.pydevproject
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Data and results
+results/
+output/
+data/
+*.npy
+*.npz
+*.pkl
+*.pickle
+*.h5
+*.hdf5
+*.pt
+*.pth
+*.ckpt
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+.tmp/
+
+# OS
+.DS_Store
+Thumbs.db
+*.lnk
+
+# Model checkpoints
+*.ckpt
+checkpoints/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Metrics and diagnostics
+metric*.json
+numeric_diagnostics.jsonl
+code_state.json
+
+# Git LFS
+.git/lfs/
+
+# Environment files
+.env
+.env.local
+*.env
+
+# Node (if applicable)
+node_modules/
+package-lock.json
+
+# Build artifacts
+*.o
+*.a
+*.so
+*.dylib
