@@ -1,0 +1,36 @@
+{
+  "created": "2026-01-28T11:36:49.271444",
+  "config": {
+    "fs": 16000,
+    "num_mics": 4,
+    "spacing_m": 0.035,
+    "c": 343.0,
+    "angle_mode": "random",
+    "angle_min": -60.0,
+    "angle_max": 60.0,
+    "angle_step": 5.0,
+    "angles": null,
+    "snr_db": 30.0,
+    "gain_jitter_db": 0.0,
+    "seed": 42
+  },
+  "items": [
+    {
+      "source_wav": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\audio\\boy1\\MIC\\boy1_papercup_MIC_001.wav",
+      "array_wav": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\worktree\\exp-tdoa-cross-correlation\\results\\array_sim_20260128_113648\\wavs\\boy1_papercup_MIC_001_array_M4.wav",
+      "angle_deg": 32.874725826715604,
+      "delays_sec": [
+        -8.30822488878341e-05,
+        -2.769408296261137e-05,
+        2.769408296261137e-05,
+        8.30822488878341e-05
+      ],
+      "delays_samples": [
+        -1.3293159822053457,
+        -0.44310532740178193,
+        0.44310532740178193,
+        1.3293159822053457
+      ]
+    }
+  ]
+}

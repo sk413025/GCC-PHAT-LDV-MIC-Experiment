@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-01-28T20:22:50.093693",
+  "mode": "full",
+  "num_pairs": 416,
+  "config": {
+    "fs": 16000,
+    "n_fft": 1024,
+    "hop_length": 256,
+    "freq_min": 300.0,
+    "freq_max": 3000.0,
+    "spacing_m": 0.05,
+    "c": 343.0,
+    "seed": 42
+  }
+}

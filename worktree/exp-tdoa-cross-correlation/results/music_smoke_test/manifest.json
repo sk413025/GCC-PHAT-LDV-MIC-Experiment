@@ -1,0 +1,24 @@
+{
+  "timestamp": "2026-01-28T18:29:38.993260",
+  "mode": "smoke",
+  "num_pairs": 1,
+  "pairs": [
+    {
+      "mic": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\audio\\boy1\\MIC\\boy1_papercup_MIC_001.wav",
+      "ldv": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\audio\\boy1\\LDV\\boy1_papercup_LDV_001.wav"
+    }
+  ],
+  "config": {
+    "fs": 16000,
+    "hop_length": 8000,
+    "n_fft": 1024,
+    "spacing_m": 0.05,
+    "c": 343.0,
+    "freq_min": 300.0,
+    "freq_max": 3000.0,
+    "angle_min": -90.0,
+    "angle_max": 90.0,
+    "angle_step": 1.0,
+    "seed": 42
+  }
+}

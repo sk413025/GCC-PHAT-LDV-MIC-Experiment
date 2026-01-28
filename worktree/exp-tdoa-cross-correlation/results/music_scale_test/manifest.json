@@ -1,0 +1,60 @@
+{
+  "timestamp": "2026-01-28T18:30:19.192339",
+  "mode": "scale",
+  "num_pairs": 10,
+  "pairs": [
+    {
+      "mic": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\audio\\boy1\\MIC\\boy1_papercup_MIC_001.wav",
+      "ldv": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\audio\\boy1\\LDV\\boy1_papercup_LDV_001.wav"
+    },
+    {
+      "mic": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\audio\\boy1\\MIC\\boy1_papercup_MIC_002.wav",
+      "ldv": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\audio\\boy1\\LDV\\boy1_papercup_LDV_002.wav"
+    },
+    {
+      "mic": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\audio\\boy1\\MIC\\boy1_papercup_MIC_003.wav",
+      "ldv": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\audio\\boy1\\LDV\\boy1_papercup_LDV_003.wav"
+    },
+    {
+      "mic": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\audio\\boy1\\MIC\\boy1_papercup_MIC_004.wav",
+      "ldv": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\audio\\boy1\\LDV\\boy1_papercup_LDV_004.wav"
+    },
+    {
+      "mic": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\audio\\boy1\\MIC\\boy1_papercup_MIC_005.wav",
+      "ldv": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\audio\\boy1\\LDV\\boy1_papercup_LDV_005.wav"
+    },
+    {
+      "mic": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\audio\\boy1\\MIC\\boy1_papercup_MIC_006.wav",
+      "ldv": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\audio\\boy1\\LDV\\boy1_papercup_LDV_006.wav"
+    },
+    {
+      "mic": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\audio\\boy1\\MIC\\boy1_papercup_MIC_007.wav",
+      "ldv": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\audio\\boy1\\LDV\\boy1_papercup_LDV_007.wav"
+    },
+    {
+      "mic": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\audio\\boy1\\MIC\\boy1_papercup_MIC_008.wav",
+      "ldv": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\audio\\boy1\\LDV\\boy1_papercup_LDV_008.wav"
+    },
+    {
+      "mic": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\audio\\boy1\\MIC\\boy1_papercup_MIC_009.wav",
+      "ldv": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\audio\\boy1\\LDV\\boy1_papercup_LDV_009.wav"
+    },
+    {
+      "mic": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\audio\\boy1\\MIC\\boy1_papercup_MIC_010.wav",
+      "ldv": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\audio\\boy1\\LDV\\boy1_papercup_LDV_010.wav"
+    }
+  ],
+  "config": {
+    "fs": 16000,
+    "hop_length": 8000,
+    "n_fft": 1024,
+    "spacing_m": 0.05,
+    "c": 343.0,
+    "freq_min": 300.0,
+    "freq_max": 3000.0,
+    "angle_min": -90.0,
+    "angle_max": 90.0,
+    "angle_step": 1.0,
+    "seed": 42
+  }
+}

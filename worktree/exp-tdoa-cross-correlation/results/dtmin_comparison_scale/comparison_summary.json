@@ -1,0 +1,66 @@
+{
+  "num_pairs": 20,
+  "methods": {
+    "cc": {
+      "no_dtmin": {
+        "tau_ms_median": -248.0,
+        "tau_ms_std": 316.8404014642072,
+        "psr_median": 6.640404425271958,
+        "snr_db_median": null
+      },
+      "with_dtmin": {
+        "tau_ms_median": 0.0,
+        "tau_ms_std": 0.0,
+        "psr_median": 8.910088696907131,
+        "snr_db_median": null
+      },
+      "psr_improvement_pct": 34.179910232534034
+    },
+    "ncc": {
+      "no_dtmin": {
+        "tau_ms_median": -248.0,
+        "tau_ms_std": 316.8404014642072,
+        "psr_median": 6.640404425271958,
+        "snr_db_median": null
+      },
+      "with_dtmin": {
+        "tau_ms_median": 0.0,
+        "tau_ms_std": 0.0,
+        "psr_median": 8.910088696907142,
+        "snr_db_median": null
+      },
+      "psr_improvement_pct": 34.1799102325342
+    },
+    "gcc_phat": {
+      "no_dtmin": {
+        "tau_ms_median": -928.0,
+        "tau_ms_std": 93.63418179276199,
+        "psr_median": 12.577625849559237,
+        "snr_db_median": null
+      },
+      "with_dtmin": {
+        "tau_ms_median": 0.0,
+        "tau_ms_std": 0.0,
+        "psr_median": 33.87595973586842,
+        "snr_db_median": null
+      },
+      "psr_improvement_pct": 169.3350886809497
+    },
+    "music": {
+      "no_dtmin": {
+        "tau_ms_median": -0.08140328703076549,
+        "tau_ms_std": 0.052486746673374184,
+        "psr_median": 19.357598873395453,
+        "snr_db_median": 16.011802683987582
+      },
+      "with_dtmin": {
+        "tau_ms_median": 0.0,
+        "tau_ms_std": 0.027307572424242994,
+        "psr_median": 55.379127548488285,
+        "snr_db_median": 16.01180268398752
+      },
+      "tau_std_reduction_pct": 47.97244227351634,
+      "psr_improvement_pct": 186.08469423653477
+    }
+  }
+}

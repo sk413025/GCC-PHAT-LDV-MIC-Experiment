@@ -1,0 +1,18 @@
+[
+  {
+    "array_wav": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\worktree\\exp-tdoa-cross-correlation\\results\\array_sim_20260128_113648\\wavs\\boy1_papercup_MIC_001_array_M4.wav",
+    "ds": {
+      "theta_hat_deg": 32.0,
+      "peak_value": 7.555349196594965e-05
+    },
+    "music": {
+      "theta_hat_deg": -32.0,
+      "peak_value": 831240.9503952563
+    },
+    "angle_gt_deg": 32.874725826715604,
+    "gcc_phat": {
+      "tau_ms": 0.125,
+      "theta_hat_deg": 24.100180326439748
+    }
+  }
+]

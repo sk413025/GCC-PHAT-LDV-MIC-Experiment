@@ -1,0 +1,36 @@
+{
+  "created": "2026-01-28T11:36:50.184937",
+  "num_files": 1,
+  "config": {
+    "fs": 16000,
+    "num_mics": 4,
+    "spacing_m": 0.035,
+    "c": 343.0,
+    "n_fft": 2048,
+    "hop_length": 160,
+    "freq_min": 300.0,
+    "freq_max": 3000.0,
+    "angle_min": -90.0,
+    "angle_max": 90.0,
+    "angle_step": 2.0,
+    "num_sources": 1
+  },
+  "ds": {
+    "num_defined": 1,
+    "mean_deg": 0.8747258267156042,
+    "median_deg": 0.8747258267156042,
+    "p90_deg": 0.8747258267156042
+  },
+  "music": {
+    "num_defined": 1,
+    "mean_deg": 64.8747258267156,
+    "median_deg": 64.8747258267156,
+    "p90_deg": 64.8747258267156
+  },
+  "gcc_phat": {
+    "num_defined": 1,
+    "mean_deg": 8.774545500275856,
+    "median_deg": 8.774545500275856,
+    "p90_deg": 8.774545500275856
+  }
+}
