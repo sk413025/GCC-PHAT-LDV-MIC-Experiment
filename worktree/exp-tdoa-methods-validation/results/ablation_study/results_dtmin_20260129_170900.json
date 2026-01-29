@@ -1,0 +1,167 @@
+[
+  {
+    "tau_ms": 2.875,
+    "peak": 0.03638197194851491,
+    "psr": 6.109435689870643,
+    "resampled_fs": 16000,
+    "original_fs": 48000,
+    "folder": "18-0.1V",
+    "pair": "LDV-LEFT",
+    "theory_tau_ms": -4.538,
+    "error_ms": 7.413
+  },
+  {
+    "tau_ms": 2.4375,
+    "peak": 0.028714572300125876,
+    "psr": 4.685201062185765,
+    "resampled_fs": 16000,
+    "original_fs": 48000,
+    "folder": "18-0.1V",
+    "pair": "LDV-RIGHT",
+    "theory_tau_ms": -3.088,
+    "error_ms": 5.5255
+  },
+  {
+    "tau_ms": -1.6875,
+    "peak": 0.35604789075521914,
+    "psr": 12.02617808285609,
+    "resampled_fs": 16000,
+    "original_fs": 48000,
+    "folder": "18-0.1V",
+    "pair": "MIC-MIC",
+    "theory_tau_ms": 1.45,
+    "error_ms": 3.1375
+  },
+  {
+    "tau_ms": 2.875,
+    "peak": 0.08479565901864897,
+    "psr": 8.034714054816703,
+    "resampled_fs": 16000,
+    "original_fs": 48000,
+    "folder": "19-0.1V",
+    "pair": "LDV-LEFT",
+    "theory_tau_ms": -4.788,
+    "error_ms": 7.663
+  },
+  {
+    "tau_ms": 1.3125,
+    "peak": 0.06903262428060264,
+    "psr": 2.485098862938927,
+    "resampled_fs": 16000,
+    "original_fs": 48000,
+    "folder": "19-0.1V",
+    "pair": "LDV-RIGHT",
+    "theory_tau_ms": -4.029,
+    "error_ms": 5.3415
+  },
+  {
+    "tau_ms": -1.6875,
+    "peak": 0.36130900401646454,
+    "psr": 12.487100157279789,
+    "resampled_fs": 16000,
+    "original_fs": 48000,
+    "folder": "19-0.1V",
+    "pair": "MIC-MIC",
+    "theory_tau_ms": 0.759,
+    "error_ms": 2.4465
+  },
+  {
+    "tau_ms": 2.875,
+    "peak": 0.08737416226462288,
+    "psr": 7.778223369498999,
+    "resampled_fs": 16000,
+    "original_fs": 48000,
+    "folder": "20-0.1V",
+    "pair": "LDV-LEFT",
+    "theory_tau_ms": -4.72,
+    "error_ms": 7.595
+  },
+  {
+    "tau_ms": 1.3125,
+    "peak": 0.06697415619851321,
+    "psr": 3.3918521476852903,
+    "resampled_fs": 16000,
+    "original_fs": 48000,
+    "folder": "20-0.1V",
+    "pair": "LDV-RIGHT",
+    "theory_tau_ms": -4.72,
+    "error_ms": 6.0325
+  },
+  {
+    "tau_ms": -1.6875,
+    "peak": 0.3560549515208736,
+    "psr": 12.899540551202238,
+    "resampled_fs": 16000,
+    "original_fs": 48000,
+    "folder": "20-0.1V",
+    "pair": "MIC-MIC",
+    "theory_tau_ms": 0.0,
+    "error_ms": 1.6875
+  },
+  {
+    "tau_ms": 2.875,
+    "peak": 0.09122610497222758,
+    "psr": 7.1586399932407225,
+    "resampled_fs": 16000,
+    "original_fs": 48000,
+    "folder": "21-0.1V",
+    "pair": "LDV-LEFT",
+    "theory_tau_ms": -4.029,
+    "error_ms": 6.904
+  },
+  {
+    "tau_ms": 1.3125,
+    "peak": 0.07406982413782554,
+    "psr": 2.939025699646669,
+    "resampled_fs": 16000,
+    "original_fs": 48000,
+    "folder": "21-0.1V",
+    "pair": "LDV-RIGHT",
+    "theory_tau_ms": -4.788,
+    "error_ms": 6.1005
+  },
+  {
+    "tau_ms": -1.6875,
+    "peak": 0.3351143342084035,
+    "psr": 11.40855341150964,
+    "resampled_fs": 16000,
+    "original_fs": 48000,
+    "folder": "21-0.1V",
+    "pair": "MIC-MIC",
+    "theory_tau_ms": -0.759,
+    "error_ms": 0.9285
+  },
+  {
+    "tau_ms": 2.875,
+    "peak": 0.10604018353936538,
+    "psr": 7.981073942947262,
+    "resampled_fs": 16000,
+    "original_fs": 48000,
+    "folder": "22-0.1V",
+    "pair": "LDV-LEFT",
+    "theory_tau_ms": -3.088,
+    "error_ms": 5.963
+  },
+  {
+    "tau_ms": 1.3125,
+    "peak": 0.07917104825423148,
+    "psr": 3.2617879964819565,
+    "resampled_fs": 16000,
+    "original_fs": 48000,
+    "folder": "22-0.1V",
+    "pair": "LDV-RIGHT",
+    "theory_tau_ms": -4.538,
+    "error_ms": 5.8505
+  },
+  {
+    "tau_ms": -1.6875,
+    "peak": 0.33083770379919936,
+    "psr": 11.70863808215894,
+    "resampled_fs": 16000,
+    "original_fs": 48000,
+    "folder": "22-0.1V",
+    "pair": "MIC-MIC",
+    "theory_tau_ms": -1.45,
+    "error_ms": 0.23750000000000004
+  }
+]
