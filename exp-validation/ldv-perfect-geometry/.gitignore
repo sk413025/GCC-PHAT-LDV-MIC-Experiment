@@ -1,0 +1,24 @@
+# Audio files
+*.wav
+*.mp3
+*.flac
+
+# Large binary files
+*.npy
+*.npz
+*.pkl
+*.pickle
+*.h5
+*.hdf5
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Large intermediate results (keep only summary.json)
+# Note: The actual large data files are in the worktree, not tracked in git
+
+# Temporary files
+*.tmp
+*.bak
