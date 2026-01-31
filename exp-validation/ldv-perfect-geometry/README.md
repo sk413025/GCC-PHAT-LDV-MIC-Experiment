@@ -96,6 +96,72 @@ for f in freq_bins:
 
 ---
 
+## 音訊分段策略 (Segmentation)
+
+驗證過程使用多段分析確保結果穩健性。
+
+### 分段參數
+
+```python
+{
+    'n_segments': 10,              # 總共驗證 10 個段落
+    'segment_spacing_sec': 50.0,   # 段落間隔 50 秒
+    'tw': 64,                      # OMP 時間窗口 = 64 frames
+    'gcc_segment_duration': 1.0,   # GCC-PHAT 分析使用 1 秒音訊
+}
+```
+
+### 分段流程
+
+```
+原始音訊 (~10 分鐘)
+│
+├─ Segment 1: t = 0s      ──► OMP 對齊 (tw=64 frames) ──► 提取 1s ──► GCC-PHAT
+├─ Segment 2: t = 50s     ──► OMP 對齊 (tw=64 frames) ──► 提取 1s ──► GCC-PHAT
+├─ Segment 3: t = 100s    ──► OMP 對齊 (tw=64 frames) ──► 提取 1s ──► GCC-PHAT
+│   ...
+└─ Segment 10: t = 450s   ──► OMP 對齊 (tw=64 frames) ──► 提取 1s ──► GCC-PHAT
+```
+
+### 時間單位換算
+
+| 參數 | 值 | 說明 |
+|------|-----|------|
+| **tw (frames)** | 64 | OMP 處理的時間窗口 |
+| **tw (秒)** | 64 × 160 / 48000 = **0.213 s** | hop_length=160, fs=48000 |
+| **tw (samples)** | 64 × 160 = **10,240** | 實際樣本數 |
+| **segment_spacing** | 50 s | 段落起始點間隔 |
+| **GCC-PHAT window** | 1.0 s = 48,000 samples | TDoA 估計使用的音訊長度 |
+
+### 分段位置計算
+
+```python
+# 計算每個 segment 的起始位置（以 STFT frames 為單位）
+frames_per_sec = fs / hop_length  # = 48000/160 = 300 frames/sec
+segment_spacing_frames = segment_spacing_sec * frames_per_sec  # = 50 * 300 = 15000 frames
+
+# 均勻分布 segments
+min_start = max_lag + 1  # 確保有足夠空間建立 lagged dictionary
+max_start = n_time - tw - max_lag - 1  # 確保不超出邊界
+
+segment_starts = [min_start + i * segment_spacing_frames for i in range(n_segments)]
+```
+
+### Single-Segment vs Multi-Segment
+
+| 驗證類型 | 說明 | 用途 |
+|----------|------|------|
+| **Single-Segment** | 只取音訊中央 1 個段落 | 快速驗證、煙霧測試 |
+| **Multi-Segment** | 10 個均勻分布的段落 | 完整驗證、穩健性測試 |
+
+### 為什麼使用 50 秒間隔？
+
+1. **避免語音內容重複**：50 秒足夠確保不同段落有獨立的語音內容
+2. **覆蓋完整錄音**：10 段 × 50 秒 = 500 秒，適合 8-10 分鐘的錄音
+3. **統計穩健性**：多個獨立樣本可識別異常值（如 Speaker 20 的雙峰分布）
+
+---
+
 ## 實驗設計
 
 採用四階段驗證流程：
