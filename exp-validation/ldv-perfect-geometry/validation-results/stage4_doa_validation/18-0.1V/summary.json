@@ -1,3 +1,710 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:28f2a5163e3b65c99c51cd535f012e075311634ba8cd5562ceae0047bfc78966
-size 15685
+{
+  "speaker_id": "18-0.1V",
+  "ground_truth": {
+    "tau_true_ms": 1.450441867492482,
+    "theta_true_deg": 20.815402749359603,
+    "d_left": 2.5,
+    "d_right": 2.0024984394500787,
+    "speaker_pos": [
+      0.8,
+      0.0
+    ]
+  },
+  "n_segments": 5,
+  "config": {
+    "fs": 48000,
+    "n_fft": 6144,
+    "hop_length": 160,
+    "max_lag": 50,
+    "max_k": 3,
+    "tw": 64,
+    "freq_min": 100,
+    "freq_max": 8000,
+    "gcc_max_lag_ms": 10.0,
+    "gcc_bandpass_low": 500.0,
+    "gcc_bandpass_high": 2000.0,
+    "psr_exclude_samples": 50,
+    "analysis_slice_sec": 5.0,
+    "eval_window_sec": 1.0,
+    "segment_spacing_sec": 50.0,
+    "segment_offset_sec": 100.0,
+    "speed_of_sound": 343.0,
+    "mic_spacing": 1.4,
+    "music_n_sources": 1,
+    "music_n_snapshots": 256
+  },
+  "segment_mode": "fixed",
+  "scan_summary": null,
+  "segment_centers_sec": [
+    100.0,
+    150.0,
+    200.0,
+    250.0,
+    300.0
+  ],
+  "results": {
+    "GCC-PHAT": {
+      "MicL-MicR": {
+        "tau_median_ms": -0.0006811532049112831,
+        "tau_std_ms": 0.013497760879079553,
+        "theta_median_deg": -0.009561664985972147,
+        "theta_error_median_deg": 20.824964414345576,
+        "psr_median_db": 25.39535886657155,
+        "per_segment": [
+          {
+            "tau_ms": 0.024810173254014058,
+            "psr_db": 11.627144691595234,
+            "theta_deg": 0.3482741077271195,
+            "theta_error": 20.467128641632485
+          },
+          {
+            "tau_ms": -0.0014854898871610124,
+            "psr_db": 25.39535886657155,
+            "theta_deg": -0.02085251421604432,
+            "theta_error": 20.836255263575648
+          },
+          {
+            "tau_ms": 0.027649538184528057,
+            "psr_db": 9.595001749868644,
+            "theta_deg": 0.38813242018303673,
+            "theta_error": 20.427270329176565
+          },
+          {
+            "tau_ms": -0.0015946374895908358,
+            "psr_db": 31.1346206165214,
+            "theta_deg": -0.02238467008113842,
+            "theta_error": 20.83778741944074
+          },
+          {
+            "tau_ms": -0.0006811532049112831,
+            "psr_db": 25.57377384835238,
+            "theta_deg": -0.009561664985972147,
+            "theta_error": 20.824964414345576
+          }
+        ]
+      },
+      "Raw_LDV": {
+        "tau_median_ms": -0.009081395512390256,
+        "tau_std_ms": 0.016244107674057585,
+        "theta_median_deg": -0.1274798857413461,
+        "theta_error_median_deg": 20.942882635100947,
+        "psr_median_db": 26.001943897170378,
+        "per_segment": [
+          {
+            "tau_ms": 0.02574100612874632,
+            "psr_db": 21.696523723448095,
+            "theta_deg": 0.36134089310857026,
+            "theta_error": 20.454061856251034
+          },
+          {
+            "tau_ms": -0.009081395512390256,
+            "psr_db": 26.001943897170378,
+            "theta_deg": -0.1274798857413461,
+            "theta_error": 20.942882635100947
+          },
+          {
+            "tau_ms": -0.01937540679144251,
+            "psr_db": 23.02393444021491,
+            "theta_deg": -0.27198263516934085,
+            "theta_error": 21.087385384528943
+          },
+          {
+            "tau_ms": -0.015977687330839985,
+            "psr_db": 28.653450989038333,
+            "theta_deg": -0.22428681517201324,
+            "theta_error": 21.039689564531617
+          },
+          {
+            "tau_ms": 0.0015468311178158884,
+            "psr_db": 29.190245615912108,
+            "theta_deg": 0.021713589713991312,
+            "theta_error": 20.793689159645613
+          }
+        ]
+      },
+      "Random_LDV": {
+        "tau_median_ms": -0.009103645919868548,
+        "tau_std_ms": 0.01625034360700385,
+        "theta_median_deg": -0.1277922258543752,
+        "theta_error_median_deg": 20.943194975213977,
+        "psr_median_db": 27.636507096307888,
+        "per_segment": [
+          {
+            "tau_ms": 0.025743657493686796,
+            "psr_db": 23.478144867999458,
+            "theta_deg": 0.3613781122939587,
+            "theta_error": 20.454024637065643
+          },
+          {
+            "tau_ms": -0.009103645919868548,
+            "psr_db": 27.636507096307888,
+            "theta_deg": -0.1277922258543752,
+            "theta_error": 20.943194975213977
+          },
+          {
+            "tau_ms": -0.019393232385513524,
+            "psr_db": 24.813433271017594,
+            "theta_deg": -0.27223286416161013,
+            "theta_error": 21.08763561352121
+          },
+          {
+            "tau_ms": -0.01597949096790429,
+            "psr_db": 31.240946298389325,
+            "theta_deg": -0.2243121338599539,
+            "theta_error": 21.039714883219556
+          },
+          {
+            "tau_ms": 0.0015460972180284676,
+            "psr_db": 31.5918830820725,
+            "theta_deg": 0.0217032876199527,
+            "theta_error": 20.79369946173965
+          }
+        ]
+      },
+      "OMP_LDV": {
+        "tau_median_ms": -0.009099352172406712,
+        "tau_std_ms": 0.016248786647433365,
+        "theta_median_deg": -0.1277319523706006,
+        "theta_error_median_deg": 20.9431347017302,
+        "psr_median_db": 27.759632742377658,
+        "per_segment": [
+          {
+            "tau_ms": 0.02573084780065689,
+            "psr_db": 23.57493376887134,
+            "theta_deg": 0.36119829308890306,
+            "theta_error": 20.4542044562707
+          },
+          {
+            "tau_ms": -0.009099352172406712,
+            "psr_db": 27.759632742377658,
+            "theta_deg": -0.1277319523706006,
+            "theta_error": 20.9431347017302
+          },
+          {
+            "tau_ms": -0.019412105595286475,
+            "psr_db": 25.07946683779099,
+            "theta_deg": -0.27249779919516015,
+            "theta_error": 21.087900548554764
+          },
+          {
+            "tau_ms": -0.015981532253585402,
+            "psr_db": 32.093865694628576,
+            "theta_deg": -0.22434078855788409,
+            "theta_error": 21.039743537917488
+          },
+          {
+            "tau_ms": 0.0015350043243206356,
+            "psr_db": 30.835824123483167,
+            "theta_deg": 0.021547571490809943,
+            "theta_error": 20.793855177868792
+          }
+        ]
+      }
+    },
+    "CC": {
+      "MicL-MicR": {
+        "tau_median_ms": -1.75,
+        "tau_std_ms": 0.010206207261596649,
+        "theta_median_deg": -25.388258128815238,
+        "theta_error_median_deg": 46.203660878174844,
+        "psr_median_db": 3.499728234699595,
+        "per_segment": [
+          {
+            "tau_ms": -1.7291666666666665,
+            "psr_db": 4.430435348668294,
+            "theta_deg": -25.06497913936042,
+            "theta_error": 45.880381888720024
+          },
+          {
+            "tau_ms": -1.75,
+            "psr_db": 3.499728234699595,
+            "theta_deg": -25.388258128815238,
+            "theta_error": 46.203660878174844
+          },
+          {
+            "tau_ms": -1.75,
+            "psr_db": 3.1087407890316783,
+            "theta_deg": -25.388258128815238,
+            "theta_error": 46.203660878174844
+          },
+          {
+            "tau_ms": -1.7291666666666665,
+            "psr_db": 2.453322931599303,
+            "theta_deg": -25.06497913936042,
+            "theta_error": 45.880381888720024
+          },
+          {
+            "tau_ms": -1.75,
+            "psr_db": 3.9991279546700236,
+            "theta_deg": -25.388258128815238,
+            "theta_error": 46.203660878174844
+          }
+        ]
+      },
+      "Raw_LDV": {
+        "tau_median_ms": 8.75,
+        "tau_std_ms": 0.024295632895188896,
+        "theta_median_deg": 90.0,
+        "theta_error_median_deg": 69.1845972506404,
+        "psr_median_db": 1.8053945906968616,
+        "per_segment": [
+          {
+            "tau_ms": 8.75,
+            "psr_db": 2.1958597992586246,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          },
+          {
+            "tau_ms": 8.729166666666666,
+            "psr_db": 1.7498650163401823,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          },
+          {
+            "tau_ms": 8.770833333333334,
+            "psr_db": 1.462005861359033,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          },
+          {
+            "tau_ms": 8.770833333333334,
+            "psr_db": 2.141682274701039,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          },
+          {
+            "tau_ms": 8.708333333333334,
+            "psr_db": 1.8053945906968616,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          }
+        ]
+      },
+      "Random_LDV": {
+        "tau_median_ms": 8.75,
+        "tau_std_ms": 0.015590239111558532,
+        "theta_median_deg": 90.0,
+        "theta_error_median_deg": 69.1845972506404,
+        "psr_median_db": 1.8024547913418543,
+        "per_segment": [
+          {
+            "tau_ms": 8.75,
+            "psr_db": 2.6496026703066984,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          },
+          {
+            "tau_ms": 8.75,
+            "psr_db": 1.4145531295293865,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          },
+          {
+            "tau_ms": 8.770833333333334,
+            "psr_db": 1.8024547913418543,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          },
+          {
+            "tau_ms": 8.770833333333334,
+            "psr_db": 2.561152951703838,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          },
+          {
+            "tau_ms": 8.729166666666666,
+            "psr_db": 1.1777599166484474,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          }
+        ]
+      },
+      "OMP_LDV": {
+        "tau_median_ms": 8.75,
+        "tau_std_ms": 0.015590239111558532,
+        "theta_median_deg": 90.0,
+        "theta_error_median_deg": 69.1845972506404,
+        "psr_median_db": 1.9054621240463283,
+        "per_segment": [
+          {
+            "tau_ms": 8.75,
+            "psr_db": 2.8985635331372595,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          },
+          {
+            "tau_ms": 8.75,
+            "psr_db": 1.5880248420681768,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          },
+          {
+            "tau_ms": 8.770833333333334,
+            "psr_db": 1.9054621240463283,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          },
+          {
+            "tau_ms": 8.770833333333334,
+            "psr_db": 2.53470861899278,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          },
+          {
+            "tau_ms": 8.729166666666666,
+            "psr_db": 1.2262340745879,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          }
+        ]
+      }
+    },
+    "NCC": {
+      "MicL-MicR": {
+        "tau_median_ms": -1.75,
+        "tau_std_ms": 0.010206207261596649,
+        "theta_median_deg": -25.388258128815238,
+        "theta_error_median_deg": 46.203660878174844,
+        "psr_median_db": 3.499727500095723,
+        "per_segment": [
+          {
+            "tau_ms": -1.7291666666666665,
+            "psr_db": 4.430435291786539,
+            "theta_deg": -25.06497913936042,
+            "theta_error": 45.880381888720024
+          },
+          {
+            "tau_ms": -1.75,
+            "psr_db": 3.499727500095723,
+            "theta_deg": -25.388258128815238,
+            "theta_error": 46.203660878174844
+          },
+          {
+            "tau_ms": -1.75,
+            "psr_db": 3.1087412808934465,
+            "theta_deg": -25.388258128815238,
+            "theta_error": 46.203660878174844
+          },
+          {
+            "tau_ms": -1.7291666666666665,
+            "psr_db": 2.453320751197557,
+            "theta_deg": -25.06497913936042,
+            "theta_error": 45.880381888720024
+          },
+          {
+            "tau_ms": -1.75,
+            "psr_db": 3.999129039869449,
+            "theta_deg": -25.388258128815238,
+            "theta_error": 46.203660878174844
+          }
+        ]
+      },
+      "Raw_LDV": {
+        "tau_median_ms": 8.75,
+        "tau_std_ms": 0.024295632895188896,
+        "theta_median_deg": 90.0,
+        "theta_error_median_deg": 69.1845972506404,
+        "psr_median_db": 1.8053931316445855,
+        "per_segment": [
+          {
+            "tau_ms": 8.75,
+            "psr_db": 2.1958534278882866,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          },
+          {
+            "tau_ms": 8.729166666666666,
+            "psr_db": 1.749862240689194,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          },
+          {
+            "tau_ms": 8.770833333333334,
+            "psr_db": 1.4620062008299142,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          },
+          {
+            "tau_ms": 8.770833333333334,
+            "psr_db": 2.1416839003307317,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          },
+          {
+            "tau_ms": 8.708333333333334,
+            "psr_db": 1.8053931316445855,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          }
+        ]
+      },
+      "Random_LDV": {
+        "tau_median_ms": 8.75,
+        "tau_std_ms": 0.015590239111558532,
+        "theta_median_deg": 90.0,
+        "theta_error_median_deg": 69.1845972506404,
+        "psr_median_db": 1.8024552970018004,
+        "per_segment": [
+          {
+            "tau_ms": 8.75,
+            "psr_db": 2.649594770257991,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          },
+          {
+            "tau_ms": 8.75,
+            "psr_db": 1.4145492984365637,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          },
+          {
+            "tau_ms": 8.770833333333334,
+            "psr_db": 1.8024552970018004,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          },
+          {
+            "tau_ms": 8.770833333333334,
+            "psr_db": 2.5611547540567114,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          },
+          {
+            "tau_ms": 8.729166666666666,
+            "psr_db": 1.1777584609620397,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          }
+        ]
+      },
+      "OMP_LDV": {
+        "tau_median_ms": 8.75,
+        "tau_std_ms": 0.015590239111558532,
+        "theta_median_deg": 90.0,
+        "theta_error_median_deg": 69.1845972506404,
+        "psr_median_db": 1.9054626512676363,
+        "per_segment": [
+          {
+            "tau_ms": 8.75,
+            "psr_db": 2.8985555134359675,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          },
+          {
+            "tau_ms": 8.75,
+            "psr_db": 1.5880254873135258,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          },
+          {
+            "tau_ms": 8.770833333333334,
+            "psr_db": 1.9054626512676363,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          },
+          {
+            "tau_ms": 8.770833333333334,
+            "psr_db": 2.5347109867256252,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          },
+          {
+            "tau_ms": 8.729166666666666,
+            "psr_db": 1.2262326042710976,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          }
+        ]
+      }
+    },
+    "MUSIC": {
+      "MicL-MicR": {
+        "tau_median_ms": 1.671671671671671,
+        "tau_std_ms": 5.2177626305429525,
+        "theta_median_deg": 24.177170026172252,
+        "theta_error_median_deg": 3.9793767967598086,
+        "psr_median_db": 0.45185587686781686,
+        "per_segment": [
+          {
+            "tau_ms": 1.6916916916916904,
+            "psr_db": 0.45185587686781686,
+            "theta_deg": 24.48559578902889,
+            "theta_error": 3.670193039669286
+          },
+          {
+            "tau_ms": -8.97897897897898,
+            "psr_db": 1.0810423840793286,
+            "theta_deg": -90.0,
+            "theta_error": 110.8154027493596
+          },
+          {
+            "tau_ms": -8.93893893893894,
+            "psr_db": 0.5355359366109422,
+            "theta_deg": -90.0,
+            "theta_error": 110.8154027493596
+          },
+          {
+            "tau_ms": 1.7117117117117115,
+            "psr_db": 0.12389548751181881,
+            "theta_deg": 24.79477954611941,
+            "theta_error": 3.9793767967598086
+          },
+          {
+            "tau_ms": 1.671671671671671,
+            "psr_db": 0.12144923233535776,
+            "theta_deg": 24.177170026172252,
+            "theta_error": 3.3617672768126496
+          }
+        ]
+      },
+      "Raw_LDV": {
+        "tau_median_ms": 0.9509509509509507,
+        "tau_std_ms": 3.670953325873698,
+        "theta_median_deg": 13.472756292700469,
+        "theta_error_median_deg": 54.306114872137584,
+        "psr_median_db": 0.7704980951523487,
+        "per_segment": [
+          {
+            "tau_ms": 4.734734734734734,
+            "psr_db": 0.00765447460742057,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          },
+          {
+            "tau_ms": -5.455455455455456,
+            "psr_db": 0.030805610149748728,
+            "theta_deg": -90.0,
+            "theta_error": 110.8154027493596
+          },
+          {
+            "tau_ms": -2.252252252252253,
+            "psr_db": 0.7704980951523487,
+            "theta_deg": -33.49071212277798,
+            "theta_error": 54.306114872137584
+          },
+          {
+            "tau_ms": 3.073073073073073,
+            "psr_db": 0.8131205182526655,
+            "theta_deg": 48.842465899657384,
+            "theta_error": 28.02706315029778
+          },
+          {
+            "tau_ms": 0.9509509509509507,
+            "psr_db": 1.6187781178148428,
+            "theta_deg": 13.472756292700469,
+            "theta_error": 7.342646456659134
+          }
+        ]
+      },
+      "Random_LDV": {
+        "tau_median_ms": -2.2322322322322323,
+        "tau_std_ms": 5.778131551084576,
+        "theta_median_deg": -33.154386482261955,
+        "theta_error_median_deg": 56.007971395469085,
+        "psr_median_db": 0.2363246645665586,
+        "per_segment": [
+          {
+            "tau_ms": -1.0710710710710707,
+            "psr_db": 0.8218553841082233,
+            "theta_deg": -15.213254441871033,
+            "theta_error": 36.028657191230636
+          },
+          {
+            "tau_ms": -2.2322322322322323,
+            "psr_db": 0.35040632059532395,
+            "theta_deg": -33.154386482261955,
+            "theta_error": 53.96978923162156
+          },
+          {
+            "tau_ms": -9.71971971971972,
+            "psr_db": 0.024124550633284857,
+            "theta_deg": -90.0,
+            "theta_error": 110.8154027493596
+          },
+          {
+            "tau_ms": 8.398398398398397,
+            "psr_db": 0.2363246645665586,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          },
+          {
+            "tau_ms": -2.3523523523523524,
+            "psr_db": 0.025493356825949196,
+            "theta_deg": -35.192568646109486,
+            "theta_error": 56.007971395469085
+          }
+        ]
+      },
+      "OMP_LDV": {
+        "tau_median_ms": -1.0710710710710707,
+        "tau_std_ms": 2.3383314821570473,
+        "theta_median_deg": -15.213254441871033,
+        "theta_error_median_deg": 44.99257277553188,
+        "psr_median_db": 0.1849903665411649,
+        "per_segment": [
+          {
+            "tau_ms": -0.6906906906906911,
+            "psr_db": 0.1849903665411649,
+            "theta_deg": -9.742425925854763,
+            "theta_error": 30.557828675214367
+          },
+          {
+            "tau_ms": -2.2922922922922924,
+            "psr_db": 0.05033131174946027,
+            "theta_deg": -34.16732485347072,
+            "theta_error": 54.98272760283032
+          },
+          {
+            "tau_ms": -1.0710710710710707,
+            "psr_db": 0.21331396113881226,
+            "theta_deg": -15.213254441871033,
+            "theta_error": 36.028657191230636
+          },
+          {
+            "tau_ms": -1.6716716716716726,
+            "psr_db": 0.04288793147787387,
+            "theta_deg": -24.17717002617228,
+            "theta_error": 44.99257277553188
+          },
+          {
+            "tau_ms": 4.254254254254254,
+            "psr_db": 0.334538764144408,
+            "theta_deg": 90.0,
+            "theta_error": 69.1845972506404
+          }
+        ]
+      }
+    }
+  },
+  "pass_conditions": {
+    "GCC-PHAT": {
+      "omp_better_than_raw": false,
+      "omp_better_than_random": true,
+      "omp_error_small": false,
+      "omp_psr_improved": true,
+      "passed": false
+    },
+    "CC": {
+      "omp_better_than_raw": false,
+      "omp_better_than_random": false,
+      "omp_error_small": false,
+      "omp_psr_improved": true,
+      "passed": false
+    },
+    "NCC": {
+      "omp_better_than_raw": false,
+      "omp_better_than_random": false,
+      "omp_error_small": false,
+      "omp_psr_improved": true,
+      "passed": false
+    },
+    "MUSIC": {
+      "omp_better_than_raw": true,
+      "omp_better_than_random": true,
+      "omp_error_small": false,
+      "omp_psr_improved": false,
+      "passed": false
+    }
+  },
+  "timestamp": "2026-01-31T14:24:29.964816"
+}
