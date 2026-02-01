@@ -1,8 +1,8 @@
 # Stage Validation Results
 
-**Commit**: `9b3e14a` (updated 2026-01-31)
-**Date**: 2026-01-31
-**Branch**: `exp/ldv-perfect-geometry`
+**Date**: 2026-02-01
+**Branch**: `exp-ldv-perfect-geometry-clean`
+**Note**: 本文件會隨實驗 commit 更新；詳見 `exp-validation/ldv-perfect-geometry/experiments/`。
 
 ---
 
@@ -14,15 +14,19 @@
 |------|------|------|--------|
 | Stage 1 | Energy Reduction | ✅ **PASSED** | 5/5 |
 | Stage 2 | Target Similarity | ✅ **PASSED** | 5/5 |
-| Stage 3 (Single) | Cross-Mic TDoA | ⚠️ PARTIAL | 4/5 |
-| Stage 3 (Multi) | Multi-Segment TDoA | ⚠️ PARTIAL | 4/5 |
-| Stage 4 | DoA Multi-Method | ✅ **PASSED** | 5/5 |
+| Stage 3 (Single, report baseline) | Cross-Mic TDoA | ⚠️ PARTIAL | 2/5 |
+| Stage 3 (Single, windowed baseline PSR>=10) | Cross-Mic TDoA | ⚠️ PARTIAL | 3/5 |
+| Stage 3 (Multi, report baseline, offset=100s) | Multi-Segment TDoA | ⚠️ PARTIAL | 1/5 |
+| Stage 3 (Multi, windowed baseline PSR>=10, offset=100s) | Multi-Segment TDoA | ⚠️ PARTIAL | 2/5 |
+| Stage 4-A (Speech + Geometry truth) | DoA Multi-Method | ❌ **FAILED** | 0/5 |
+| Stage 4-B (Chirp + Mic truth-ref) | DoA Multi-Method（GCC-PHAT） | ✅ **PASSED** | 2/2 |
+| Stage 4-C (Speech + Chirp truth-ref) | DoA Multi-Method（GCC-PHAT） | ⚠️ PARTIAL | 1/2 |
 
 **關鍵發現**：
-1. OMP 對齊在 Stage 1、2、4 表現優異（**全部 5/5 通過**）
-2. **Stage 4 GCC-PHAT 結果**：OMP 成功匹配 baseline TDoA（error ≤ 0.021 ms）
-3. Speaker 20（中央位置）在 Stage 3 有雙峰分布特性，但 Stage 4 仍通過
-4. 修正了幾何 ground truth 的符號約定
+1. OMP 對齊在 Stage 1、2 表現優異（**全部 5/5 通過**）
+2. Stage 3/4 對「baseline 的定義」非常敏感：短時間窗 + 低 PSR 時容易鎖到固定假峰（例如 -81 samples = -1.6875 ms）；report baseline 也可能因 PSR 過低而不可靠
+3. 以語音長檔在 **500–2000 Hz** + **1 秒窗**的設定下，Stage 4 的 **MicL–MicR τ 幾乎都接近 0 ms**，因此與幾何真值偏差很大（除了 speaker 20 本來就是 θ≈0°）
+4. 以 `_old_reports` 的 chirp（23/24）做驗證時，採用 **scan 挑窗 + LDV→MicL GCC-PHAT prealign**，`OMP_LDV`（GCC-PHAT）可把 DoA 拉回到非常接近真值參考（|Δθ| < 1°）
 
 ---
 
@@ -84,42 +88,82 @@
 
 ## Stage 3: Cross-Mic TDoA Evaluation
 
-### Single-Segment 結果
+### 目標
+驗證 `OMP_LDV`（把 LDV 對齊到 MicL）是否能取代 MicL 與 MicR 做 cross-mic TDoA：
+- baseline：`GCC-PHAT(MicL, MicR)`
+- raw：`GCC-PHAT(Raw_LDV, MicR)`
+- OMP：`GCC-PHAT(LDV_as_MicL, MicR)`
 
-| Speaker | Baseline τ | Raw Error | OMP Error | Improvement | Status |
-|---------|-----------|-----------|-----------|-------------|--------|
-| 18-0.1V | -1.688 ms | 3.229 ms | **0.021 ms** | 99.4% | ✅ |
-| 19-0.1V | -1.688 ms | 3.042 ms | **0.000 ms** | 100% | ✅ |
-| 20-0.1V | -1.688 ms | 3.021 ms | **0.000 ms** | 100% | ✅ |
-| 21-0.1V | -1.688 ms | 3.042 ms | **0.000 ms** | 100% | ✅ |
-| 22-0.1V | -1.688 ms | 1.688 ms | 1.688 ms | 0% | ❌ |
+### Baseline 定義（最影響 Stage 3 的地方）
+Stage 3 的「通過/失敗」高度依賴你把哪個 `τ` 當作 `τ_baseline`：
+- `baseline_method=segment`：只看單一短窗的 `(MicL,MicR)`；在低 PSR 時可能鎖到 **固定假峰 -81 samples = -1.6875 ms**
+- `baseline_method=report`：對齊 `full_analysis.py` / 報告設定，用 100–600s 長區間做 baseline（但 PSR 仍可能很低）
+- `baseline_method=windowed`：100–600s 多窗 median（可加 PSR>=10 篩選），baseline 會更穩定（本次落在 ~0ms）
 
-### Multi-Segment 結果（10 segments, 50s spacing）
+> 本文件「最新數值」以 `report` 與 `windowed(PSR>=10)` 兩種 baseline 為主；legacy 的 `segment` baseline 僅保留作為「為什麼會全部 -1.688ms」的對照。
 
-| Speaker | Baseline τ | Raw Error | OMP Error | Improvement | Status |
-|---------|-----------|-----------|-----------|-------------|--------|
-| 18-0.1V | -1.688 ms | 3.219 ms | **0.010 ms** | 99.7% | ✅ |
-| 19-0.1V | -1.688 ms | 3.229 ms | **0.000 ms** | 100% | ✅ |
-| 20-0.1V | -1.688 ms | 3.031 ms | **0.865 ms** | 71.5% | ❌ |
-| 21-0.1V | -1.688 ms | 3.240 ms | **0.000 ms** | 100% | ✅ |
-| 22-0.1V | -1.688 ms | 3.125 ms | **0.000 ms** | 100% | ✅ |
+### Single-Segment（center=300s, eval=1s, bandpass=500–2000Hz）
 
-### 關鍵觀察
+#### baseline_method=report（對齊報告）
 
-1. **Speaker 20 異常**：
-   - Single-segment: error = 0.000 ms（完美）
-   - Multi-segment: error = 0.865 ms（有殘差）
-   - 可能原因：該位置（中央）的 OMP 泛化能力較差
-   - std = 3.157 ms（高變異），表明不同 segments 表現差異大
+| Speaker | Baseline(report) τ (ms) | Baseline PSR | Segment τ (ms) | Segment PSR | Raw τ (ms) | OMP τ (ms) | OMP Error vs Baseline (ms) | Raw→OMP PSR (dB) | Status |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|:--:|
+| 18-0.1V | -0.0164 | 5.60 | +0.0051 | 21.79 | +0.0000 | +0.0000 | 0.0164 | 31.0 → 32.8 | ❌ |
+| 19-0.1V | -1.6841 | 2.81 | +0.0097 | 23.77 | +0.0165 | +0.0165 | 1.7007 | 23.5 → 27.0 | ❌ |
+| 20-0.1V | +0.0030 | 14.51 | -0.0002 | 27.58 | +0.0192 | +0.0192 | 0.0162 | 23.7 → 26.3 | ✅ |
+| 21-0.1V | +0.0003 | 23.47 | -0.0140 | 21.55 | -0.0209 | -0.0212 | 0.0215 | 7.6 → 11.5 | ❌ |
+| 22-0.1V | -0.0232 | 16.22 | -0.0014 | 28.94 | -0.0013 | -0.0015 | 0.0218 | 28.8 → 31.7 | ✅ |
 
-2. **Speaker 22 完成** ✅：
-   - Multi-segment: error = 0.000 ms（完美）
-   - 9/10 segments 達到完全一致（τ = -1.6875 ms）
-   - Single-segment 時 Raw τ = 0 是特殊情況，multi-segment 驗證更具代表性
+**通過率**：2/5（20、22）
 
-3. **其他 Speaker（18, 19, 21, 22）表現優異**：
-   - Multi-segment error ≤ 0.010 ms
-   - 4/5 speakers 證明方法在大多數情況下有效
+#### baseline_method=windowed（PSR>=10）
+
+| Speaker | Baseline τ (ms) | Baseline PSR | Raw τ (ms) | OMP τ (ms) | OMP Error (ms) | Raw→OMP PSR (dB) | Status |
+|---|---:|---:|---:|---:|---:|---:|:--:|
+| 18-0.1V | +0.0003 | 23.82 | +0.0000 | +0.0000 | 0.0003 | 31.0 → 32.8 | ✅ |
+| 19-0.1V | +0.0003 | 23.95 | +0.0165 | +0.0165 | 0.0163 | 23.5 → 27.0 | ✅ |
+| 20-0.1V | -0.0001 | 24.39 | +0.0192 | +0.0192 | 0.0193 | 23.7 → 26.3 | ✅ |
+| 21-0.1V | +0.0004 | 25.56 | -0.0209 | -0.0212 | 0.0216 | 7.6 → 11.5 | ❌ |
+| 22-0.1V | +0.0002 | 25.53 | -0.0013 | -0.0015 | 0.0016 | 28.8 → 31.7 | ❌ |
+
+**通過率**：3/5（18、19、20）
+
+### Multi-Segment（10 segments; centers=100..550s, eval=1s, bandpass=500–2000Hz）
+
+#### baseline_method=report（offset=100s）
+
+| Speaker | Baseline(report) τ (ms) | Baseline PSR | Raw median error (ms) | OMP median error (ms) | Raw→OMP PSR (dB) | Status |
+|---|---:|---:|---:|---:|---:|:--:|
+| 18-0.1V | -0.0164 | 5.60 | 0.0128 | 0.0129 | 26.8 → 28.1 | ❌ |
+| 19-0.1V | -1.6841 | 2.81 | 1.6810 | 1.6811 | 24.8 → 27.8 | ❌ |
+| 20-0.1V | +0.0030 | 14.51 | 0.0044 | 0.0044 | 31.0 → 33.4 | ❌ |
+| 21-0.1V | +0.0003 | 23.47 | 0.0122 | 0.0122 | 27.8 → 28.9 | ❌ |
+| 22-0.1V | -0.0232 | 16.22 | 0.0222 | 0.0222 | 27.3 → 29.3 | ✅ |
+
+**通過率**：1/5（22）
+
+#### baseline_method=windowed（PSR>=10, offset=100s）
+
+| Speaker | Baseline(windowed) τ (ms) | Baseline PSR | Raw median error (ms) | OMP median error (ms) | Raw→OMP PSR (dB) | Status |
+|---|---:|---:|---:|---:|---:|:--:|
+| 18-0.1V | +0.0003 | 23.82 | 0.0170 | 0.0169 | 26.8 → 28.1 | ✅ |
+| 19-0.1V | +0.0003 | 23.95 | 0.0183 | 0.0184 | 24.8 → 27.8 | ❌ |
+| 20-0.1V | -0.0001 | 24.39 | 0.0021 | 0.0021 | 31.0 → 33.4 | ❌ |
+| 21-0.1V | +0.0004 | 25.56 | 0.0121 | 0.0121 | 27.8 → 28.9 | ❌ |
+| 22-0.1V | +0.0002 | 25.53 | 0.0096 | 0.0095 | 27.3 → 29.3 | ✅ |
+
+**通過率**：2/5（18、22）
+
+### Legacy 對照：baseline_method=segment（短窗）
+
+`baseline_method=segment` 只看單一短窗的 `(MicL,MicR)`；在低 PSR 時可能鎖到穩定假峰（例如 `-81 samples ≈ -1.6875 ms`）。
+因此本文件的「通過率」與後續比較以 `report` / `windowed(PSR>=10)` 為主；legacy 現象可參考 `validation-results/stage3_multi_segment/` 的 per-segment baseline（偶發 outlier）。
+
+### 補充觀察（從最新 report/windowed 結果）
+
+1. `baseline_method=report` 在部分 speaker 的 baseline PSR 偏低（如 19 的 2.81 dB），`τ_baseline` 本身就不穩定  
+2. `baseline_method=windowed(PSR>=10)` 的 baseline PSR 穩定（~24–26 dB），但 `τ_baseline ≈ 0 ms`（語音短窗下 mic-mic 主峰常偏到 0）  
+3. 多數 ❌ 來自 `error_improved=false`（OMP 與 Raw 的誤差非常接近），而不是 OMP 明顯變差；若要改成「OMP 至少不比 Raw 差」需調整 pass rule（目前規則採嚴格 `<`）
 
 ---
 
@@ -144,98 +188,20 @@ Speed of Sound: 343 m/s
 
 | Script | 用途 | 完成狀態 |
 |--------|------|----------|
-| `stage1_energy_reduction.py` | 驗證 OMP > Random | ✅ 5/5 |
-| `stage2_target_similarity.py` | 驗證 OMP ≈ Target Mic | ✅ 5/5 |
-| `stage3_tdoa_evaluation.py` | 單一 segment TDoA | ✅ 5/5 |
-| `stage3_multi_segment.py` | 多 segment TDoA | ✅ 4/5 完成 |
+| `stage1_energy_reduction.py` | 驗證 OMP > Random | ✅ 已跑完（5 speakers） |
+| `stage2_target_similarity.py` | 驗證 OMP ≈ Target Mic | ✅ 已跑完（5 speakers） |
+| `stage3_tdoa_evaluation.py` | 單一 segment TDoA（report/windowed/geometry） | ✅ 已跑完（5 speakers） |
+| `stage3_multi_segment.py` | 多 segment TDoA（report/windowed/geometry） | ✅ 已跑完（5 speakers） |
+| `stage4_doa_validation.py` | DoA Multi-Method（fixed/scan + prealign） | ✅ 已跑完（speech 5 + chirp 2） |
 
 ---
 
-## Speaker 20 異常分析
+## Legacy Notes（Stage 3 multi; baseline_method=segment）
 
-### 現象
-Speaker 20（中央位置 x=0）是唯一在 multi-segment 驗證中表現較差的 speaker：
-- **OMP error_median**: 0.865 ms（目標 < 0.5 ms）
-- **OMP τ_std**: 3.157 ms（極高變異）
-- **τ_median**: -0.823 ms（目標 -1.688 ms）
+`validation-results/stage3_multi_segment/` 保留作為 legacy multi-segment 對照（`baseline_method=segment`）。
+在語音短窗下，per-segment 的 mic-mic τ 可能出現 outlier（包含偶發 `~ -1.69 ms` 的穩定假峰），因此不適合作為真值 baseline。
 
-### Per-Segment 一致性比較
-
-| Speaker | 位置 | OMP τ_std | 完美 segment 比例 |
-|---------|------|-----------|-------------------|
-| 18 | x=+0.8 | 0.010 ms | 10/10 |
-| 22 | x=-0.8 | 0.504 ms | 9/10 |
-| 19 | x=+0.4 | 1.177 ms | 8/10 |
-| 21 | x=-0.4 | 0.673 ms | 8/10 |
-| **20** | **x=0** | **3.157 ms** | **?/10** |
-
-### 幾何假設
-Speaker 20 在中央位置（x=0）可能造成：
-1. **對稱性問題**：LDV 位於 (0, 0.5)，與 Speaker 20 (0, 0) 在同一垂直軸上
-2. **TDoA 接近零**：中央位置的聲源到達兩個麥克風的時間差最小
-3. **OMP 歧義**：當 target TDoA ≈ 0 時，OMP 可能找到多個等效解
-
-### OMP Lag 分布分析結果
-
-**關鍵發現**：所有 speaker 的 OMP lag 分布非常相似！
-
-| Speaker | 位置 | Dominant lag mean | Dominant lag std |
-|---------|------|-------------------|------------------|
-| 18 | x=+0.8 | -0.037 ms | 0.553 ms |
-| 19 | x=+0.4 | +0.027 ms | 0.564 ms |
-| 20 | x=0 | +0.028 ms | 0.529 ms |
-| 21 | x=-0.4 | +0.056 ms | 0.556 ms |
-| 22 | x=-0.8 | +0.025 ms | 0.559 ms |
-
-**結論**：問題不在 OMP lag 選擇本身（Stage 2 對所有 speakers 都有效），而在於 Stage 3 multi-segment 時的 **segment-to-segment 泛化能力**。
-
-### Per-Segment 詳細分析（Re-run 完成）
-
-| Segment | OMP τ (ms) | Error (ms) | Status |
-|---------|------------|------------|--------|
-| 1 | 0.000 | 1.688 | ❌ τ=0 |
-| 2 | -1.646 | 0.042 | ✅ |
-| 3 | **-1.688** | 0.000 | ✅ 完美 |
-| 4 | +9.188 | **10.875** | ❌ 極端 outlier |
-| 5 | +1.333 | 3.021 | ❌ |
-| 6 | 0.000 | 1.688 | ❌ τ=0 |
-| 7 | **-1.688** | 0.000 | ✅ 完美 |
-| 8 | -1.667 | 0.021 | ✅ |
-| 9 | -1.667 | 0.021 | ✅ |
-| 10 | 0.000 | 1.688 | ❌ τ=0 |
-
-**統計**：
-- 正確 segments (τ ≈ -1.688 ms): **5/10** (50%)
-- 錯誤 τ ≈ 0 ms: 4/10 (40%)
-- 極端 outlier: 1/10 (10%)
-
-### 結論：雙峰分布
-
-Speaker 20 展現**雙峰分布**特性：
-1. **正確峰** @ τ ≈ -1.688 ms（5 segments）
-2. **錯誤峰** @ τ ≈ 0 ms（4 segments）
-
-**根本原因**：
-- Speaker 20 位於中央位置 (x=0)，與 LDV (x=0) 在同一垂直軸
-- 這可能導致 OMP 找到兩個等價的對齊方案
-- 其他 speakers 的非對稱位置提供更明確的對齊方向
-
-### 已完成驗證
-- [x] 分析 Speaker 20 每個 segment 的 OMP τ 分布 → 雙峰分布
-- [x] 檢查失敗 segment 的 OMP lag 選擇 → OMP lag 分布正常
-- [x] 比較 edge vs center 的 lag 分布差異 → 所有位置相似
-
----
-
-## Open Questions
-
-1. **Speaker 20 異常的根本原因是什麼？**
-   - 幾何對稱性導致 OMP 歧義？
-   - 還是 segment 品質問題？
-
-2. **如何改進中央位置的表現？**
-   - 幾何預補償？
-   - 增加 OMP 約束（如 smoothness prior）？
+正式的通過率與比較請以 `stage3_multi_segment_report_offset100/` 與 `stage3_multi_segment_windowed_psr10_offset100/` 為主（見上表）。
 
 ---
 
@@ -249,46 +215,87 @@ Speaker 20 展現**雙峰分布**特性：
 {
     'methods': ['GCC-PHAT', 'CC', 'NCC', 'MUSIC'],
     'pairings': ['MicL-MicR', 'Raw_LDV', 'Random_LDV', 'OMP_LDV'],
-    'n_segments': 5,
+    'n_segments': 5,              # centers: 100,150,200,250,300s
+    'eval_window_sec': 1.0,       # 每段取 1 秒
+    'analysis_slice_sec': 5.0,    # 每段用 5 秒做 STFT/OMP，避免全檔 STFT 記憶體爆炸
+    'bandpass': 500–2000 Hz,      # GCC/CC/NCC 與 MUSIC 都使用相同頻帶（MUSIC 內部本來就是 500–2000）
 }
 ```
 
-### GCC-PHAT 結果（全部 5 Speakers）
+### Stage 4-A（Speech + Geometry truth）：GCC-PHAT 結果（5 speakers）
 
-| Speaker | 位置 | Baseline τ | OMP τ | Error | Status |
-|---------|------|------------|-------|-------|--------|
-| 18-0.1V | x=+0.8 | -1.688 ms | -1.667 ms | **0.021 ms** | ✅ PASS |
-| 19-0.1V | x=+0.4 | -1.688 ms | -1.667 ms | **0.021 ms** | ✅ PASS |
-| 20-0.1V | x=0 | -1.688 ms | -1.688 ms | **0.000 ms** | ✅ PASS |
-| 21-0.1V | x=-0.4 | -1.688 ms | -1.688 ms | **0.000 ms** | ✅ PASS |
-| 22-0.1V | x=-0.8 | -1.688 ms | -1.667 ms | **0.021 ms** | ✅ PASS |
+| Speaker | θ_true (°) | τ_true (ms) | Mic-Mic τ (ms) | OMP τ (ms) | OMP θ_error (°) | Raw→OMP PSR (dB) |
+|---------|-----------:|------------:|---------------:|-----------:|----------------:|-----------------:|
+| 18-0.1V | +20.82 | +1.450 | -0.0007 | -0.0091 | 20.94 | 26.0 → 27.8 |
+| 19-0.1V | +10.71 | +0.759 | +0.0024 | -0.0002 | 10.71 | 27.8 → 30.6 |
+| 20-0.1V | +0.00 | +0.000 | +0.0031 | -0.0014 | 0.11 | 30.9 → 33.6 |
+| 21-0.1V | -10.71 | -0.759 | -0.0013 | -0.0022 | 10.68 | 32.2 → 34.4 |
+| 22-0.1V | -20.82 | -1.450 | -0.0008 | +0.0076 | 20.92 | 26.8 → 29.4 |
 
-**通過率**: **5/5** 全部通過（error ≤ 0.021 ms）
+**觀察**：在語音長檔、1 秒窗 + 500–2000 Hz 的設定下，`MicL–MicR` 的 τ 幾乎都落在 **0 ms 附近**，導致 DoA 角度也接近 0°，因此與幾何真值偏差很大（除了 speaker 20 本來就是 0°）。
 
 ### 關鍵發現
 
-1. **OMP 成功匹配 Baseline TDoA**：
-   - 所有完成的 speakers：OMP error ≤ 0.021 ms
-   - 證明 OMP 對齊方法**有效**
+1. **Stage 4（幾何 DoA 真值）在語音資料上不穩定**：
+   - `MicL–MicR` 本身的 τ 在短窗會偏向 0 ms（高 PSR），不代表幾何路徑差
+   - 因此 `θ_error` 主要反映「短窗估計在混響/干擾下鎖到哪個峰」，而不是 OMP 對齊是否成功
 
-2. **符號約定已修正**：
-   - 原計算: `τ = (d_left - d_right) / c`（錯誤）
-   - 修正後: `τ = (d_right - d_left) / c`（正確）
-   - GCC-PHAT(MicL, MicR) 約定：正 τ = MicL 信號領先
-
-3. **各方法表現**：
+2. **各方法表現（語音 1 秒窗）**：
 
 | 方法 | Baseline 穩定性 | OMP 與 Baseline 匹配度 | 建議 |
 |------|----------------|----------------------|------|
-| **GCC-PHAT** | 極穩定 (std≈0) | ✅ error < 0.1 ms | **推薦使用** |
-| CC | 不穩定 | 不穩定 | 不適用 |
-| NCC | 不穩定 | 不穩定 | 不適用 |
-| MUSIC | 高變異 | 高變異 | 需更多 snapshots |
+| **GCC-PHAT** | τ 在短窗容易收斂到 0 ms | OMP/Raw 差異很小 | 建議改用 chirp 或 window 篩選後再做幾何驗證 |
+| CC | 常出現非物理解（θ 飽和到 ±90°） | 不穩定 | 不建議 |
+| NCC | 常出現非物理解（θ 飽和到 ±90°） | 不穩定 | 不建議 |
+| MUSIC | 變異大，依賴 snapshots/場景 | 不穩定 | 需重新設計參數/資料型態 |
 
 ### 結論
-- **GCC-PHAT + OMP** 是最有效的組合
-- OMP 對齊成功讓 LDV 取代 Mic_L 進行 TDoA 估計
-- **5/5 speakers 全部通過**（error ≤ 0.021 ms）
+- 本次（語音長檔、短窗、500–2000 Hz）無法用 Stage 4 去驗證幾何 DoA 真值：**4/5 speakers 的 θ_error 仍約等於 |θ_true|**
+- 若要把 Stage 4 當作「幾何 DoA 真值」驗證，請改用 chirp（或先掃窗挑出 `MicL–MicR τ` 接近理論值且 PSR 足夠的片段再驗）
+
+### Stage 4-B（Chirp + Mic truth-ref）：GCC-PHAT 結果（2 datasets）
+
+在 `_old_reports` 裡的 chirp 資料（23/24）其實更適合拿來當「真值參考」，因為 `MicL–MicR` 的 GCC-PHAT 會穩定地收斂到一致的 τ（不像語音短窗常偏到 0 ms）。
+
+本次使用：
+- `segment_mode=scan` + `scan_sort_by=psr`（優先挑 mic-mic 峰值最穩的窗）
+- `ldv_prealign=gcc_phat`（先用 LDV→MicL 的 GCC-PHAT 估出 delay，再對 LDV 做 fractional delay）
+- scan 參數：`eval_window=1.0s`, `hop=0.1s`, `scan_psr_min_db=5`, `scan_ldv_micl_psr_min_db=4`, `scan_tau_err_max_ms=0.3`, `min_separation=1.0s`
+- GCC-PHAT 不做帶通（`gcc_bandpass_low/high <= 0`）
+
+| Dataset | center (s) | Mic τ (ms) | Mic θ (°) | Mic PSR | OMP τ (ms) | OMP θ (°) | OMP PSR | abs(Δθ) (°) |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| 23-chirp(-0.8m) | 11.40 | -1.306 | -18.67 | 13.3 | -1.250 | -17.83 | 9.7 | 0.84 |
+| 24-chirp(-0.4m) | 13.60 | -0.636 | -8.97 | 10.9 | -0.641 | -9.03 | 7.0 | 0.07 |
+
+（Raw 對照，顯示未對齊時會飽和到 -90°）
+
+| Dataset | Raw τ (ms) | Raw θ (°) | Raw PSR |
+|---|---:|---:|---:|
+| 23-chirp(-0.8m) | -4.064 | -84.62 | 8.2 |
+| 24-chirp(-0.4m) | -4.433 | -90.00 | 5.2 |
+
+**結論**：若把 chirp 的 `MicL–MicR` 當作「真值參考」，在以上挑窗策略下，`OMP_LDV`（GCC-PHAT）可以把 DoA 拉回到非常接近真值（誤差 < 1°）。
+
+### Stage 4-C（Speech + Chirp truth-ref）：GCC-PHAT（2 speakers）
+
+想法：因為 21/22 的擺位與 24/23-chirp 相同（x=-0.4 / -0.8），理論上 TDoA/DoA 應該一致；因此可用 chirp 的 `MicL–MicR`（不帶通）作為 truth-ref，再看 speech 的 `OMP_LDV` 能否回到同一個角度。
+
+本段更新為「**5 秒窗 + guided peak**」版本：
+- 評估窗：`eval_window_sec=5.0`（同時用在 scan 與最後的 GCC-PHAT 計算）
+- chirp truth-ref：也用 **5 秒窗**重新計算（避免 1 秒 vs 5 秒不公平）
+- guided peak：`gcc_guided_peak_radius_ms=0.3`（GCC-PHAT 只在 `τ_ref ± 0.3ms` 的區間內找峰，避免被全域假峰吃掉）
+- scan：`segment_mode=scan`（100–600s、hop=1.0s）挑 1 個最接近 truth-ref 的窗  
+  *注意：guided peak 的 PSR 可能是負值（代表「在全域範圍內，這個 guided peak 不是最大峰」），因此 scan 的 `scan_psr_min_db` 需放寬（本次用 -20）*
+
+| Speech | Chirp truth-ref | center (s) | θ_ref (°) | Mic θ (°) | Raw θ (°) | OMP θ (°) | abs(Raw-Ref θ) (°) | abs(OMP-Ref θ) (°) | GCC-PHAT |
+|---|---|---:|---:|---:|---:|---:|---:|---:|:--:|
+| 21-0.1V | chirp 24 mic truth-ref (5s) | 279.00 | -8.94 | -6.77 | -9.14 | -9.00 | 0.20 | 0.06 | ✅ |
+| 22-0.1V | chirp 23 mic truth-ref (5s) | 395.00 | -18.68 | -22.28 | -17.44 | -22.30 | 1.24 | 3.62 | ❌ |
+
+**觀察**：
+- 21：`OMP_LDV` 可以在 5 秒窗下維持接近 truth-ref（0.06°），且略優於 Raw
+- 22：即使用 guided peak + 5 秒窗，`OMP_LDV` 仍落在 -22° 附近（離 truth-ref ~3.6°）；反而 Raw 在該窗更接近 truth-ref（~1.2°）
 
 ---
 
@@ -349,31 +356,42 @@ OMP_LDV = Σ coeffs[k] * Dict[:, selected_lags[k], :]
 
 1. ✅ Stage 1: Energy Reduction - **完成** (5/5)
 2. ✅ Stage 2: Target Similarity - **完成** (5/5)
-3. ⚠️ Stage 3: Cross-Mic TDoA - **4/5 完成**
-   - ✅ Speaker 18, 19, 21, 22: error ≤ 0.010 ms
-   - ⚠️ Speaker 20: error = 0.865 ms（中央位置雙峰分布）
-4. ✅ Stage 4: DoA Multi-Method - **5/5 完成**
-   - ✅ GCC-PHAT OMP 成功匹配 baseline（error ≤ 0.021 ms）
+3. ⚠️ Stage 3: Cross-Mic TDoA（baseline 敏感）
+   - Single：report 2/5；windowed(PSR>=10) 3/5
+   - Multi：report(offset=100s) 1/5；windowed(PSR>=10, offset=100s) 2/5
+   - Legacy segment baseline（可能有 outlier 假峰）：multi 2/5（僅供對照，不建議當真值）
+4. ⚠️ Stage 4: DoA Multi-Method
+   - Speech + Geometry truth：0/5（語音短窗下 `MicL–MicR τ ≈ 0 ms`）
+   - Chirp + Mic truth-ref：2/2（GCC-PHAT；|Δθ| < 1°）
+   - Speech + Chirp truth-ref：1/2（5s + guided peak；21 ✅ / 22 ❌）
 
 ### 已完成工作
-- [x] 完整運行 Stage 4 (5/5 speakers) ✅
-- [x] 修正幾何 ground truth 符號約定
-- [x] 分析 Speaker 20 中央位置的特殊情況（雙峰分布，50% 成功率）
+- [x] Stage 3：report/windowed baseline 的 single/multi 全部跑完並輸出 `summary.json`
+- [x] Stage 4：speech（fixed 5 段）+ chirp（scan + prealign）都已跑完
 
 ### 後續建議
-- Stage 3 Speaker 20 中央位置需要特殊處理（幾何預補償或增加 OMP 約束）
-- Stage 4 驗證已全部通過，可進入下一階段開發
+- Stage 3：先決定「要驗證什麼真值」：mic truth（report/windowed）或幾何 truth；若要幾何 truth，建議用 chirp 或先做 window/PSR 篩選後再做 `baseline_method=geometry`
+- Stage 3 pass rule：目前用嚴格 `error_omp < error_raw`，會讓「OMP 跟 Raw 一樣好」被判 ❌；可視需求改成 `<=` 或改成只看 `error_small + PSR 提升`
+- Stage 4：語音資料要對幾何真值需重新設計資料/窗長/挑窗策略（否則 MicL–MicR 自己就不對）
 
 ---
 
 ## Files
 
 - 結果目錄：
-  - `results/stage1_energy_reduction/` (5 speakers)
-  - `results/stage2_target_similarity/` (5 speakers)
-  - `results/stage3_tdoa_evaluation/` (5 speakers)
-  - `results/stage3_multi_segment/` (5 speakers)
-  - `results/stage4_doa_validation/` (5 speakers)
+  - `validation-results/stage1_energy_reduction/` (5 speakers)
+  - `validation-results/stage2_target_similarity/` (5 speakers)
+  - `validation-results/stage3_tdoa_evaluation/` (Single; report baseline)
+  - `validation-results/stage3_tdoa_evaluation_windowed_psr10/` (Single; windowed baseline PSR>=10)
+  - `validation-results/stage3_multi_segment/` (Multi; legacy segment baseline)
+  - `validation-results/stage3_multi_segment_report_offset100/` (Multi; report baseline, offset=100s)
+  - `validation-results/stage3_multi_segment_windowed_psr10_offset100/` (Multi; windowed baseline PSR>=10, offset=100s)
+  - `validation-results/stage4_doa_validation/` (Speech; fixed segments)
+  - `validation-results/stage4_doa_validation_chirp/` (Chirp; no prealign; ablation)
+  - `validation-results/stage4_doa_validation_chirp_prealign/` (Chirp; prealign only; ablation)
+  - `validation-results/stage4_doa_validation_chirp_prealign_scan_psr/` (Chirp; scan + prealign; final)
+  - `validation-results/stage4_doa_validation_speech_truthref_chirp_scan/` (Speech; scan + chirp truth-ref override; legacy 1s)
+  - `validation-results/stage4_doa_validation_speech_truthref_chirp_scan_guided_5s/` (Speech; scan + chirp truth-ref override + guided peak; 5s)
 - Scripts：
   - `scripts/stage1_energy_reduction.py`
   - `scripts/stage2_target_similarity.py`
@@ -384,5 +402,5 @@ OMP_LDV = Σ coeffs[k] * Dict[:, selected_lags[k], :]
 
 ---
 
-**Last Updated**: 2026-01-31
-**Branch**: `exp/ldv-perfect-geometry`
+**Last Updated**: 2026-02-01
+**Branch**: `exp-ldv-perfect-geometry-clean`

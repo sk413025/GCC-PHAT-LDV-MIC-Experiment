@@ -1,3 +1,61 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:3c0a89ecd08639f3199099a212529df284bf29d267192c6ec8ce89fd39ffe421
-size 1600
+{
+  "timestamp": "2026-01-30T21:36:52.771706",
+  "config": {
+    "fs": 48000,
+    "n_fft": 6144,
+    "hop_length": 160,
+    "max_lag": 50,
+    "max_k": 3,
+    "tw": 64,
+    "freq_min": 100,
+    "freq_max": 8000,
+    "gcc_n_fft": 4096,
+    "gcc_hop": 1024,
+    "gcc_max_lag_ms": 10.0,
+    "speed_of_sound": 343.0
+  },
+  "geometry": {
+    "delta_t_ms": 4.72000586017991,
+    "speaker_id": "20-0.1V",
+    "target_side": "right"
+  },
+  "files": {
+    "ldv": "..\\..\\dataset\\GCC-PHAT-LDV-MIC-Experiment\\20-0.1V\\0128-LDV-20-boy-320.wav",
+    "mic": "..\\..\\dataset\\GCC-PHAT-LDV-MIC-Experiment\\20-0.1V\\0128-RIGHT-MIC-20-boy-320.wav",
+    "target_name": "MicR"
+  },
+  "alignment_info": {
+    "start_t": 156666,
+    "tw": 64,
+    "segment_samples": 48000,
+    "segment_ms": 1000.0
+  },
+  "metrics": {
+    "raw_ldv": {
+      "gcc_phat_tau_ms": 1.3333333333333333,
+      "gcc_phat_psr_db": 0.036019571125507355,
+      "ncc_peak": 0.13290610909461975,
+      "ncc_lag_samples": -387
+    },
+    "geom_ldv": {
+      "gcc_phat_tau_ms": 1.3333333333333333,
+      "gcc_phat_psr_db": 0.036019571125507355,
+      "ncc_peak": 0.13290610909461975,
+      "ncc_lag_samples": -387
+    },
+    "geom_omp_ldv": {
+      "gcc_phat_tau_ms": 0.0,
+      "gcc_phat_psr_db": 6.637548923492432,
+      "ncc_peak": 0.1326819658279419,
+      "ncc_lag_samples": -389
+    }
+  },
+  "pass_conditions": {
+    "tau_improved": true,
+    "psr_improved": true,
+    "tau_near_zero": true,
+    "geom_improved_tau": false,
+    "omp_improved_over_geom": true,
+    "passed": true
+  }
+}

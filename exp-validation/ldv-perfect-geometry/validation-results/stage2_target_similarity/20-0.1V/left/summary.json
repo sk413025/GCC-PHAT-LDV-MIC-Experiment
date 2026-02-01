@@ -1,3 +1,47 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:e86c8ad24c5dde9d6e33f6f2cadb38f40c9bfa5f780470d708bf2ba6eda6443d
-size 1195
+{
+  "timestamp": "2026-01-30T20:57:18.008380",
+  "config": {
+    "fs": 48000,
+    "n_fft": 6144,
+    "hop_length": 160,
+    "max_lag": 50,
+    "max_k": 3,
+    "tw": 64,
+    "freq_min": 100,
+    "freq_max": 8000,
+    "gcc_n_fft": 4096,
+    "gcc_hop": 1024,
+    "gcc_max_lag_ms": 5.0
+  },
+  "files": {
+    "ldv": "..\\..\\dataset\\GCC-PHAT-LDV-MIC-Experiment\\20-0.1V\\0128-LDV-20-boy-320.wav",
+    "mic": "..\\..\\dataset\\GCC-PHAT-LDV-MIC-Experiment\\20-0.1V\\0128-LEFT-MIC-20-boy-320.wav",
+    "target_name": "MicL"
+  },
+  "alignment_info": {
+    "start_t": 156666,
+    "tw": 64,
+    "segment_samples": 16384,
+    "segment_ms": 341.3333333333333
+  },
+  "metrics": {
+    "raw_ldv": {
+      "gcc_phat_tau_ms": 0.0,
+      "gcc_phat_psr_db": 2.29538631439209,
+      "ncc_peak": -0.26977309584617615,
+      "ncc_lag_samples": -467
+    },
+    "omp_ldv": {
+      "gcc_phat_tau_ms": -0.020833333333333332,
+      "gcc_phat_psr_db": 9.242860794067383,
+      "ncc_peak": -0.271881103515625,
+      "ncc_lag_samples": 732
+    }
+  },
+  "pass_conditions": {
+    "tau_improved": false,
+    "psr_improved": true,
+    "tau_near_zero": true,
+    "passed": false
+  }
+}

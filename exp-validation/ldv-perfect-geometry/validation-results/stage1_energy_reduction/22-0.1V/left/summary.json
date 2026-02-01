@@ -1,3 +1,56 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:8914205f39c5b3ec7eb2fc0d67bdbba6ae631ba1897888783834f98d9478b828
-size 1476
+{
+  "timestamp": "2026-01-30T21:56:56.678761",
+  "config": {
+    "fs": 48000,
+    "n_fft": 6144,
+    "hop_length": 160,
+    "max_lag": 50,
+    "max_k": 3,
+    "tw": 64,
+    "segment_length": 50,
+    "segment_overlap": 1,
+    "freq_min": 100,
+    "freq_max": 8000
+  },
+  "files": {
+    "ldv": "..\\..\\dataset\\GCC-PHAT-LDV-MIC-Experiment\\22-0.1V\\0128-LDV-22-boy-320.wav",
+    "mic": "..\\..\\dataset\\GCC-PHAT-LDV-MIC-Experiment\\22-0.1V\\0128-LEFT-MIC-22-boy-320.wav",
+    "target_name": "MicL"
+  },
+  "stft_info": {
+    "n_freq_total": 3073,
+    "n_time_total": 313038,
+    "n_freq_selected": 1012,
+    "freq_range": [
+      100,
+      8000
+    ],
+    "time_window": {
+      "start_t": 156487,
+      "tw": 64
+    }
+  },
+  "metrics": {
+    "omp": {
+      "energy_reduction_mean": 0.9101695418357849,
+      "energy_reduction_std": 0.06531419605016708,
+      "energy_reduction_min": 0.46876418590545654,
+      "energy_reduction_max": 0.9977253675460815
+    },
+    "random": {
+      "energy_reduction_mean": 0.6440209150314331,
+      "energy_reduction_std": 0.11439793556928635,
+      "energy_reduction_min": 0.24498358368873596,
+      "energy_reduction_max": 0.899239182472229
+    },
+    "comparison": {
+      "improvement_absolute": 0.2661486268043518,
+      "improvement_percent": 41.32608413696289
+    }
+  },
+  "pass_conditions": {
+    "omp_gt_random": true,
+    "improvement_gt_10pct": true,
+    "passed": true
+  }
+}
