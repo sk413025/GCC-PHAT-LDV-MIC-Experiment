@@ -1,0 +1,20 @@
+# Raw speech datasets (not committed; see manifests under exp-validation/ldv-perfect-geometry/datasets/)
+18-0.1V/
+19-0.1V/
+20-0.1V/
+21-0.1V/
+22-0.1V/
+dataset/GCC-PHAT-LDV-MIC-Experiment/
+
+# Old reports / raw archives (keep chirp datasets only)
+_old_reports/
+!_old_reports/
+_old_reports/*
+!_old_reports/23-chirp(-0.8m)/
+!_old_reports/23-chirp(-0.8m)/**
+!_old_reports/24-chirp(-0.4m)/
+!_old_reports/24-chirp(-0.4m)/**
+
+# Python
+**/__pycache__/
+*.pyc
