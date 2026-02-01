@@ -303,10 +303,26 @@ exp-validation/ldv-perfect-geometry/
 
 3. **執行驗證**：
    ```bash
-   python scripts/stage1_energy_reduction.py --data-root dataset/GCC-PHAT-LDV-MIC-Experiment
-   python scripts/stage2_target_similarity.py --data-root dataset/GCC-PHAT-LDV-MIC-Experiment
-   python scripts/stage3_tdoa_evaluation.py --data-root dataset/GCC-PHAT-LDV-MIC-Experiment
-   python scripts/stage4_doa_validation.py --data-root dataset/GCC-PHAT-LDV-MIC-Experiment
+   python scripts/stage1_energy_reduction.py --data_root dataset/GCC-PHAT-LDV-MIC-Experiment
+   python scripts/stage2_target_similarity.py --data_root dataset/GCC-PHAT-LDV-MIC-Experiment
+   python scripts/stage3_tdoa_evaluation.py --data_root dataset/GCC-PHAT-LDV-MIC-Experiment
+   python scripts/stage4_doa_validation.py --data_root dataset/GCC-PHAT-LDV-MIC-Experiment
+   ```
+
+   Stage 3 常用參數（對齊 `full_analysis.py` 的 500–2000 Hz 設定/避免整段 STFT 佔用大量記憶體）：
+   ```bash
+   # 單段：指定中心時間（秒）、GCC 視窗長度、以及 OMP 使用的頻段
+   python scripts/stage3_tdoa_evaluation.py --data_root dataset/GCC-PHAT-LDV-MIC-Experiment --speaker 18-0.1V \\
+     --center_sec 300 --analysis_slice_sec 5 --gcc_segment_sec 1 \\
+     --freq_min 500 --freq_max 2000 \\
+     --baseline_method report --baseline_start_sec 100 --baseline_end_sec 600
+
+   # 多段：指定起始 offset（秒）+ spacing（秒）
+   python scripts/stage3_multi_segment.py --data_root dataset/GCC-PHAT-LDV-MIC-Experiment --speaker 18-0.1V \\
+     --segment_offset 100 --segment_spacing 50 --n_segments 10 \\
+     --analysis_slice_sec 5 --gcc_segment_sec 1 \\
+     --freq_min 500 --freq_max 2000 \\
+     --baseline_method report --baseline_start_sec 100 --baseline_end_sec 600
    ```
 
 ---

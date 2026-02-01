@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-31T10:58:31.247484",
+  "timestamp": "2026-01-31T11:00:53.442817",
   "config": {
     "fs": 48000,
     "n_fft": 6144,
@@ -14,12 +14,12 @@
     "gcc_bandpass_high": 2000,
     "gcc_segment_sec": 1.0,
     "analysis_slice_sec": 5.0,
-    "baseline_method": "report",
+    "baseline_method": "windowed",
     "baseline_start_sec": 100.0,
     "baseline_end_sec": 600.0,
     "baseline_window_sec": 5.0,
     "baseline_hop_sec": 5.0,
-    "baseline_psr_min_db": null,
+    "baseline_psr_min_db": 10.0,
     "baseline_psr_exclude_samples": 50,
     "speed_of_sound": 343.0
   },
@@ -42,45 +42,51 @@
   "metrics": {
     "baseline": {
       "pairing": "(MicL, MicR)",
-      "method": "report",
-      "tau_ms": -0.023231884019391913,
-      "psr_db": 16.218417001031508,
-      "error_vs_theory_ms": 1.42720998347309
+      "method": "windowed",
+      "tau_ms": 0.0001845070033894558,
+      "psr_db": 25.534210812188178,
+      "error_vs_theory_ms": 1.4506263744958714
     },
     "baseline_segment": {
       "pairing": "(MicL, MicR)",
       "tau_ms": -0.0013990601062812875,
       "psr_db": 28.944258302591237,
-      "error_vs_baseline_ms": 0.021832823913110627,
+      "error_vs_baseline_ms": 0.0015835671096707433,
       "error_vs_theory_ms": 1.4490428073862007
     },
-    "baseline_report": {
+    "baseline_report": null,
+    "baseline_windowed": {
       "start_sec": 100.0,
       "end_sec": 600.0,
-      "duration_sec": 500.0,
-      "tau_ms": -0.023231884019391913,
-      "psr_db": 16.218417001031508
+      "window_sec": 5.0,
+      "hop_sec": 5.0,
+      "n_windows": 100,
+      "n_used": 93,
+      "psr_min_db": 10.0,
+      "tau_median_ms": 0.0001845070033894558,
+      "tau_std_ms": 0.009508790498356191,
+      "psr_median_db": 25.534210812188178,
+      "psr_std_db": 4.501336823900645
     },
-    "baseline_windowed": null,
     "raw_ldv": {
       "pairing": "(Raw_LDV, MicR)",
       "tau_ms": -0.0013464898369832667,
       "psr_db": 28.81607479736936,
-      "error_vs_baseline_ms": 0.02188539418240865,
+      "error_vs_baseline_ms": 0.0015309968403727225,
       "error_vs_theory_ms": 1.4490953776554987
     },
     "omp_ldv": {
       "pairing": "(LDV_as_MicL, MicR)",
       "tau_ms": -0.0014611904361352401,
       "psr_db": 31.694253027989085,
-      "error_vs_baseline_ms": 0.021770693583256676,
+      "error_vs_baseline_ms": 0.001645697439524696,
       "error_vs_theory_ms": 1.4489806770563467
     }
   },
   "pass_conditions": {
-    "error_improved": true,
+    "error_improved": false,
     "psr_improved": true,
     "error_small": true,
-    "passed": true
+    "passed": false
   }
 }
