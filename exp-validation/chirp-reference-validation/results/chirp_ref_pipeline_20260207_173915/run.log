@@ -1,0 +1,80 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20260207173915
+Username: DESKTOP-DSDRNG7\Jenner
+RunAs User: DESKTOP-DSDRNG7\Jenner
+Configuration Name: 
+Machine: DESKTOP-DSDRNG7 (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -ExecutionPolicy Bypass -Command & { Set-Location -Path 'C:\Users\Jenner\Documents\SBP Lab\LDVReorientation\worktree\exp-chirp-reference-validation'; Start-Transcript -Path 'C:\Users\Jenner\Documents\SBP Lab\LDVReorientation\worktree\exp-chirp-reference-validation\results\chirp_ref_pipeline_20260207_173915\run.log' -Append | Out-Null; try { .\\run_chirp_ref_validation.ps1 -VerboseOutput -SkipOnFailure } finally { Stop-Transcript | Out-Null } }
+Process ID: 49552
+PSVersion: 5.1.26100.7462
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.7462
+BuildVersion: 10.0.26100.7462
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+
+Chirp Reference Validation Pipeline
+Run timestamp: 20260207_173915
+Results base:  C:\Users\Jenner\Documents\SBP Lab\LDVReorientation\worktree\exp-chirp-reference-validation\results
+
+
+============================================================
+  Step 0 : Chirp Cross-Validation
+============================================================
+  Started: 2026-02-07 17:39:15
+
+
+  [PASS] Step 0 completed successfully.
+
+============================================================
+  Step 1 : Phase 1: Tau Stability with Chirp Reference
+============================================================
+  Started: 2026-02-07 17:39:15
+
+
+  [FAIL] Step 1 failed: Step 1 exited with code 2
+
+============================================================
+  Step 2 : Phase 2-4: Guided Search, Stage 3, Final Summary
+============================================================
+  Started: 2026-02-07 17:53:44
+
+
+  [FAIL] Step 2 failed: Step 2 exited with code 2
+
+============================================================
+  Step 3 : LDV Delay Re-evaluation
+============================================================
+  Started: 2026-02-07 18:12:07
+
+
+  [PASS] Step 3 completed successfully.
+
+============================================================
+  Step 4 : Negative Position Diagnosis (-0.4, -0.8)
+============================================================
+  Started: 2026-02-07 18:14:18
+
+
+  [PASS] Step 4 completed successfully.
+
+============================================================
+  Pipeline Summary
+============================================================
+  [PASS] Step 0: Chirp Cross-Validation
+  [SKIP] Step 1: Phase 1 with Chirp Reference
+  [SKIP] Step 2: Phase 2-4 Re-run
+  [PASS] Step 3: LDV Delay Re-evaluation
+  [PASS] Step 4: Negative Position Diagnosis
+
+  3 / 5 steps passed.
+  Completed: 2026-02-07 18:14:21
+
+**********************
+Windows PowerShell transcript end
+End time: 20260207181421
+**********************

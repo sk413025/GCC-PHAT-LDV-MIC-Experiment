@@ -1,0 +1,84 @@
+{
+  "chirp": {
+    "+0.0": {
+      "n": 20,
+      "mean_ms": 0.8524721225863374,
+      "std_ms": 0.13016803683931275,
+      "p2_5_ms": 0.5947423757834669,
+      "p97_5_ms": 0.9401964185351104,
+      "cv_percent": 15.269477252158408,
+      "n_events_total": 3,
+      "n_events_used": 2,
+      "used_pass_events_only": true,
+      "subsample_n": 2,
+      "stability": "marginal"
+    },
+    "+0.4": {
+      "n": 20,
+      "mean_ms": 0.9037465677570236,
+      "std_ms": 0.12344507040443176,
+      "p2_5_ms": 0.7333009803839513,
+      "p97_5_ms": 1.1456442533918576,
+      "cv_percent": 13.659257452098068,
+      "n_events_total": 6,
+      "n_events_used": 4,
+      "used_pass_events_only": true,
+      "subsample_n": 3,
+      "stability": "marginal"
+    },
+    "+0.8": {
+      "n": 20,
+      "mean_ms": 0.7440393509106983,
+      "std_ms": 0.09841624071291451,
+      "p2_5_ms": 0.5227496990042666,
+      "p97_5_ms": 0.8206154664369849,
+      "cv_percent": 13.22728973843303,
+      "n_events_total": 5,
+      "n_events_used": 5,
+      "used_pass_events_only": true,
+      "subsample_n": 3,
+      "stability": "marginal"
+    }
+  },
+  "chirp_2": {
+    "+0.0": {
+      "n": 20,
+      "mean_ms": 0.8351257344282436,
+      "std_ms": 0.1348421949523484,
+      "p2_5_ms": 0.6083312755381035,
+      "p97_5_ms": 0.9863317058668231,
+      "cv_percent": 16.14633454502107,
+      "n_events_total": 5,
+      "n_events_used": 5,
+      "used_pass_events_only": true,
+      "subsample_n": 3,
+      "stability": "marginal"
+    },
+    "+0.4": {
+      "n": 20,
+      "mean_ms": 0.6726474737440069,
+      "std_ms": 0.10262140510869305,
+      "p2_5_ms": 0.575857807020607,
+      "p97_5_ms": 0.8693531460694737,
+      "cv_percent": 15.256342900909821,
+      "n_events_total": 4,
+      "n_events_used": 4,
+      "used_pass_events_only": true,
+      "subsample_n": 3,
+      "stability": "marginal"
+    },
+    "+0.8": {
+      "n": 20,
+      "mean_ms": 0.7368742220553053,
+      "std_ms": 0.07926178975128685,
+      "p2_5_ms": 0.5983720995452723,
+      "p97_5_ms": 0.8969654272509665,
+      "cv_percent": 10.756488336667305,
+      "n_events_total": 4,
+      "n_events_used": 4,
+      "used_pass_events_only": true,
+      "subsample_n": 3,
+      "stability": "marginal"
+    }
+  }
+}

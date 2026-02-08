@@ -1,0 +1,61 @@
+{
+  "timestamp": "2026-02-07T18:04:12.086537",
+  "total_comparisons": 4180,
+  "search_window_analysis": {
+    "0.1ms": {
+      "num_comparisons": 836,
+      "false_peak_rate_global": 0.7930622009569378,
+      "false_peak_rate_guided": 0.0,
+      "guided_better_rate": 0.8157894736842105,
+      "deviation_mean_global_ms": 0.9580837825534972,
+      "deviation_mean_guided_ms": 0.05594990110894237,
+      "deviation_reduction_percent": 94.16022876832086
+    },
+    "0.2ms": {
+      "num_comparisons": 836,
+      "false_peak_rate_global": 0.7930622009569378,
+      "false_peak_rate_guided": 0.0,
+      "guided_better_rate": 0.8157894736842105,
+      "deviation_mean_global_ms": 0.9580837825534972,
+      "deviation_mean_guided_ms": 0.12857539497851667,
+      "deviation_reduction_percent": 86.57994245181399
+    },
+    "0.3ms": {
+      "num_comparisons": 836,
+      "false_peak_rate_global": 0.7930622009569378,
+      "false_peak_rate_guided": 0.0,
+      "guided_better_rate": 0.7930622009569378,
+      "deviation_mean_global_ms": 0.9580837825534972,
+      "deviation_mean_guided_ms": 0.1705147883277778,
+      "deviation_reduction_percent": 82.20251804353482
+    },
+    "0.5ms": {
+      "num_comparisons": 836,
+      "false_peak_rate_global": 0.7930622009569378,
+      "false_peak_rate_guided": 0.0,
+      "guided_better_rate": 0.7930622009569378,
+      "deviation_mean_global_ms": 0.9580837825534972,
+      "deviation_mean_guided_ms": 0.21814514698022597,
+      "deviation_reduction_percent": 77.23109910087167
+    },
+    "1.0ms": {
+      "num_comparisons": 836,
+      "false_peak_rate_global": 0.7930622009569378,
+      "false_peak_rate_guided": 0.423444976076555,
+      "guided_better_rate": 0.4043062200956938,
+      "deviation_mean_global_ms": 0.9580837825534972,
+      "deviation_mean_guided_ms": 0.4128918401682874,
+      "deviation_reduction_percent": 56.90441194319742
+    }
+  },
+  "overall_comparison": {
+    "false_peak_rate_global": 0.7930622009569378,
+    "best_false_peak_rate_guided": 0.0,
+    "improvement": 100.0
+  },
+  "stability_comparison": {
+    "tau_std_global": 0.46315391799580313,
+    "tau_std_guided": 1.0864609729925605,
+    "stability_improvement": -134.57881511485033
+  }
+}

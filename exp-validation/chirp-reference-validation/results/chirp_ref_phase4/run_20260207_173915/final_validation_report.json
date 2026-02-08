@@ -1,0 +1,54 @@
+{
+  "timestamp": "2026-02-07T18:12:07.352134",
+  "phases": {
+    "phase1_tau_stability": {
+      "status": "completed",
+      "stable_params_found": false,
+      "best_stability_rate": 0.2069377990430622,
+      "best_params": "5.0s_200-4000Hz",
+      "key_findings": [
+        "No stable parameters found",
+        "High collapse rate: 91.3%"
+      ]
+    },
+    "phase2_guided_search": {
+      "status": "completed",
+      "guided_search_effective": true,
+      "best_search_window": "0.1ms",
+      "false_peak_reduction": 100.0,
+      "key_findings": [
+        "Guided search significantly reduces false peaks"
+      ]
+    },
+    "phase3_stage3_revalidation": {
+      "status": "completed",
+      "stage3_improved": true,
+      "old_pass_rate": 0.0,
+      "new_pass_rate": 14.930388862217955,
+      "improvement": 14.930388862217955,
+      "key_findings": [
+        "Moderate Stage 3 improvement: +14.9%",
+        "Primary failure reason: low_psr (1355 cases)"
+      ],
+      "failure_reasons": {
+        "low_psr": 1355,
+        "baseline_unreliable": 417
+      }
+    }
+  },
+  "overall_assessment": {
+    "phases_completed": 3,
+    "total_phases": 3,
+    "tau_stability_achieved": false,
+    "guided_search_effective": true,
+    "stage3_improved": true
+  },
+  "recommendations": [
+    "Consider alternative signals for evaluation",
+    "Review frequency band selection",
+    "Stage 3 pass rate still low - investigate alignment",
+    "Focus on improving baseline reliability",
+    "Signal quality issues - review preprocessing"
+  ],
+  "decision": "VALIDATION_NEEDS_WORK"
+}

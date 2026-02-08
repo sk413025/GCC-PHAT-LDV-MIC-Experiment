@@ -1,0 +1,55 @@
+{
+  "timestamp": "2026-02-07T18:12:05.736727",
+  "old_method": {
+    "total": 2083,
+    "passed": 0,
+    "pass_rate": 0.0,
+    "non_degradation_rate": 0.0,
+    "accurate_rate": 0.9889582333173308,
+    "high_quality_rate": 0.9121459433509361
+  },
+  "new_method": {
+    "total": 2083,
+    "passed": 311,
+    "pass_rate": 0.14930388862217955,
+    "non_degradation_rate": 1.0,
+    "accurate_rate": 0.6634661545847336,
+    "high_quality_rate": 0.14930388862217955
+  },
+  "comparison": {
+    "pass_rate_improvement": 14.930388862217955,
+    "old_pass_rate": 0.0,
+    "new_pass_rate": 14.930388862217955
+  },
+  "position_breakdown": {
+    "18": {
+      "old_pass_rate": 0.0,
+      "new_pass_rate": 7.6923076923076925
+    },
+    "19": {
+      "old_pass_rate": 0.0,
+      "new_pass_rate": 16.507177033492823
+    },
+    "20": {
+      "old_pass_rate": 0.0,
+      "new_pass_rate": 0.0
+    },
+    "21": {
+      "old_pass_rate": 0.0,
+      "new_pass_rate": 15.865384615384615
+    },
+    "22": {
+      "old_pass_rate": 0.0,
+      "new_pass_rate": 34.61538461538461
+    }
+  },
+  "failure_analysis": {
+    "old_method": {
+      "omp_degraded": 2083
+    },
+    "new_method": {
+      "low_psr": 1355,
+      "baseline_unreliable": 417
+    }
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "chirp": {
+    "+0.0": {
+      "n": 1000,
+      "mean_ms": 0.8435766381260337,
+      "std_ms": 0.13212799968681654,
+      "p2_5_ms": 0.5947423757834669,
+      "p97_5_ms": 0.9401964185351104,
+      "cv_percent": 15.662832956153547,
+      "n_events_total": 3,
+      "n_events_used": 2,
+      "used_pass_events_only": true,
+      "subsample_n": 2,
+      "stability": "marginal"
+    },
+    "+0.4": {
+      "n": 1000,
+      "mean_ms": 0.9266417913398642,
+      "std_ms": 0.11943333447126611,
+      "p2_5_ms": 0.7082283542665471,
+      "p97_5_ms": 1.1355305932344029,
+      "cv_percent": 12.88883531775242,
+      "n_events_total": 6,
+      "n_events_used": 4,
+      "used_pass_events_only": true,
+      "subsample_n": 3,
+      "stability": "marginal"
+    },
+    "+0.8": {
+      "n": 1000,
+      "mean_ms": 0.7468736966341016,
+      "std_ms": 0.13445611889901452,
+      "p2_5_ms": 0.432797746711665,
+      "p97_5_ms": 0.9733831058683899,
+      "cv_percent": 18.00252432304969,
+      "n_events_total": 5,
+      "n_events_used": 5,
+      "used_pass_events_only": true,
+      "subsample_n": 3,
+      "stability": "marginal"
+    }
+  },
+  "chirp_2": {
+    "+0.0": {
+      "n": 1000,
+      "mean_ms": 0.7839211274262206,
+      "std_ms": 0.15789186282279588,
+      "p2_5_ms": 0.5189418554507621,
+      "p97_5_ms": 1.0551469686436197,
+      "cv_percent": 20.14129448726409,
+      "n_events_total": 5,
+      "n_events_used": 5,
+      "used_pass_events_only": true,
+      "subsample_n": 3,
+      "stability": "unstable"
+    },
+    "+0.4": {
+      "n": 1000,
+      "mean_ms": 0.657059594605451,
+      "std_ms": 0.08995954434669377,
+      "p2_5_ms": 0.5914955001448504,
+      "p97_5_ms": 0.8693531460694738,
+      "cv_percent": 13.69123061062861,
+      "n_events_total": 4,
+      "n_events_used": 4,
+      "used_pass_events_only": true,
+      "subsample_n": 3,
+      "stability": "marginal"
+    },
+    "+0.8": {
+      "n": 1000,
+      "mean_ms": 0.7481305984558271,
+      "std_ms": 0.07748054415330084,
+      "p2_5_ms": 0.6423645873498715,
+      "p97_5_ms": 0.9157600401619139,
+      "cv_percent": 10.356553296072093,
+      "n_events_total": 4,
+      "n_events_used": 4,
+      "used_pass_events_only": true,
+      "subsample_n": 3,
+      "stability": "marginal"
+    }
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "timestamp": "2026-02-07T16:25:13.723323",
+  "summary": {
+    "n_positions": 5,
+    "n_both_reliable": 3,
+    "n_geometric_fallback": 2,
+    "max_discrepancy_ms": 0.11458333333333326,
+    "mean_discrepancy_ms": 0.05902777777777778
+  },
+  "positions": {
+    "+0.0": {
+      "chirp_tau_ms": 0.020833333333333332,
+      "chirp2_tau_ms": 0.0,
+      "geometric_tau_ms": 0.0,
+      "chirp_reliable": true,
+      "chirp2_reliable": true,
+      "chirp_events_used": 2,
+      "chirp2_events_used": 5,
+      "discrepancy_ms": 0.020833333333333332,
+      "mean_tau_ms": 0.010416666666666666,
+      "chirp_vs_geom_ms": 0.020833333333333332,
+      "chirp2_vs_geom_ms": 0.0,
+      "reference_source": "chirp_mean",
+      "reference_tau_ms": 0.010416666666666666
+    },
+    "+0.4": {
+      "chirp_tau_ms": 0.75,
+      "chirp2_tau_ms": 0.8645833333333333,
+      "geometric_tau_ms": 0.7585061238687961,
+      "chirp_reliable": true,
+      "chirp2_reliable": true,
+      "chirp_events_used": 4,
+      "chirp2_events_used": 4,
+      "discrepancy_ms": 0.11458333333333326,
+      "mean_tau_ms": 0.8072916666666666,
+      "chirp_vs_geom_ms": 0.008506123868796123,
+      "chirp2_vs_geom_ms": 0.10607720946453714,
+      "reference_source": "chirp_mean",
+      "reference_tau_ms": 0.8072916666666666
+    },
+    "+0.8": {
+      "chirp_tau_ms": 1.5625,
+      "chirp2_tau_ms": 1.5208333333333333,
+      "geometric_tau_ms": 1.450441867492482,
+      "chirp_reliable": true,
+      "chirp2_reliable": true,
+      "chirp_events_used": 5,
+      "chirp2_events_used": 4,
+      "discrepancy_ms": 0.04166666666666674,
+      "mean_tau_ms": 1.5416666666666665,
+      "chirp_vs_geom_ms": 0.11205813250751806,
+      "chirp2_vs_geom_ms": 0.07039146584085132,
+      "reference_source": "chirp_mean",
+      "reference_tau_ms": 1.5416666666666665
+    },
+    "-0.4": {
+      "chirp_tau_ms": -0.3125,
+      "chirp2_tau_ms": -0.3958333333333333,
+      "geometric_tau_ms": -0.7585061238687961,
+      "chirp_reliable": false,
+      "chirp2_reliable": false,
+      "chirp_events_used": 0,
+      "chirp2_events_used": 0,
+      "discrepancy_ms": 0.08333333333333331,
+      "mean_tau_ms": -0.35416666666666663,
+      "chirp_vs_geom_ms": 0.4460061238687961,
+      "chirp2_vs_geom_ms": 0.3626727905354628,
+      "reference_source": "geometric_fallback",
+      "reference_tau_ms": -0.7585061238687961
+    },
+    "-0.8": {
+      "chirp_tau_ms": -1.1875,
+      "chirp2_tau_ms": -1.0,
+      "geometric_tau_ms": -1.450441867492482,
+      "chirp_reliable": false,
+      "chirp2_reliable": false,
+      "chirp_events_used": 1,
+      "chirp2_events_used": 0,
+      "discrepancy_ms": 0.1875,
+      "mean_tau_ms": -1.09375,
+      "chirp_vs_geom_ms": 0.26294186749248194,
+      "chirp2_vs_geom_ms": 0.45044186749248194,
+      "reference_source": "geometric_fallback",
+      "reference_tau_ms": -1.450441867492482
+    }
+  },
+  "sensor_delays": {
+    "chirp": {
+      "LEFT-MIC": 0.0,
+      "RIGHT-MIC": -0.005230004338069937,
+      "LDV": 0.8679419649676854
+    },
+    "chirp_2": {
+      "LEFT-MIC": 0.0,
+      "RIGHT-MIC": -0.04329620398924498,
+      "LDV": 0.6832645121428178
+    }
+  }
+}

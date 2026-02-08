@@ -1,0 +1,175 @@
+{
+  "timestamp": "2026-02-07T17:10:21.968655",
+  "total_segments": 46350,
+  "valid_segments": 46350,
+  "parameter_analysis": {
+    "0.5s_100-8000Hz": {
+      "window_size": 0.5,
+      "freq_band": "100-8000Hz",
+      "num_segments": 8356,
+      "deviation_mean_ms": 1.0605613087261445,
+      "deviation_std_ms": 0.7535813326410004,
+      "stability_rate": 0.1992580181905218,
+      "psr_mean_db": 8.91225774502623
+    },
+    "0.5s_200-4000Hz": {
+      "window_size": 0.5,
+      "freq_band": "200-4000Hz",
+      "num_segments": 8356,
+      "deviation_mean_ms": 0.9685385070505068,
+      "deviation_std_ms": 0.6381752035080135,
+      "stability_rate": 0.20081378650071804,
+      "psr_mean_db": 14.07245592087625
+    },
+    "0.5s_500-2000Hz": {
+      "window_size": 0.5,
+      "freq_band": "500-2000Hz",
+      "num_segments": 8356,
+      "deviation_mean_ms": 0.9176219982231753,
+      "deviation_std_ms": 0.56294946213366,
+      "stability_rate": 0.20093346098611775,
+      "psr_mean_db": 23.83165157559763
+    },
+    "1.0s_100-8000Hz": {
+      "window_size": 1.0,
+      "freq_band": "100-8000Hz",
+      "num_segments": 4175,
+      "deviation_mean_ms": 1.0643065837894503,
+      "deviation_std_ms": 0.7550853420473296,
+      "stability_rate": 0.19880239520958085,
+      "psr_mean_db": 8.589636518395038
+    },
+    "1.0s_200-4000Hz": {
+      "window_size": 1.0,
+      "freq_band": "200-4000Hz",
+      "num_segments": 4175,
+      "deviation_mean_ms": 0.9690771206178151,
+      "deviation_std_ms": 0.630178262920784,
+      "stability_rate": 0.1992814371257485,
+      "psr_mean_db": 13.658495920332676
+    },
+    "1.0s_500-2000Hz": {
+      "window_size": 1.0,
+      "freq_band": "500-2000Hz",
+      "num_segments": 4175,
+      "deviation_mean_ms": 0.9206117231703717,
+      "deviation_std_ms": 0.5611386318769416,
+      "stability_rate": 0.19856287425149702,
+      "psr_mean_db": 23.311042007930524
+    },
+    "2.0s_100-8000Hz": {
+      "window_size": 2.0,
+      "freq_band": "100-8000Hz",
+      "num_segments": 2083,
+      "deviation_mean_ms": 1.0616464046755927,
+      "deviation_std_ms": 0.7424339965368091,
+      "stability_rate": 0.19923187710033605,
+      "psr_mean_db": 8.503251446522158
+    },
+    "2.0s_200-4000Hz": {
+      "window_size": 2.0,
+      "freq_band": "200-4000Hz",
+      "num_segments": 2083,
+      "deviation_mean_ms": 0.9841416039284877,
+      "deviation_std_ms": 0.648573953839514,
+      "stability_rate": 0.1982717234757561,
+      "psr_mean_db": 13.108972068051036
+    },
+    "2.0s_500-2000Hz": {
+      "window_size": 2.0,
+      "freq_band": "500-2000Hz",
+      "num_segments": 2083,
+      "deviation_mean_ms": 0.9205838768529401,
+      "deviation_std_ms": 0.56412758494773,
+      "stability_rate": 0.20067210753720593,
+      "psr_mean_db": 22.44272943012321
+    },
+    "5.0s_100-8000Hz": {
+      "window_size": 5.0,
+      "freq_band": "100-8000Hz",
+      "num_segments": 836,
+      "deviation_mean_ms": 1.0711659648975465,
+      "deviation_std_ms": 0.7435082041963588,
+      "stability_rate": 0.1985645933014354,
+      "psr_mean_db": 7.9451639594882355
+    },
+    "5.0s_200-4000Hz": {
+      "window_size": 5.0,
+      "freq_band": "200-4000Hz",
+      "num_segments": 836,
+      "deviation_mean_ms": 0.9580837825534972,
+      "deviation_std_ms": 0.634419024983836,
+      "stability_rate": 0.2069377990430622,
+      "psr_mean_db": 12.891298128993416
+    },
+    "5.0s_500-2000Hz": {
+      "window_size": 5.0,
+      "freq_band": "500-2000Hz",
+      "num_segments": 836,
+      "deviation_mean_ms": 0.9203207260041067,
+      "deviation_std_ms": 0.5644596648367247,
+      "stability_rate": 0.19976076555023922,
+      "psr_mean_db": 22.06777065091108
+    }
+  },
+  "position_analysis": {
+    "18": {
+      "num_segments": 9261,
+      "deviation_mean_ms": 1.6943464153795702,
+      "deviation_std_ms": 0.48393330072724494,
+      "stability_rate": 0.0,
+      "chirp_reference_ms": 1.5416666666666665
+    },
+    "19": {
+      "num_segments": 9297,
+      "deviation_mean_ms": 0.9516397702698253,
+      "deviation_std_ms": 0.4714431091107247,
+      "stability_rate": 0.0,
+      "chirp_reference_ms": 0.8072916666666666
+    },
+    "20": {
+      "num_segments": 9273,
+      "deviation_mean_ms": 0.15497249861868972,
+      "deviation_std_ms": 0.4700584437163721,
+      "stability_rate": 0.9143750673999784,
+      "chirp_reference_ms": 0.010416666666666666
+    },
+    "21": {
+      "num_segments": 9261,
+      "deviation_mean_ms": 0.7727132885068617,
+      "deviation_std_ms": 0.047152852972090306,
+      "stability_rate": 0.00010797969981643452,
+      "chirp_reference_ms": -0.7585061238687961
+    },
+    "22": {
+      "num_segments": 9258,
+      "deviation_mean_ms": 1.3467959710037531,
+      "deviation_std_ms": 0.3404039910646989,
+      "stability_rate": 0.08479153164830416,
+      "chirp_reference_ms": -1.450441867492482
+    }
+  },
+  "collapse_analysis": {
+    "threshold_ms": 0.1,
+    "total_collapse_cases": 42312,
+    "collapse_rate": 0.9128802588996764,
+    "by_window_size": {
+      "0.5s": 0.9165868836764002,
+      "1.0s": 0.912814371257485,
+      "2.0s": 0.9019043046887502,
+      "5.0s": 0.9035087719298246
+    },
+    "by_freq_band": {
+      "500-2000Hz": 0.9922977346278317,
+      "200-4000Hz": 0.9274433656957929,
+      "100-8000Hz": 0.8188996763754045
+    }
+  },
+  "chirp_references_ms": {
+    "18": 1.5416666666666665,
+    "19": 0.8072916666666666,
+    "20": 0.010416666666666666,
+    "21": -0.7585061238687961,
+    "22": -1.450441867492482
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-02-07T16:25:13.724323",
+  "references": {
+    "18": 1.5416666666666665,
+    "19": 0.8072916666666666,
+    "20": 0.010416666666666666
+  },
+  "position_mapping": {
+    "18": "+0.8",
+    "19": "+0.4",
+    "20": "+0.0",
+    "21": "-0.4",
+    "22": "-0.8"
+  },
+  "allow_geometric_fallback": false,
+  "dataset_root": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation"
+}
