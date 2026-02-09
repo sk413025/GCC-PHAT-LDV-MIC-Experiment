@@ -399,6 +399,8 @@ OMP_LDV = Σ coeffs[k] * Dict[:, selected_lags[k], :]
   - `scripts/stage3_multi_segment.py`
   - `scripts/stage4_doa_validation.py`
 - 計畫文件：`EXPERIMENT_PLAN.md`, `STAGE_VALIDATION_PLAN.md`
+- 重現紀錄：
+  - `experiments/LDVPG-20260209-S4C-fullchain-repro-62a51617.md`（Stage 4-C 兩列 full-chain 重現 runbook）
 
 ---
 
