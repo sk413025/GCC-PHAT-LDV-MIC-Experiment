@@ -1,0 +1,27 @@
+{
+  "18-0.1V": {
+    "ldv": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\GCC-PHAT-LDV-MIC-Experiment\\18-0.1V\\0128-LDV-18-boy-320.wav",
+    "mic_left": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\GCC-PHAT-LDV-MIC-Experiment\\18-0.1V\\0128-LEFT-MIC-18-boy-320.wav",
+    "mic_right": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\GCC-PHAT-LDV-MIC-Experiment\\18-0.1V\\0128-RIGHT-MIC-18-boy-320.wav"
+  },
+  "19-0.1V": {
+    "ldv": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\GCC-PHAT-LDV-MIC-Experiment\\19-0.1V\\0128-LDV-19-boy-320.wav",
+    "mic_left": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\GCC-PHAT-LDV-MIC-Experiment\\19-0.1V\\0128-LEFT-MIC-19-boy-320.wav",
+    "mic_right": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\GCC-PHAT-LDV-MIC-Experiment\\19-0.1V\\0128-RIGHT-MIC-19-boy-320.wav"
+  },
+  "20-0.1V": {
+    "ldv": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\GCC-PHAT-LDV-MIC-Experiment\\20-0.1V\\0128-LDV-20-boy-320.wav",
+    "mic_left": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\GCC-PHAT-LDV-MIC-Experiment\\20-0.1V\\0128-LEFT-MIC-20-boy-320.wav",
+    "mic_right": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\GCC-PHAT-LDV-MIC-Experiment\\20-0.1V\\0128-RIGHT-MIC-20-boy-320.wav"
+  },
+  "21-0.1V": {
+    "ldv": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\GCC-PHAT-LDV-MIC-Experiment\\21-0.1V\\0128-LDV-21-boy-320.wav",
+    "mic_left": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\GCC-PHAT-LDV-MIC-Experiment\\21-0.1V\\0128-LEFT-MIC-21-boy-320.wav",
+    "mic_right": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\GCC-PHAT-LDV-MIC-Experiment\\21-0.1V\\0128-RIGHT-MIC-21-boy-320.wav"
+  },
+  "22-0.1V": {
+    "ldv": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\GCC-PHAT-LDV-MIC-Experiment\\22-0.1V\\0128-LDV-22-boy-320.wav",
+    "mic_left": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\GCC-PHAT-LDV-MIC-Experiment\\22-0.1V\\0128-LEFT-MIC-22-boy-320.wav",
+    "mic_right": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\dataset\\GCC-PHAT-LDV-MIC-Experiment\\22-0.1V\\0128-RIGHT-MIC-22-boy-320.wav"
+  }
+}

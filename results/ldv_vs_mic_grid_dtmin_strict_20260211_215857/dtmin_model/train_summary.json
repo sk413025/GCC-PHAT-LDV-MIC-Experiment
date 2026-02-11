@@ -1,0 +1,14 @@
+{
+  "generated": "2026-02-11T22:00:36.855258",
+  "traj_path": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\worktree\\exp-ldv-vs-mic-doa-comparison\\results\\ldv_vs_mic_grid_dtmin_strict_20260211_215857\\teacher_trajectories\\lag_trajectories.npz",
+  "n_samples": 25300,
+  "horizon": 3,
+  "n_lags": 101,
+  "model_type": "nearest_centroid_stepwise",
+  "non_empty_actions_per_step": [
+    101,
+    101,
+    101
+  ],
+  "model_path": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\worktree\\exp-ldv-vs-mic-doa-comparison\\results\\ldv_vs_mic_grid_dtmin_strict_20260211_215857\\dtmin_model\\model_dtmin_policy_k3.npz"
+}

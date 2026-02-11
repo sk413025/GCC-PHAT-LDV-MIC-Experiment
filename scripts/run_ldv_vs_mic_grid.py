@@ -143,12 +143,12 @@ def write_grid_summary(output_base: Path, grid_rows: list[dict]) -> None:
     lines = []
     lines.append("# LDV-vs-Mic Grid Summary (GCC-PHAT)")
     lines.append("")
-    lines.append("| truth_type | config | tau_err_max_ms | bandpass | pass_mode | pass_count | failing_speakers | run_dir |")
-    lines.append("| --- | --- | --- | --- | --- | --- | --- | --- |")
+    lines.append("| truth_type | config | tau_err_max_ms | bandpass | pass_mode | alignment_mode | pass_count | failing_speakers | run_dir |")
+    lines.append("| --- | --- | --- | --- | --- | --- | --- | --- | --- |")
     for row in grid_rows:
         lines.append(
             f"| {row['truth_type']} | {row['label']} | {row['tau_err_max_ms']} | "
-            f"{row['bandpass_low']}-{row['bandpass_high']} | {row.get('pass_mode', 'NA')} | {row['pass_count']} | "
+            f"{row['bandpass_low']}-{row['bandpass_high']} | {row.get('pass_mode', 'NA')} | {row.get('alignment_mode', 'omp')} | {row['pass_count']} | "
             f"{', '.join(row['failing_speakers'])} | {row['run_dir']} |"
         )
     (output_base / "grid_summary.md").write_text("\n".join(lines), encoding="utf-8")
@@ -170,12 +170,12 @@ def write_grid_report(output_base: Path, grid_rows: list[dict], data_root: Path,
     lines.append("")
     lines.append("## Grid Summary")
     lines.append("")
-    lines.append("| truth_type | config | tau_err_max_ms | bandpass | pass_mode | pass_count | failing_speakers | run_dir |")
-    lines.append("| --- | --- | --- | --- | --- | --- | --- | --- |")
+    lines.append("| truth_type | config | tau_err_max_ms | bandpass | pass_mode | alignment_mode | pass_count | failing_speakers | run_dir |")
+    lines.append("| --- | --- | --- | --- | --- | --- | --- | --- | --- |")
     for row in grid_rows:
         lines.append(
             f"| {row['truth_type']} | {row['label']} | {row['tau_err_max_ms']} | "
-            f"{row['bandpass_low']}-{row['bandpass_high']} | {row.get('pass_mode', 'NA')} | {row['pass_count']} | "
+            f"{row['bandpass_low']}-{row['bandpass_high']} | {row.get('pass_mode', 'NA')} | {row.get('alignment_mode', 'omp')} | {row['pass_count']} | "
             f"{', '.join(row['failing_speakers'])} | {row['run_dir']} |"
         )
     lines.append("")
@@ -192,6 +192,9 @@ def main() -> None:
     parser.add_argument("--speakers", type=str, nargs="+", default=["18-0.1V", "19-0.1V", "20-0.1V", "21-0.1V", "22-0.1V"])
     parser.add_argument("--output_base", type=str, required=True, help="Base output directory")
     parser.add_argument("--chirp_truth_file", type=str, default=None, help="Path to chirp truth JSON")
+    parser.add_argument("--alignment_mode", type=str, choices=["omp", "dtmin"], default="omp")
+    parser.add_argument("--dtmin_model_path", type=str, default=None)
+    parser.add_argument("--max_k", type=int, default=3)
     parser.add_argument("--skip_smoke", action="store_true")
     parser.add_argument("--skip_guardrail", action="store_true")
     parser.add_argument("--debug", action="store_true")
@@ -288,11 +291,19 @@ def main() -> None:
                 str(cfg["bandpass_high"]),
                 "--ldv_prealign",
                 "gcc_phat",
+                "--alignment_mode",
+                str(args.alignment_mode),
+                "--max_k",
+                str(int(args.max_k)),
                 "--pass_theta_max_deg",
                 "5.0",
                 "--pass_mode",
                 pass_mode,
             ]
+            if cfg["signal_pair"] == "ldv_micl" and args.alignment_mode == "dtmin":
+                if not args.dtmin_model_path:
+                    raise ValueError("--alignment_mode dtmin requires --dtmin_model_path")
+                args_list += ["--dtmin_model_path", str(args.dtmin_model_path)]
 
             if cfg["truth_type"] == "chirp":
                 if not chirp_truth or "truth_ref" not in chirp_truth:
@@ -321,6 +332,9 @@ def main() -> None:
         run_config = {
             "config": cfg,
             "pass_mode": pass_mode,
+            "alignment_mode": str(args.alignment_mode),
+            "dtmin_model_path": None if args.dtmin_model_path is None else str(args.dtmin_model_path),
+            "max_k": int(args.max_k),
             "speakers": speakers,
             "segment_mode": "scan",
             "analysis_slice_sec": 5,
@@ -351,6 +365,7 @@ def main() -> None:
                 "bandpass_low": cfg["bandpass_low"],
                 "bandpass_high": cfg["bandpass_high"],
                 "pass_mode": pass_mode,
+                "alignment_mode": str(args.alignment_mode),
                 "pass_count": pass_count,
                 "failing_speakers": failing,
                 "run_dir": str(run_dir),
@@ -387,7 +402,12 @@ def main() -> None:
                 "1",
                 "--ldv_prealign",
                 "gcc_phat",
+                "--alignment_mode",
+                str(args.alignment_mode),
+                "--max_k",
+                str(int(args.max_k)),
             ]
+            + (["--dtmin_model_path", str(args.dtmin_model_path)] if args.alignment_mode == "dtmin" and args.dtmin_model_path else [])
         )
 
         smoke_dir = output_base / "smoke_micl_micr_chirp"
@@ -440,7 +460,12 @@ def main() -> None:
                 "--eval_window_sec",
                 "1",
                 "--use_geometry_truth",
+                "--alignment_mode",
+                str(args.alignment_mode),
+                "--max_k",
+                str(int(args.max_k)),
             ]
+            + (["--dtmin_model_path", str(args.dtmin_model_path)] if args.alignment_mode == "dtmin" and args.dtmin_model_path else [])
         )
 
     if not args.skip_guardrail:

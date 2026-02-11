@@ -1,0 +1,2 @@
+2026-02-11 22:00:36,862 - INFO - Saved model: C:\Users\Jenner\Documents\SBP Lab\LDVReorientation\worktree\exp-ldv-vs-mic-doa-comparison\results\ldv_vs_mic_grid_dtmin_strict_20260211_215857\dtmin_model\model_dtmin_policy_k3.npz
+2026-02-11 22:00:36,863 - INFO - Non-empty actions per step: [101, 101, 101]

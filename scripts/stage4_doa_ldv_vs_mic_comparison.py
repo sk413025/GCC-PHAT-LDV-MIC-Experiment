@@ -49,6 +49,8 @@ DEFAULT_CONFIG = {
     "segment_spacing_sec": 50.0,
     "segment_offset_sec": 100.0,
     "ldv_prealign": "none",
+    "alignment_mode": "omp",
+    "dtmin_model_path": None,
     "speed_of_sound": 343.0,
     "mic_spacing": 1.4,
 }
@@ -326,6 +328,100 @@ def omp_single_freq(Dict_f: np.ndarray, Y_f: np.ndarray, max_k: int) -> tuple[li
     return selected_lags, coeffs, reconstructed
 
 
+def load_dtmin_policy(model_path: str, *, expected_k: int, expected_n_lags: int) -> dict:
+    payload = np.load(model_path, allow_pickle=False)
+    centroids = payload["centroids"]
+    action_valid = payload["action_valid"]
+    metadata = {}
+    if "metadata_json" in payload:
+        metadata = json.loads(str(payload["metadata_json"]))
+
+    if centroids.ndim != 3:
+        raise ValueError(f"Invalid centroids shape {centroids.shape}; expected (K, n_lags, n_lags)")
+    if action_valid.ndim != 2:
+        raise ValueError(f"Invalid action_valid shape {action_valid.shape}; expected (K, n_lags)")
+    if centroids.shape[0] < expected_k:
+        raise ValueError(f"Model K={centroids.shape[0]} < required max_k={expected_k}")
+    if centroids.shape[1] != expected_n_lags or centroids.shape[2] != expected_n_lags:
+        raise ValueError(
+            "Model lag shape mismatch: "
+            f"centroids={centroids.shape}, expected_n_lags={expected_n_lags}"
+        )
+    if action_valid.shape[0] < expected_k or action_valid.shape[1] != expected_n_lags:
+        raise ValueError(
+            "Model action mask mismatch: "
+            f"action_valid={action_valid.shape}, expected=({expected_k}, {expected_n_lags})"
+        )
+    return {"centroids": centroids, "action_valid": action_valid, "metadata": metadata}
+
+
+def select_lag_dtmin(
+    obs: np.ndarray,
+    *,
+    step_idx: int,
+    selected_lags: list[int],
+    policy: dict | None,
+) -> int:
+    # Fallback behavior when no policy is available for this step.
+    def fallback() -> int:
+        scores = obs.copy()
+        for lag in selected_lags:
+            scores[lag] = -np.inf
+        return int(np.argmax(scores))
+
+    if policy is None:
+        return fallback()
+    if step_idx >= policy["centroids"].shape[0]:
+        return fallback()
+
+    centroids = policy["centroids"][step_idx]
+    action_valid = policy["action_valid"][step_idx]
+    if not np.any(action_valid):
+        return fallback()
+
+    dists = np.linalg.norm(centroids - obs[np.newaxis, :], axis=1)
+    dists = np.where(action_valid, dists, np.inf)
+    for lag in selected_lags:
+        dists[lag] = np.inf
+    if not np.isfinite(dists).any():
+        return fallback()
+    return int(np.argmin(dists))
+
+
+def dtmin_single_freq(
+    Dict_f: np.ndarray,
+    Y_f: np.ndarray,
+    max_k: int,
+    policy: dict | None,
+) -> tuple[list[int], np.ndarray | None, np.ndarray]:
+    n_lags, _ = Dict_f.shape
+    D = Dict_f.T
+    D_norms = np.linalg.norm(np.abs(D), axis=0, keepdims=True) + 1e-10
+    D_normalized = D / D_norms
+    residual = Y_f.copy()
+    selected_lags: list[int] = []
+    coeffs = None
+    reconstructed = np.zeros_like(Y_f)
+    for step_idx in range(max_k):
+        corrs = np.abs(D_normalized.conj().T @ residual).astype(np.float64, copy=False)
+        best_lag = select_lag_dtmin(corrs, step_idx=step_idx, selected_lags=selected_lags, policy=policy)
+        if best_lag in selected_lags:
+            # Safety guard; fallback chooser should already avoid duplicates.
+            fallback = np.argsort(-corrs)
+            for cand in fallback:
+                if int(cand) not in selected_lags:
+                    best_lag = int(cand)
+                    break
+        selected_lags.append(best_lag)
+        if len(selected_lags) > n_lags:
+            break
+        A = D[:, selected_lags]
+        coeffs, _, _, _ = np.linalg.lstsq(A, Y_f, rcond=None)
+        reconstructed = A @ coeffs
+        residual = Y_f - reconstructed
+    return selected_lags, coeffs, reconstructed
+
+
 def apply_omp_alignment(Zxx_ldv: np.ndarray, Zxx_mic: np.ndarray, config: dict, start_t: int) -> np.ndarray:
     max_lag = int(config["max_lag"])
     max_k = int(config["max_k"])
@@ -362,6 +458,46 @@ def apply_omp_alignment(Zxx_ldv: np.ndarray, Zxx_mic: np.ndarray, config: dict, 
         Zxx_omp[freq_indices[f_idx], start_t : start_t + tw] = reconstructed_orig
 
     return Zxx_omp
+
+
+def apply_dtmin_alignment(
+    Zxx_ldv: np.ndarray,
+    Zxx_mic: np.ndarray,
+    config: dict,
+    start_t: int,
+    policy: dict,
+) -> np.ndarray:
+    max_lag = int(config["max_lag"])
+    max_k = int(config["max_k"])
+    tw = int(config["tw"])
+    freq_min = float(config["freq_min"])
+    freq_max = float(config["freq_max"])
+    fs = int(config["fs"])
+    n_fft = int(config["n_fft"])
+
+    freqs = np.fft.rfftfreq(n_fft, 1 / fs)
+    freq_mask = (freqs >= freq_min) & (freqs <= freq_max)
+    freq_indices = np.where(freq_mask)[0]
+
+    Dict_full = build_lagged_dictionary(Zxx_ldv, max_lag, tw, start_t)
+    Dict_selected = Dict_full[freq_mask, :, :]
+
+    Zxx_aligned = Zxx_ldv.copy()
+    for f_idx in range(len(freq_indices)):
+        Dict_f = Dict_selected[f_idx]
+        Y_f = Zxx_mic[freq_indices[f_idx], start_t : start_t + tw]
+
+        Dict_norm, _ = normalize_per_freq_maxabs(Dict_f)
+        Y_norm, _ = normalize_per_freq_maxabs(Y_f)
+        selected_lags, _, _ = dtmin_single_freq(Dict_norm, Y_norm, max_k, policy)
+
+        D_orig = Dict_selected[f_idx].T
+        A = D_orig[:, selected_lags]
+        Y_orig = Zxx_mic[freq_indices[f_idx], start_t : start_t + tw]
+        coeffs_orig, _, _, _ = np.linalg.lstsq(A, Y_orig, rcond=None)
+        reconstructed_orig = A @ coeffs_orig
+        Zxx_aligned[freq_indices[f_idx], start_t : start_t + tw] = reconstructed_orig
+    return Zxx_aligned
 
 
 # -----------------------------------------------------------------------------
@@ -540,6 +676,8 @@ def run_stage4_evaluation(
     pass_psr_min_db: float | None,
     pass_mode: str,
     speaker_key_override: str | None,
+    alignment_mode: str,
+    dtmin_model_path: str | None,
 ) -> dict:
     logger.info("=" * 70)
     logger.info("Stage 4: LDV-vs-Mic DoA (GCC-PHAT)")
@@ -548,6 +686,7 @@ def run_stage4_evaluation(
     speaker_id = Path(ldv_path).parent.name
     logger.info("Speaker: %s", speaker_id)
     logger.info("Signal pair: %s", signal_pair)
+    logger.info("Alignment mode: %s", alignment_mode)
 
     ground_truth = compute_ground_truth(speaker_key_override or speaker_id, config)
     tau_geom_ms = float(ground_truth["tau_true_ms"])
@@ -574,6 +713,19 @@ def run_stage4_evaluation(
     if effective_pass_mode not in {"omp_vs_raw", "theta_only"}:
         raise ValueError(f"Invalid pass_mode: {pass_mode}")
     logger.info("Pass mode: %s", effective_pass_mode)
+
+    if alignment_mode not in {"omp", "dtmin"}:
+        raise ValueError(f"Invalid alignment_mode={alignment_mode!r} (expected: omp|dtmin)")
+    dtmin_policy = None
+    if signal_pair == "ldv_micl" and alignment_mode == "dtmin":
+        if not dtmin_model_path:
+            raise ValueError("alignment_mode=dtmin requires dtmin_model_path")
+        n_lags = 2 * int(config["max_lag"]) + 1
+        dtmin_policy = load_dtmin_policy(
+            dtmin_model_path,
+            expected_k=int(config["max_k"]),
+            expected_n_lags=n_lags,
+        )
 
     sr_ldv, ldv_signal = load_wav(ldv_path)
     sr_mic_l, mic_left_signal = load_wav(mic_left_path)
@@ -755,7 +907,10 @@ def run_stage4_evaluation(
                     f"need > {(tw + 2 * max_lag) * config['hop_length'] / config['fs']:.3f}s of STFT support"
                 )
 
-            Zxx_omp = apply_omp_alignment(Zxx_ldv, Zxx_mic_left, config, start_t)
+            if alignment_mode == "omp":
+                Zxx_omp = apply_omp_alignment(Zxx_ldv, Zxx_mic_left, config, start_t)
+            else:
+                Zxx_omp = apply_dtmin_alignment(Zxx_ldv, Zxx_mic_left, config, start_t, dtmin_policy)
             _, ldv_omp_td = istft(
                 Zxx_omp,
                 fs=config["fs"],
@@ -847,9 +1002,13 @@ def run_stage4_evaluation(
         passed = bool(omp_better_than_raw and omp_error_small and psr_min_ok)
         pass_conditions = {
             "pass_mode": "omp_vs_raw",
+            "alignment_mode": alignment_mode,
             "omp_better_than_raw": omp_better_than_raw,
+            "aligned_better_than_raw": omp_better_than_raw,
             "omp_error_small": omp_error_small,
+            "aligned_error_small": omp_error_small,
             "omp_psr_improved": bool(psr_median > raw_summary["psr_median_db"]),
+            "aligned_psr_improved": bool(psr_median > raw_summary["psr_median_db"]),
             "psr_min_db": None if pass_psr_min_db is None else float(pass_psr_min_db),
             "psr_min_ok": psr_min_ok,
             "passed": passed,
@@ -859,6 +1018,7 @@ def run_stage4_evaluation(
         passed = bool(theta_error_small and psr_min_ok)
         pass_conditions = {
             "pass_mode": "theta_only",
+            "alignment_mode": alignment_mode,
             "theta_error_small": theta_error_small,
             "psr_min_db": None if pass_psr_min_db is None else float(pass_psr_min_db),
             "psr_min_ok": psr_min_ok,
@@ -869,7 +1029,7 @@ def run_stage4_evaluation(
         "speaker_id": speaker_id,
         "signal_pair": signal_pair,
         "pair_description": (
-            "LDV aligned to MicL (OMP) paired with MicR"
+            f"LDV aligned to MicL ({alignment_mode.upper()}) paired with MicR"
             if signal_pair == "ldv_micl"
             else "MicL-MicR"
         ),
@@ -885,6 +1045,9 @@ def run_stage4_evaluation(
         "scan_summary": scan_summary,
         "segment_centers_sec": segment_centers_sec,
         "ldv_prealign": ldv_prealign,
+        "alignment_mode": alignment_mode,
+        "dtmin_model_path": None if dtmin_model_path is None else str(dtmin_model_path),
+        "dtmin_model_metadata": None if dtmin_policy is None else dtmin_policy.get("metadata"),
         "config": config,
         "result": {
             "tau_median_ms": tau_median,
@@ -948,6 +1111,9 @@ def main() -> None:
     parser.add_argument("--gcc_guided_peak_radius_ms", type=float, default=None)
     parser.add_argument("--psr_exclude_samples", type=int, default=None)
     parser.add_argument("--ldv_prealign", type=str, choices=["none", "gcc_phat"], default=None)
+    parser.add_argument("--alignment_mode", type=str, choices=["omp", "dtmin"], default=None)
+    parser.add_argument("--dtmin_model_path", type=str, default=None)
+    parser.add_argument("--max_k", type=int, default=None)
 
     parser.add_argument("--truth_tau_ms", type=float, default=None)
     parser.add_argument("--truth_theta_deg", type=float, default=None)
@@ -995,6 +1161,12 @@ def main() -> None:
         config["psr_exclude_samples"] = int(args.psr_exclude_samples)
     if args.ldv_prealign is not None:
         config["ldv_prealign"] = str(args.ldv_prealign)
+    if args.alignment_mode is not None:
+        config["alignment_mode"] = str(args.alignment_mode)
+    if args.dtmin_model_path is not None:
+        config["dtmin_model_path"] = str(args.dtmin_model_path)
+    if args.max_k is not None:
+        config["max_k"] = int(args.max_k)
 
     truth_tau_ms = None if args.use_geometry_truth else args.truth_tau_ms
     truth_theta_deg = None if args.use_geometry_truth else args.truth_theta_deg
@@ -1034,6 +1206,8 @@ def main() -> None:
             pass_psr_min_db=args.pass_psr_min_db,
             pass_mode=args.pass_mode,
             speaker_key_override=args.speaker_key,
+            alignment_mode=str(config.get("alignment_mode", "omp")),
+            dtmin_model_path=config.get("dtmin_model_path"),
         )
     except Exception as exc:
         logger.exception("Run failed: %s", exc)

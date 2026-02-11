@@ -1,0 +1,9 @@
+2026-02-11 21:59:19,813 - INFO - Speakers: ['18-0.1V', '19-0.1V', '20-0.1V', '21-0.1V', '22-0.1V']
+2026-02-11 21:59:19,813 - INFO - Config: max_k=3, n_lags=101, n_freq_selected=1012
+2026-02-11 21:59:21,234 - INFO - 18-0.1V: 5 segments
+2026-02-11 21:59:31,375 - INFO - 19-0.1V: 5 segments
+2026-02-11 21:59:41,543 - INFO - 20-0.1V: 5 segments
+2026-02-11 21:59:51,827 - INFO - 21-0.1V: 5 segments
+2026-02-11 22:00:02,142 - INFO - 22-0.1V: 5 segments
+2026-02-11 22:00:12,559 - INFO - Saved trajectories: C:\Users\Jenner\Documents\SBP Lab\LDVReorientation\worktree\exp-ldv-vs-mic-doa-comparison\results\ldv_vs_mic_grid_dtmin_strict_20260211_215857\teacher_trajectories\lag_trajectories.npz
+2026-02-11 22:00:12,560 - INFO - n_samples=25300, max_k=3, n_lags=101

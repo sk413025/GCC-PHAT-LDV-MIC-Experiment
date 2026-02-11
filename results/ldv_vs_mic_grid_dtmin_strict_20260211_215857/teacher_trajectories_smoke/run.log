@@ -1,0 +1,5 @@
+2026-02-11 21:59:07,258 - INFO - Speakers: ['20-0.1V']
+2026-02-11 21:59:07,258 - INFO - Config: max_k=3, n_lags=101, n_freq_selected=1012
+2026-02-11 21:59:08,695 - INFO - 20-0.1V: 1 segments
+2026-02-11 21:59:10,455 - INFO - Saved trajectories: C:\Users\Jenner\Documents\SBP Lab\LDVReorientation\worktree\exp-ldv-vs-mic-doa-comparison\results\ldv_vs_mic_grid_dtmin_strict_20260211_215857\teacher_trajectories_smoke\lag_trajectories.npz
+2026-02-11 21:59:10,455 - INFO - n_samples=1012, max_k=3, n_lags=101

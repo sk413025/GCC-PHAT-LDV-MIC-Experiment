@@ -1,0 +1,23 @@
+﻿{
+    "timestamp":  "2026-02-11T22:32:50",
+    "git_head":  "b63a4ab7e96974279a57b43188110bd886b0fb5f",
+    "dirty":  true,
+    "files":  [
+                  {
+                      "path":  "scripts/stage4_doa_ldv_vs_mic_comparison.py",
+                      "sha256":  "4E19AD2AC5A67B543548C00F9E6CF4B24A3B0B97BB83EA4E8E23904C6FE2AEDB"
+                  },
+                  {
+                      "path":  "scripts/run_ldv_vs_mic_grid.py",
+                      "sha256":  "2A84A1502467FE0023321E4AB6A2D6C350EA2B6D44B7CCB74CD14FD2440C941F"
+                  },
+                  {
+                      "path":  "scripts/generate_omp_dtmin_trajectories.py",
+                      "sha256":  "CE6DC09F4800956DA2728058735243620479194C03CA21A809EF188D6C2B9F80"
+                  },
+                  {
+                      "path":  "scripts/train_dtmin_from_omp_trajectories.py",
+                      "sha256":  "B265A8EEDB6603C74CE9A123B98F368F267B62BFF8FFAF07C31BECF735346B93"
+                  }
+              ]
+}

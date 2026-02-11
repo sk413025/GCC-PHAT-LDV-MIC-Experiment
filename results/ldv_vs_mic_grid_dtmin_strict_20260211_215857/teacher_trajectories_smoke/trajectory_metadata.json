@@ -1,0 +1,7086 @@
+[
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 13,
+    "freq_hz": 101.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 14,
+    "freq_hz": 109.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 15,
+    "freq_hz": 117.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 16,
+    "freq_hz": 125.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 17,
+    "freq_hz": 132.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 18,
+    "freq_hz": 140.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 19,
+    "freq_hz": 148.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 20,
+    "freq_hz": 156.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 21,
+    "freq_hz": 164.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 22,
+    "freq_hz": 171.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 23,
+    "freq_hz": 179.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 24,
+    "freq_hz": 187.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 25,
+    "freq_hz": 195.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 26,
+    "freq_hz": 203.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 27,
+    "freq_hz": 210.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 28,
+    "freq_hz": 218.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 29,
+    "freq_hz": 226.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 30,
+    "freq_hz": 234.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 31,
+    "freq_hz": 242.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 32,
+    "freq_hz": 250.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 33,
+    "freq_hz": 257.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 34,
+    "freq_hz": 265.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 35,
+    "freq_hz": 273.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 36,
+    "freq_hz": 281.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 37,
+    "freq_hz": 289.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 38,
+    "freq_hz": 296.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 39,
+    "freq_hz": 304.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 40,
+    "freq_hz": 312.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 41,
+    "freq_hz": 320.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 42,
+    "freq_hz": 328.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 43,
+    "freq_hz": 335.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 44,
+    "freq_hz": 343.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 45,
+    "freq_hz": 351.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 46,
+    "freq_hz": 359.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 47,
+    "freq_hz": 367.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 48,
+    "freq_hz": 375.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 49,
+    "freq_hz": 382.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 50,
+    "freq_hz": 390.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 51,
+    "freq_hz": 398.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 52,
+    "freq_hz": 406.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 53,
+    "freq_hz": 414.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 54,
+    "freq_hz": 421.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 55,
+    "freq_hz": 429.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 56,
+    "freq_hz": 437.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 57,
+    "freq_hz": 445.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 58,
+    "freq_hz": 453.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 59,
+    "freq_hz": 460.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 60,
+    "freq_hz": 468.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 61,
+    "freq_hz": 476.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 62,
+    "freq_hz": 484.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 63,
+    "freq_hz": 492.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 64,
+    "freq_hz": 500.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 65,
+    "freq_hz": 507.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 66,
+    "freq_hz": 515.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 67,
+    "freq_hz": 523.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 68,
+    "freq_hz": 531.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 69,
+    "freq_hz": 539.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 70,
+    "freq_hz": 546.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 71,
+    "freq_hz": 554.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 72,
+    "freq_hz": 562.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 73,
+    "freq_hz": 570.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 74,
+    "freq_hz": 578.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 75,
+    "freq_hz": 585.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 76,
+    "freq_hz": 593.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 77,
+    "freq_hz": 601.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 78,
+    "freq_hz": 609.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 79,
+    "freq_hz": 617.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 80,
+    "freq_hz": 625.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 81,
+    "freq_hz": 632.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 82,
+    "freq_hz": 640.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 83,
+    "freq_hz": 648.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 84,
+    "freq_hz": 656.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 85,
+    "freq_hz": 664.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 86,
+    "freq_hz": 671.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 87,
+    "freq_hz": 679.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 88,
+    "freq_hz": 687.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 89,
+    "freq_hz": 695.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 90,
+    "freq_hz": 703.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 91,
+    "freq_hz": 710.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 92,
+    "freq_hz": 718.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 93,
+    "freq_hz": 726.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 94,
+    "freq_hz": 734.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 95,
+    "freq_hz": 742.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 96,
+    "freq_hz": 750.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 97,
+    "freq_hz": 757.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 98,
+    "freq_hz": 765.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 99,
+    "freq_hz": 773.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 100,
+    "freq_hz": 781.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 101,
+    "freq_hz": 789.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 102,
+    "freq_hz": 796.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 103,
+    "freq_hz": 804.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 104,
+    "freq_hz": 812.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 105,
+    "freq_hz": 820.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 106,
+    "freq_hz": 828.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 107,
+    "freq_hz": 835.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 108,
+    "freq_hz": 843.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 109,
+    "freq_hz": 851.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 110,
+    "freq_hz": 859.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 111,
+    "freq_hz": 867.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 112,
+    "freq_hz": 875.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 113,
+    "freq_hz": 882.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 114,
+    "freq_hz": 890.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 115,
+    "freq_hz": 898.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 116,
+    "freq_hz": 906.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 117,
+    "freq_hz": 914.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 118,
+    "freq_hz": 921.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 119,
+    "freq_hz": 929.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 120,
+    "freq_hz": 937.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 121,
+    "freq_hz": 945.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 122,
+    "freq_hz": 953.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 123,
+    "freq_hz": 960.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 124,
+    "freq_hz": 968.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 125,
+    "freq_hz": 976.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 126,
+    "freq_hz": 984.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 127,
+    "freq_hz": 992.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 128,
+    "freq_hz": 1000.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 129,
+    "freq_hz": 1007.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 130,
+    "freq_hz": 1015.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 131,
+    "freq_hz": 1023.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 132,
+    "freq_hz": 1031.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 133,
+    "freq_hz": 1039.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 134,
+    "freq_hz": 1046.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 135,
+    "freq_hz": 1054.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 136,
+    "freq_hz": 1062.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 137,
+    "freq_hz": 1070.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 138,
+    "freq_hz": 1078.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 139,
+    "freq_hz": 1085.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 140,
+    "freq_hz": 1093.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 141,
+    "freq_hz": 1101.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 142,
+    "freq_hz": 1109.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 143,
+    "freq_hz": 1117.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 144,
+    "freq_hz": 1125.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 145,
+    "freq_hz": 1132.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 146,
+    "freq_hz": 1140.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 147,
+    "freq_hz": 1148.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 148,
+    "freq_hz": 1156.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 149,
+    "freq_hz": 1164.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 150,
+    "freq_hz": 1171.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 151,
+    "freq_hz": 1179.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 152,
+    "freq_hz": 1187.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 153,
+    "freq_hz": 1195.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 154,
+    "freq_hz": 1203.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 155,
+    "freq_hz": 1210.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 156,
+    "freq_hz": 1218.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 157,
+    "freq_hz": 1226.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 158,
+    "freq_hz": 1234.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 159,
+    "freq_hz": 1242.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 160,
+    "freq_hz": 1250.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 161,
+    "freq_hz": 1257.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 162,
+    "freq_hz": 1265.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 163,
+    "freq_hz": 1273.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 164,
+    "freq_hz": 1281.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 165,
+    "freq_hz": 1289.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 166,
+    "freq_hz": 1296.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 167,
+    "freq_hz": 1304.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 168,
+    "freq_hz": 1312.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 169,
+    "freq_hz": 1320.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 170,
+    "freq_hz": 1328.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 171,
+    "freq_hz": 1335.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 172,
+    "freq_hz": 1343.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 173,
+    "freq_hz": 1351.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 174,
+    "freq_hz": 1359.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 175,
+    "freq_hz": 1367.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 176,
+    "freq_hz": 1375.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 177,
+    "freq_hz": 1382.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 178,
+    "freq_hz": 1390.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 179,
+    "freq_hz": 1398.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 180,
+    "freq_hz": 1406.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 181,
+    "freq_hz": 1414.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 182,
+    "freq_hz": 1421.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 183,
+    "freq_hz": 1429.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 184,
+    "freq_hz": 1437.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 185,
+    "freq_hz": 1445.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 186,
+    "freq_hz": 1453.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 187,
+    "freq_hz": 1460.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 188,
+    "freq_hz": 1468.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 189,
+    "freq_hz": 1476.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 190,
+    "freq_hz": 1484.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 191,
+    "freq_hz": 1492.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 192,
+    "freq_hz": 1500.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 193,
+    "freq_hz": 1507.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 194,
+    "freq_hz": 1515.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 195,
+    "freq_hz": 1523.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 196,
+    "freq_hz": 1531.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 197,
+    "freq_hz": 1539.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 198,
+    "freq_hz": 1546.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 199,
+    "freq_hz": 1554.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 200,
+    "freq_hz": 1562.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 201,
+    "freq_hz": 1570.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 202,
+    "freq_hz": 1578.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 203,
+    "freq_hz": 1585.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 204,
+    "freq_hz": 1593.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 205,
+    "freq_hz": 1601.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 206,
+    "freq_hz": 1609.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 207,
+    "freq_hz": 1617.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 208,
+    "freq_hz": 1625.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 209,
+    "freq_hz": 1632.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 210,
+    "freq_hz": 1640.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 211,
+    "freq_hz": 1648.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 212,
+    "freq_hz": 1656.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 213,
+    "freq_hz": 1664.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 214,
+    "freq_hz": 1671.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 215,
+    "freq_hz": 1679.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 216,
+    "freq_hz": 1687.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 217,
+    "freq_hz": 1695.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 218,
+    "freq_hz": 1703.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 219,
+    "freq_hz": 1710.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 220,
+    "freq_hz": 1718.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 221,
+    "freq_hz": 1726.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 222,
+    "freq_hz": 1734.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 223,
+    "freq_hz": 1742.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 224,
+    "freq_hz": 1750.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 225,
+    "freq_hz": 1757.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 226,
+    "freq_hz": 1765.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 227,
+    "freq_hz": 1773.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 228,
+    "freq_hz": 1781.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 229,
+    "freq_hz": 1789.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 230,
+    "freq_hz": 1796.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 231,
+    "freq_hz": 1804.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 232,
+    "freq_hz": 1812.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 233,
+    "freq_hz": 1820.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 234,
+    "freq_hz": 1828.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 235,
+    "freq_hz": 1835.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 236,
+    "freq_hz": 1843.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 237,
+    "freq_hz": 1851.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 238,
+    "freq_hz": 1859.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 239,
+    "freq_hz": 1867.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 240,
+    "freq_hz": 1875.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 241,
+    "freq_hz": 1882.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 242,
+    "freq_hz": 1890.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 243,
+    "freq_hz": 1898.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 244,
+    "freq_hz": 1906.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 245,
+    "freq_hz": 1914.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 246,
+    "freq_hz": 1921.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 247,
+    "freq_hz": 1929.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 248,
+    "freq_hz": 1937.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 249,
+    "freq_hz": 1945.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 250,
+    "freq_hz": 1953.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 251,
+    "freq_hz": 1960.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 252,
+    "freq_hz": 1968.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 253,
+    "freq_hz": 1976.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 254,
+    "freq_hz": 1984.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 255,
+    "freq_hz": 1992.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 256,
+    "freq_hz": 2000.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 257,
+    "freq_hz": 2007.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 258,
+    "freq_hz": 2015.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 259,
+    "freq_hz": 2023.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 260,
+    "freq_hz": 2031.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 261,
+    "freq_hz": 2039.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 262,
+    "freq_hz": 2046.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 263,
+    "freq_hz": 2054.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 264,
+    "freq_hz": 2062.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 265,
+    "freq_hz": 2070.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 266,
+    "freq_hz": 2078.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 267,
+    "freq_hz": 2085.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 268,
+    "freq_hz": 2093.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 269,
+    "freq_hz": 2101.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 270,
+    "freq_hz": 2109.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 271,
+    "freq_hz": 2117.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 272,
+    "freq_hz": 2125.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 273,
+    "freq_hz": 2132.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 274,
+    "freq_hz": 2140.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 275,
+    "freq_hz": 2148.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 276,
+    "freq_hz": 2156.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 277,
+    "freq_hz": 2164.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 278,
+    "freq_hz": 2171.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 279,
+    "freq_hz": 2179.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 280,
+    "freq_hz": 2187.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 281,
+    "freq_hz": 2195.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 282,
+    "freq_hz": 2203.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 283,
+    "freq_hz": 2210.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 284,
+    "freq_hz": 2218.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 285,
+    "freq_hz": 2226.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 286,
+    "freq_hz": 2234.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 287,
+    "freq_hz": 2242.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 288,
+    "freq_hz": 2250.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 289,
+    "freq_hz": 2257.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 290,
+    "freq_hz": 2265.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 291,
+    "freq_hz": 2273.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 292,
+    "freq_hz": 2281.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 293,
+    "freq_hz": 2289.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 294,
+    "freq_hz": 2296.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 295,
+    "freq_hz": 2304.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 296,
+    "freq_hz": 2312.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 297,
+    "freq_hz": 2320.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 298,
+    "freq_hz": 2328.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 299,
+    "freq_hz": 2335.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 300,
+    "freq_hz": 2343.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 301,
+    "freq_hz": 2351.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 302,
+    "freq_hz": 2359.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 303,
+    "freq_hz": 2367.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 304,
+    "freq_hz": 2375.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 305,
+    "freq_hz": 2382.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 306,
+    "freq_hz": 2390.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 307,
+    "freq_hz": 2398.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 308,
+    "freq_hz": 2406.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 309,
+    "freq_hz": 2414.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 310,
+    "freq_hz": 2421.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 311,
+    "freq_hz": 2429.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 312,
+    "freq_hz": 2437.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 313,
+    "freq_hz": 2445.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 314,
+    "freq_hz": 2453.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 315,
+    "freq_hz": 2460.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 316,
+    "freq_hz": 2468.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 317,
+    "freq_hz": 2476.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 318,
+    "freq_hz": 2484.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 319,
+    "freq_hz": 2492.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 320,
+    "freq_hz": 2500.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 321,
+    "freq_hz": 2507.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 322,
+    "freq_hz": 2515.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 323,
+    "freq_hz": 2523.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 324,
+    "freq_hz": 2531.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 325,
+    "freq_hz": 2539.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 326,
+    "freq_hz": 2546.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 327,
+    "freq_hz": 2554.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 328,
+    "freq_hz": 2562.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 329,
+    "freq_hz": 2570.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 330,
+    "freq_hz": 2578.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 331,
+    "freq_hz": 2585.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 332,
+    "freq_hz": 2593.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 333,
+    "freq_hz": 2601.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 334,
+    "freq_hz": 2609.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 335,
+    "freq_hz": 2617.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 336,
+    "freq_hz": 2625.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 337,
+    "freq_hz": 2632.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 338,
+    "freq_hz": 2640.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 339,
+    "freq_hz": 2648.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 340,
+    "freq_hz": 2656.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 341,
+    "freq_hz": 2664.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 342,
+    "freq_hz": 2671.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 343,
+    "freq_hz": 2679.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 344,
+    "freq_hz": 2687.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 345,
+    "freq_hz": 2695.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 346,
+    "freq_hz": 2703.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 347,
+    "freq_hz": 2710.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 348,
+    "freq_hz": 2718.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 349,
+    "freq_hz": 2726.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 350,
+    "freq_hz": 2734.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 351,
+    "freq_hz": 2742.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 352,
+    "freq_hz": 2750.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 353,
+    "freq_hz": 2757.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 354,
+    "freq_hz": 2765.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 355,
+    "freq_hz": 2773.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 356,
+    "freq_hz": 2781.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 357,
+    "freq_hz": 2789.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 358,
+    "freq_hz": 2796.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 359,
+    "freq_hz": 2804.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 360,
+    "freq_hz": 2812.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 361,
+    "freq_hz": 2820.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 362,
+    "freq_hz": 2828.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 363,
+    "freq_hz": 2835.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 364,
+    "freq_hz": 2843.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 365,
+    "freq_hz": 2851.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 366,
+    "freq_hz": 2859.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 367,
+    "freq_hz": 2867.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 368,
+    "freq_hz": 2875.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 369,
+    "freq_hz": 2882.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 370,
+    "freq_hz": 2890.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 371,
+    "freq_hz": 2898.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 372,
+    "freq_hz": 2906.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 373,
+    "freq_hz": 2914.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 374,
+    "freq_hz": 2921.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 375,
+    "freq_hz": 2929.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 376,
+    "freq_hz": 2937.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 377,
+    "freq_hz": 2945.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 378,
+    "freq_hz": 2953.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 379,
+    "freq_hz": 2960.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 380,
+    "freq_hz": 2968.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 381,
+    "freq_hz": 2976.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 382,
+    "freq_hz": 2984.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 383,
+    "freq_hz": 2992.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 384,
+    "freq_hz": 3000.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 385,
+    "freq_hz": 3007.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 386,
+    "freq_hz": 3015.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 387,
+    "freq_hz": 3023.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 388,
+    "freq_hz": 3031.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 389,
+    "freq_hz": 3039.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 390,
+    "freq_hz": 3046.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 391,
+    "freq_hz": 3054.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 392,
+    "freq_hz": 3062.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 393,
+    "freq_hz": 3070.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 394,
+    "freq_hz": 3078.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 395,
+    "freq_hz": 3085.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 396,
+    "freq_hz": 3093.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 397,
+    "freq_hz": 3101.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 398,
+    "freq_hz": 3109.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 399,
+    "freq_hz": 3117.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 400,
+    "freq_hz": 3125.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 401,
+    "freq_hz": 3132.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 402,
+    "freq_hz": 3140.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 403,
+    "freq_hz": 3148.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 404,
+    "freq_hz": 3156.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 405,
+    "freq_hz": 3164.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 406,
+    "freq_hz": 3171.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 407,
+    "freq_hz": 3179.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 408,
+    "freq_hz": 3187.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 409,
+    "freq_hz": 3195.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 410,
+    "freq_hz": 3203.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 411,
+    "freq_hz": 3210.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 412,
+    "freq_hz": 3218.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 413,
+    "freq_hz": 3226.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 414,
+    "freq_hz": 3234.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 415,
+    "freq_hz": 3242.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 416,
+    "freq_hz": 3250.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 417,
+    "freq_hz": 3257.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 418,
+    "freq_hz": 3265.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 419,
+    "freq_hz": 3273.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 420,
+    "freq_hz": 3281.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 421,
+    "freq_hz": 3289.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 422,
+    "freq_hz": 3296.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 423,
+    "freq_hz": 3304.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 424,
+    "freq_hz": 3312.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 425,
+    "freq_hz": 3320.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 426,
+    "freq_hz": 3328.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 427,
+    "freq_hz": 3335.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 428,
+    "freq_hz": 3343.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 429,
+    "freq_hz": 3351.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 430,
+    "freq_hz": 3359.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 431,
+    "freq_hz": 3367.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 432,
+    "freq_hz": 3375.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 433,
+    "freq_hz": 3382.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 434,
+    "freq_hz": 3390.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 435,
+    "freq_hz": 3398.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 436,
+    "freq_hz": 3406.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 437,
+    "freq_hz": 3414.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 438,
+    "freq_hz": 3421.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 439,
+    "freq_hz": 3429.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 440,
+    "freq_hz": 3437.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 441,
+    "freq_hz": 3445.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 442,
+    "freq_hz": 3453.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 443,
+    "freq_hz": 3460.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 444,
+    "freq_hz": 3468.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 445,
+    "freq_hz": 3476.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 446,
+    "freq_hz": 3484.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 447,
+    "freq_hz": 3492.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 448,
+    "freq_hz": 3500.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 449,
+    "freq_hz": 3507.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 450,
+    "freq_hz": 3515.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 451,
+    "freq_hz": 3523.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 452,
+    "freq_hz": 3531.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 453,
+    "freq_hz": 3539.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 454,
+    "freq_hz": 3546.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 455,
+    "freq_hz": 3554.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 456,
+    "freq_hz": 3562.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 457,
+    "freq_hz": 3570.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 458,
+    "freq_hz": 3578.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 459,
+    "freq_hz": 3585.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 460,
+    "freq_hz": 3593.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 461,
+    "freq_hz": 3601.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 462,
+    "freq_hz": 3609.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 463,
+    "freq_hz": 3617.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 464,
+    "freq_hz": 3625.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 465,
+    "freq_hz": 3632.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 466,
+    "freq_hz": 3640.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 467,
+    "freq_hz": 3648.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 468,
+    "freq_hz": 3656.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 469,
+    "freq_hz": 3664.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 470,
+    "freq_hz": 3671.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 471,
+    "freq_hz": 3679.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 472,
+    "freq_hz": 3687.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 473,
+    "freq_hz": 3695.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 474,
+    "freq_hz": 3703.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 475,
+    "freq_hz": 3710.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 476,
+    "freq_hz": 3718.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 477,
+    "freq_hz": 3726.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 478,
+    "freq_hz": 3734.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 479,
+    "freq_hz": 3742.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 480,
+    "freq_hz": 3750.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 481,
+    "freq_hz": 3757.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 482,
+    "freq_hz": 3765.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 483,
+    "freq_hz": 3773.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 484,
+    "freq_hz": 3781.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 485,
+    "freq_hz": 3789.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 486,
+    "freq_hz": 3796.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 487,
+    "freq_hz": 3804.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 488,
+    "freq_hz": 3812.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 489,
+    "freq_hz": 3820.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 490,
+    "freq_hz": 3828.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 491,
+    "freq_hz": 3835.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 492,
+    "freq_hz": 3843.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 493,
+    "freq_hz": 3851.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 494,
+    "freq_hz": 3859.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 495,
+    "freq_hz": 3867.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 496,
+    "freq_hz": 3875.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 497,
+    "freq_hz": 3882.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 498,
+    "freq_hz": 3890.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 499,
+    "freq_hz": 3898.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 500,
+    "freq_hz": 3906.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 501,
+    "freq_hz": 3914.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 502,
+    "freq_hz": 3921.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 503,
+    "freq_hz": 3929.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 504,
+    "freq_hz": 3937.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 505,
+    "freq_hz": 3945.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 506,
+    "freq_hz": 3953.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 507,
+    "freq_hz": 3960.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 508,
+    "freq_hz": 3968.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 509,
+    "freq_hz": 3976.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 510,
+    "freq_hz": 3984.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 511,
+    "freq_hz": 3992.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 512,
+    "freq_hz": 4000.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 513,
+    "freq_hz": 4007.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 514,
+    "freq_hz": 4015.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 515,
+    "freq_hz": 4023.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 516,
+    "freq_hz": 4031.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 517,
+    "freq_hz": 4039.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 518,
+    "freq_hz": 4046.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 519,
+    "freq_hz": 4054.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 520,
+    "freq_hz": 4062.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 521,
+    "freq_hz": 4070.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 522,
+    "freq_hz": 4078.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 523,
+    "freq_hz": 4085.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 524,
+    "freq_hz": 4093.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 525,
+    "freq_hz": 4101.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 526,
+    "freq_hz": 4109.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 527,
+    "freq_hz": 4117.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 528,
+    "freq_hz": 4125.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 529,
+    "freq_hz": 4132.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 530,
+    "freq_hz": 4140.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 531,
+    "freq_hz": 4148.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 532,
+    "freq_hz": 4156.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 533,
+    "freq_hz": 4164.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 534,
+    "freq_hz": 4171.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 535,
+    "freq_hz": 4179.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 536,
+    "freq_hz": 4187.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 537,
+    "freq_hz": 4195.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 538,
+    "freq_hz": 4203.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 539,
+    "freq_hz": 4210.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 540,
+    "freq_hz": 4218.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 541,
+    "freq_hz": 4226.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 542,
+    "freq_hz": 4234.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 543,
+    "freq_hz": 4242.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 544,
+    "freq_hz": 4250.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 545,
+    "freq_hz": 4257.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 546,
+    "freq_hz": 4265.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 547,
+    "freq_hz": 4273.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 548,
+    "freq_hz": 4281.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 549,
+    "freq_hz": 4289.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 550,
+    "freq_hz": 4296.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 551,
+    "freq_hz": 4304.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 552,
+    "freq_hz": 4312.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 553,
+    "freq_hz": 4320.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 554,
+    "freq_hz": 4328.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 555,
+    "freq_hz": 4335.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 556,
+    "freq_hz": 4343.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 557,
+    "freq_hz": 4351.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 558,
+    "freq_hz": 4359.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 559,
+    "freq_hz": 4367.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 560,
+    "freq_hz": 4375.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 561,
+    "freq_hz": 4382.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 562,
+    "freq_hz": 4390.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 563,
+    "freq_hz": 4398.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 564,
+    "freq_hz": 4406.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 565,
+    "freq_hz": 4414.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 566,
+    "freq_hz": 4421.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 567,
+    "freq_hz": 4429.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 568,
+    "freq_hz": 4437.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 569,
+    "freq_hz": 4445.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 570,
+    "freq_hz": 4453.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 571,
+    "freq_hz": 4460.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 572,
+    "freq_hz": 4468.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 573,
+    "freq_hz": 4476.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 574,
+    "freq_hz": 4484.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 575,
+    "freq_hz": 4492.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 576,
+    "freq_hz": 4500.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 577,
+    "freq_hz": 4507.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 578,
+    "freq_hz": 4515.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 579,
+    "freq_hz": 4523.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 580,
+    "freq_hz": 4531.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 581,
+    "freq_hz": 4539.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 582,
+    "freq_hz": 4546.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 583,
+    "freq_hz": 4554.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 584,
+    "freq_hz": 4562.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 585,
+    "freq_hz": 4570.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 586,
+    "freq_hz": 4578.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 587,
+    "freq_hz": 4585.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 588,
+    "freq_hz": 4593.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 589,
+    "freq_hz": 4601.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 590,
+    "freq_hz": 4609.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 591,
+    "freq_hz": 4617.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 592,
+    "freq_hz": 4625.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 593,
+    "freq_hz": 4632.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 594,
+    "freq_hz": 4640.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 595,
+    "freq_hz": 4648.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 596,
+    "freq_hz": 4656.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 597,
+    "freq_hz": 4664.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 598,
+    "freq_hz": 4671.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 599,
+    "freq_hz": 4679.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 600,
+    "freq_hz": 4687.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 601,
+    "freq_hz": 4695.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 602,
+    "freq_hz": 4703.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 603,
+    "freq_hz": 4710.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 604,
+    "freq_hz": 4718.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 605,
+    "freq_hz": 4726.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 606,
+    "freq_hz": 4734.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 607,
+    "freq_hz": 4742.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 608,
+    "freq_hz": 4750.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 609,
+    "freq_hz": 4757.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 610,
+    "freq_hz": 4765.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 611,
+    "freq_hz": 4773.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 612,
+    "freq_hz": 4781.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 613,
+    "freq_hz": 4789.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 614,
+    "freq_hz": 4796.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 615,
+    "freq_hz": 4804.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 616,
+    "freq_hz": 4812.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 617,
+    "freq_hz": 4820.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 618,
+    "freq_hz": 4828.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 619,
+    "freq_hz": 4835.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 620,
+    "freq_hz": 4843.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 621,
+    "freq_hz": 4851.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 622,
+    "freq_hz": 4859.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 623,
+    "freq_hz": 4867.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 624,
+    "freq_hz": 4875.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 625,
+    "freq_hz": 4882.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 626,
+    "freq_hz": 4890.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 627,
+    "freq_hz": 4898.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 628,
+    "freq_hz": 4906.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 629,
+    "freq_hz": 4914.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 630,
+    "freq_hz": 4921.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 631,
+    "freq_hz": 4929.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 632,
+    "freq_hz": 4937.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 633,
+    "freq_hz": 4945.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 634,
+    "freq_hz": 4953.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 635,
+    "freq_hz": 4960.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 636,
+    "freq_hz": 4968.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 637,
+    "freq_hz": 4976.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 638,
+    "freq_hz": 4984.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 639,
+    "freq_hz": 4992.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 640,
+    "freq_hz": 5000.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 641,
+    "freq_hz": 5007.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 642,
+    "freq_hz": 5015.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 643,
+    "freq_hz": 5023.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 644,
+    "freq_hz": 5031.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 645,
+    "freq_hz": 5039.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 646,
+    "freq_hz": 5046.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 647,
+    "freq_hz": 5054.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 648,
+    "freq_hz": 5062.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 649,
+    "freq_hz": 5070.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 650,
+    "freq_hz": 5078.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 651,
+    "freq_hz": 5085.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 652,
+    "freq_hz": 5093.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 653,
+    "freq_hz": 5101.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 654,
+    "freq_hz": 5109.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 655,
+    "freq_hz": 5117.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 656,
+    "freq_hz": 5125.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 657,
+    "freq_hz": 5132.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 658,
+    "freq_hz": 5140.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 659,
+    "freq_hz": 5148.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 660,
+    "freq_hz": 5156.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 661,
+    "freq_hz": 5164.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 662,
+    "freq_hz": 5171.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 663,
+    "freq_hz": 5179.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 664,
+    "freq_hz": 5187.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 665,
+    "freq_hz": 5195.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 666,
+    "freq_hz": 5203.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 667,
+    "freq_hz": 5210.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 668,
+    "freq_hz": 5218.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 669,
+    "freq_hz": 5226.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 670,
+    "freq_hz": 5234.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 671,
+    "freq_hz": 5242.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 672,
+    "freq_hz": 5250.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 673,
+    "freq_hz": 5257.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 674,
+    "freq_hz": 5265.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 675,
+    "freq_hz": 5273.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 676,
+    "freq_hz": 5281.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 677,
+    "freq_hz": 5289.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 678,
+    "freq_hz": 5296.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 679,
+    "freq_hz": 5304.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 680,
+    "freq_hz": 5312.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 681,
+    "freq_hz": 5320.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 682,
+    "freq_hz": 5328.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 683,
+    "freq_hz": 5335.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 684,
+    "freq_hz": 5343.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 685,
+    "freq_hz": 5351.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 686,
+    "freq_hz": 5359.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 687,
+    "freq_hz": 5367.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 688,
+    "freq_hz": 5375.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 689,
+    "freq_hz": 5382.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 690,
+    "freq_hz": 5390.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 691,
+    "freq_hz": 5398.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 692,
+    "freq_hz": 5406.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 693,
+    "freq_hz": 5414.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 694,
+    "freq_hz": 5421.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 695,
+    "freq_hz": 5429.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 696,
+    "freq_hz": 5437.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 697,
+    "freq_hz": 5445.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 698,
+    "freq_hz": 5453.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 699,
+    "freq_hz": 5460.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 700,
+    "freq_hz": 5468.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 701,
+    "freq_hz": 5476.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 702,
+    "freq_hz": 5484.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 703,
+    "freq_hz": 5492.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 704,
+    "freq_hz": 5500.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 705,
+    "freq_hz": 5507.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 706,
+    "freq_hz": 5515.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 707,
+    "freq_hz": 5523.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 708,
+    "freq_hz": 5531.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 709,
+    "freq_hz": 5539.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 710,
+    "freq_hz": 5546.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 711,
+    "freq_hz": 5554.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 712,
+    "freq_hz": 5562.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 713,
+    "freq_hz": 5570.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 714,
+    "freq_hz": 5578.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 715,
+    "freq_hz": 5585.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 716,
+    "freq_hz": 5593.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 717,
+    "freq_hz": 5601.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 718,
+    "freq_hz": 5609.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 719,
+    "freq_hz": 5617.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 720,
+    "freq_hz": 5625.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 721,
+    "freq_hz": 5632.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 722,
+    "freq_hz": 5640.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 723,
+    "freq_hz": 5648.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 724,
+    "freq_hz": 5656.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 725,
+    "freq_hz": 5664.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 726,
+    "freq_hz": 5671.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 727,
+    "freq_hz": 5679.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 728,
+    "freq_hz": 5687.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 729,
+    "freq_hz": 5695.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 730,
+    "freq_hz": 5703.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 731,
+    "freq_hz": 5710.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 732,
+    "freq_hz": 5718.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 733,
+    "freq_hz": 5726.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 734,
+    "freq_hz": 5734.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 735,
+    "freq_hz": 5742.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 736,
+    "freq_hz": 5750.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 737,
+    "freq_hz": 5757.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 738,
+    "freq_hz": 5765.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 739,
+    "freq_hz": 5773.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 740,
+    "freq_hz": 5781.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 741,
+    "freq_hz": 5789.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 742,
+    "freq_hz": 5796.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 743,
+    "freq_hz": 5804.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 744,
+    "freq_hz": 5812.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 745,
+    "freq_hz": 5820.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 746,
+    "freq_hz": 5828.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 747,
+    "freq_hz": 5835.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 748,
+    "freq_hz": 5843.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 749,
+    "freq_hz": 5851.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 750,
+    "freq_hz": 5859.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 751,
+    "freq_hz": 5867.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 752,
+    "freq_hz": 5875.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 753,
+    "freq_hz": 5882.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 754,
+    "freq_hz": 5890.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 755,
+    "freq_hz": 5898.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 756,
+    "freq_hz": 5906.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 757,
+    "freq_hz": 5914.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 758,
+    "freq_hz": 5921.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 759,
+    "freq_hz": 5929.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 760,
+    "freq_hz": 5937.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 761,
+    "freq_hz": 5945.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 762,
+    "freq_hz": 5953.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 763,
+    "freq_hz": 5960.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 764,
+    "freq_hz": 5968.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 765,
+    "freq_hz": 5976.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 766,
+    "freq_hz": 5984.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 767,
+    "freq_hz": 5992.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 768,
+    "freq_hz": 6000.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 769,
+    "freq_hz": 6007.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 770,
+    "freq_hz": 6015.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 771,
+    "freq_hz": 6023.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 772,
+    "freq_hz": 6031.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 773,
+    "freq_hz": 6039.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 774,
+    "freq_hz": 6046.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 775,
+    "freq_hz": 6054.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 776,
+    "freq_hz": 6062.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 777,
+    "freq_hz": 6070.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 778,
+    "freq_hz": 6078.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 779,
+    "freq_hz": 6085.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 780,
+    "freq_hz": 6093.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 781,
+    "freq_hz": 6101.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 782,
+    "freq_hz": 6109.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 783,
+    "freq_hz": 6117.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 784,
+    "freq_hz": 6125.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 785,
+    "freq_hz": 6132.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 786,
+    "freq_hz": 6140.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 787,
+    "freq_hz": 6148.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 788,
+    "freq_hz": 6156.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 789,
+    "freq_hz": 6164.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 790,
+    "freq_hz": 6171.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 791,
+    "freq_hz": 6179.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 792,
+    "freq_hz": 6187.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 793,
+    "freq_hz": 6195.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 794,
+    "freq_hz": 6203.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 795,
+    "freq_hz": 6210.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 796,
+    "freq_hz": 6218.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 797,
+    "freq_hz": 6226.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 798,
+    "freq_hz": 6234.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 799,
+    "freq_hz": 6242.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 800,
+    "freq_hz": 6250.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 801,
+    "freq_hz": 6257.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 802,
+    "freq_hz": 6265.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 803,
+    "freq_hz": 6273.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 804,
+    "freq_hz": 6281.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 805,
+    "freq_hz": 6289.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 806,
+    "freq_hz": 6296.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 807,
+    "freq_hz": 6304.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 808,
+    "freq_hz": 6312.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 809,
+    "freq_hz": 6320.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 810,
+    "freq_hz": 6328.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 811,
+    "freq_hz": 6335.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 812,
+    "freq_hz": 6343.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 813,
+    "freq_hz": 6351.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 814,
+    "freq_hz": 6359.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 815,
+    "freq_hz": 6367.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 816,
+    "freq_hz": 6375.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 817,
+    "freq_hz": 6382.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 818,
+    "freq_hz": 6390.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 819,
+    "freq_hz": 6398.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 820,
+    "freq_hz": 6406.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 821,
+    "freq_hz": 6414.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 822,
+    "freq_hz": 6421.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 823,
+    "freq_hz": 6429.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 824,
+    "freq_hz": 6437.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 825,
+    "freq_hz": 6445.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 826,
+    "freq_hz": 6453.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 827,
+    "freq_hz": 6460.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 828,
+    "freq_hz": 6468.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 829,
+    "freq_hz": 6476.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 830,
+    "freq_hz": 6484.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 831,
+    "freq_hz": 6492.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 832,
+    "freq_hz": 6500.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 833,
+    "freq_hz": 6507.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 834,
+    "freq_hz": 6515.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 835,
+    "freq_hz": 6523.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 836,
+    "freq_hz": 6531.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 837,
+    "freq_hz": 6539.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 838,
+    "freq_hz": 6546.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 839,
+    "freq_hz": 6554.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 840,
+    "freq_hz": 6562.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 841,
+    "freq_hz": 6570.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 842,
+    "freq_hz": 6578.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 843,
+    "freq_hz": 6585.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 844,
+    "freq_hz": 6593.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 845,
+    "freq_hz": 6601.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 846,
+    "freq_hz": 6609.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 847,
+    "freq_hz": 6617.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 848,
+    "freq_hz": 6625.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 849,
+    "freq_hz": 6632.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 850,
+    "freq_hz": 6640.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 851,
+    "freq_hz": 6648.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 852,
+    "freq_hz": 6656.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 853,
+    "freq_hz": 6664.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 854,
+    "freq_hz": 6671.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 855,
+    "freq_hz": 6679.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 856,
+    "freq_hz": 6687.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 857,
+    "freq_hz": 6695.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 858,
+    "freq_hz": 6703.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 859,
+    "freq_hz": 6710.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 860,
+    "freq_hz": 6718.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 861,
+    "freq_hz": 6726.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 862,
+    "freq_hz": 6734.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 863,
+    "freq_hz": 6742.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 864,
+    "freq_hz": 6750.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 865,
+    "freq_hz": 6757.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 866,
+    "freq_hz": 6765.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 867,
+    "freq_hz": 6773.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 868,
+    "freq_hz": 6781.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 869,
+    "freq_hz": 6789.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 870,
+    "freq_hz": 6796.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 871,
+    "freq_hz": 6804.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 872,
+    "freq_hz": 6812.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 873,
+    "freq_hz": 6820.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 874,
+    "freq_hz": 6828.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 875,
+    "freq_hz": 6835.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 876,
+    "freq_hz": 6843.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 877,
+    "freq_hz": 6851.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 878,
+    "freq_hz": 6859.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 879,
+    "freq_hz": 6867.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 880,
+    "freq_hz": 6875.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 881,
+    "freq_hz": 6882.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 882,
+    "freq_hz": 6890.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 883,
+    "freq_hz": 6898.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 884,
+    "freq_hz": 6906.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 885,
+    "freq_hz": 6914.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 886,
+    "freq_hz": 6921.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 887,
+    "freq_hz": 6929.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 888,
+    "freq_hz": 6937.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 889,
+    "freq_hz": 6945.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 890,
+    "freq_hz": 6953.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 891,
+    "freq_hz": 6960.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 892,
+    "freq_hz": 6968.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 893,
+    "freq_hz": 6976.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 894,
+    "freq_hz": 6984.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 895,
+    "freq_hz": 6992.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 896,
+    "freq_hz": 7000.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 897,
+    "freq_hz": 7007.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 898,
+    "freq_hz": 7015.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 899,
+    "freq_hz": 7023.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 900,
+    "freq_hz": 7031.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 901,
+    "freq_hz": 7039.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 902,
+    "freq_hz": 7046.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 903,
+    "freq_hz": 7054.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 904,
+    "freq_hz": 7062.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 905,
+    "freq_hz": 7070.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 906,
+    "freq_hz": 7078.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 907,
+    "freq_hz": 7085.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 908,
+    "freq_hz": 7093.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 909,
+    "freq_hz": 7101.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 910,
+    "freq_hz": 7109.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 911,
+    "freq_hz": 7117.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 912,
+    "freq_hz": 7125.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 913,
+    "freq_hz": 7132.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 914,
+    "freq_hz": 7140.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 915,
+    "freq_hz": 7148.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 916,
+    "freq_hz": 7156.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 917,
+    "freq_hz": 7164.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 918,
+    "freq_hz": 7171.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 919,
+    "freq_hz": 7179.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 920,
+    "freq_hz": 7187.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 921,
+    "freq_hz": 7195.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 922,
+    "freq_hz": 7203.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 923,
+    "freq_hz": 7210.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 924,
+    "freq_hz": 7218.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 925,
+    "freq_hz": 7226.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 926,
+    "freq_hz": 7234.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 927,
+    "freq_hz": 7242.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 928,
+    "freq_hz": 7250.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 929,
+    "freq_hz": 7257.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 930,
+    "freq_hz": 7265.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 931,
+    "freq_hz": 7273.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 932,
+    "freq_hz": 7281.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 933,
+    "freq_hz": 7289.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 934,
+    "freq_hz": 7296.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 935,
+    "freq_hz": 7304.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 936,
+    "freq_hz": 7312.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 937,
+    "freq_hz": 7320.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 938,
+    "freq_hz": 7328.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 939,
+    "freq_hz": 7335.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 940,
+    "freq_hz": 7343.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 941,
+    "freq_hz": 7351.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 942,
+    "freq_hz": 7359.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 943,
+    "freq_hz": 7367.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 944,
+    "freq_hz": 7375.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 945,
+    "freq_hz": 7382.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 946,
+    "freq_hz": 7390.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 947,
+    "freq_hz": 7398.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 948,
+    "freq_hz": 7406.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 949,
+    "freq_hz": 7414.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 950,
+    "freq_hz": 7421.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 951,
+    "freq_hz": 7429.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 952,
+    "freq_hz": 7437.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 953,
+    "freq_hz": 7445.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 954,
+    "freq_hz": 7453.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 955,
+    "freq_hz": 7460.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 956,
+    "freq_hz": 7468.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 957,
+    "freq_hz": 7476.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 958,
+    "freq_hz": 7484.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 959,
+    "freq_hz": 7492.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 960,
+    "freq_hz": 7500.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 961,
+    "freq_hz": 7507.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 962,
+    "freq_hz": 7515.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 963,
+    "freq_hz": 7523.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 964,
+    "freq_hz": 7531.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 965,
+    "freq_hz": 7539.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 966,
+    "freq_hz": 7546.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 967,
+    "freq_hz": 7554.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 968,
+    "freq_hz": 7562.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 969,
+    "freq_hz": 7570.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 970,
+    "freq_hz": 7578.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 971,
+    "freq_hz": 7585.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 972,
+    "freq_hz": 7593.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 973,
+    "freq_hz": 7601.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 974,
+    "freq_hz": 7609.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 975,
+    "freq_hz": 7617.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 976,
+    "freq_hz": 7625.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 977,
+    "freq_hz": 7632.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 978,
+    "freq_hz": 7640.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 979,
+    "freq_hz": 7648.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 980,
+    "freq_hz": 7656.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 981,
+    "freq_hz": 7664.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 982,
+    "freq_hz": 7671.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 983,
+    "freq_hz": 7679.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 984,
+    "freq_hz": 7687.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 985,
+    "freq_hz": 7695.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 986,
+    "freq_hz": 7703.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 987,
+    "freq_hz": 7710.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 988,
+    "freq_hz": 7718.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 989,
+    "freq_hz": 7726.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 990,
+    "freq_hz": 7734.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 991,
+    "freq_hz": 7742.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 992,
+    "freq_hz": 7750.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 993,
+    "freq_hz": 7757.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 994,
+    "freq_hz": 7765.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 995,
+    "freq_hz": 7773.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 996,
+    "freq_hz": 7781.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 997,
+    "freq_hz": 7789.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 998,
+    "freq_hz": 7796.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 999,
+    "freq_hz": 7804.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 1000,
+    "freq_hz": 7812.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 1001,
+    "freq_hz": 7820.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 1002,
+    "freq_hz": 7828.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 1003,
+    "freq_hz": 7835.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 1004,
+    "freq_hz": 7843.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 1005,
+    "freq_hz": 7851.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 1006,
+    "freq_hz": 7859.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 1007,
+    "freq_hz": 7867.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 1008,
+    "freq_hz": 7875.0
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 1009,
+    "freq_hz": 7882.8125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 1010,
+    "freq_hz": 7890.625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 1011,
+    "freq_hz": 7898.4375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 1012,
+    "freq_hz": 7906.25
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 1013,
+    "freq_hz": 7914.0625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 1014,
+    "freq_hz": 7921.875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 1015,
+    "freq_hz": 7929.6875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 1016,
+    "freq_hz": 7937.5
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 1017,
+    "freq_hz": 7945.3125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 1018,
+    "freq_hz": 7953.125
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 1019,
+    "freq_hz": 7960.9375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 1020,
+    "freq_hz": 7968.75
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 1021,
+    "freq_hz": 7976.5625
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 1022,
+    "freq_hz": 7984.375
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 1023,
+    "freq_hz": 7992.1875
+  },
+  {
+    "speaker": "20-0.1V",
+    "segment_index": 0,
+    "center_sec": 522.3253333333333,
+    "freq_bin": 1024,
+    "freq_hz": 8000.0
+  }
+]

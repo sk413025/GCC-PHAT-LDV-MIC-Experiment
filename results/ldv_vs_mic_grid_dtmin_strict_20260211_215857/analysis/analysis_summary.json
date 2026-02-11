@@ -1,0 +1,76 @@
+{
+  "generated": "2026-02-11T22:32:07.511850",
+  "grid_base": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\worktree\\exp-ldv-vs-mic-doa-comparison\\results\\ldv_vs_mic_grid_dtmin_strict_20260211_215857",
+  "rows": [
+    {
+      "run_dir": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\worktree\\exp-ldv-vs-mic-doa-comparison\\results\\ldv_vs_mic_grid_dtmin_strict_20260211_215857\\ldv_micl_chirp_tau2_band0",
+      "pass_count": 4,
+      "pass_rate": 0.8,
+      "theta_err_median_deg": 2.9293086525645142,
+      "psr_median_db": -4.296012536298594,
+      "n_summaries": 5,
+      "pass_mode": "omp_vs_raw",
+      "label": "ldv_micl_chirp_tau2_band0",
+      "truth_type": "chirp",
+      "tau_err_max_ms": 2.0,
+      "bandpass_low": 0,
+      "bandpass_high": 0
+    },
+    {
+      "run_dir": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\worktree\\exp-ldv-vs-mic-doa-comparison\\results\\ldv_vs_mic_grid_dtmin_strict_20260211_215857\\ldv_micl_chirp_tau2_band500_2000",
+      "pass_count": 4,
+      "pass_rate": 0.8,
+      "theta_err_median_deg": 2.8069572928281694,
+      "psr_median_db": -28.04974414209905,
+      "n_summaries": 5,
+      "pass_mode": "omp_vs_raw",
+      "label": "ldv_micl_chirp_tau2_band500_2000",
+      "truth_type": "chirp",
+      "tau_err_max_ms": 2.0,
+      "bandpass_low": 500,
+      "bandpass_high": 2000
+    },
+    {
+      "run_dir": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\worktree\\exp-ldv-vs-mic-doa-comparison\\results\\ldv_vs_mic_grid_dtmin_strict_20260211_215857\\micl_micr_chirp_tau2_band500_2000",
+      "pass_count": 5,
+      "pass_rate": 1.0,
+      "theta_err_median_deg": 0.13023575322842973,
+      "psr_median_db": -10.151222683086289,
+      "n_summaries": 5,
+      "pass_mode": "theta_only",
+      "label": "micl_micr_chirp_tau2_band500_2000",
+      "truth_type": "chirp",
+      "tau_err_max_ms": 2.0,
+      "bandpass_low": 500,
+      "bandpass_high": 2000
+    },
+    {
+      "run_dir": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\worktree\\exp-ldv-vs-mic-doa-comparison\\results\\ldv_vs_mic_grid_dtmin_strict_20260211_215857\\ldv_micl_geometry_tau2_band500_2000",
+      "pass_count": 3,
+      "pass_rate": 0.6,
+      "theta_err_median_deg": 1.962231268341963,
+      "psr_median_db": -1.3788056136918665,
+      "n_summaries": 5,
+      "pass_mode": "omp_vs_raw",
+      "label": "ldv_micl_geometry_tau2_band500_2000",
+      "truth_type": "geometry",
+      "tau_err_max_ms": 2.0,
+      "bandpass_low": 500,
+      "bandpass_high": 2000
+    },
+    {
+      "run_dir": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\worktree\\exp-ldv-vs-mic-doa-comparison\\results\\ldv_vs_mic_grid_dtmin_strict_20260211_215857\\ldv_micl_chirp_tau0p3_band500_2000",
+      "pass_count": 4,
+      "pass_rate": 0.8,
+      "theta_err_median_deg": 2.8069572928281694,
+      "psr_median_db": -28.04974414209905,
+      "n_summaries": 5,
+      "pass_mode": "omp_vs_raw",
+      "label": "ldv_micl_chirp_tau0p3_band500_2000",
+      "truth_type": "chirp",
+      "tau_err_max_ms": 0.3,
+      "bandpass_low": 500,
+      "bandpass_high": 2000
+    }
+  ]
+}
