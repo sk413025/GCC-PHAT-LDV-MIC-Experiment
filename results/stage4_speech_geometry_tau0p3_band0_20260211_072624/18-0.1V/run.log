@@ -1,0 +1,19 @@
+2026-02-11 07:39:55,619 - INFO - ======================================================================
+2026-02-11 07:39:55,619 - INFO - Stage 4: DoA Multi-Method Validation
+2026-02-11 07:39:55,619 - INFO - ======================================================================
+2026-02-11 07:39:55,619 - INFO - Speaker: 18-0.1V
+2026-02-11 07:39:55,619 - INFO - Geometry Truth:  \u03c4 = 1.450 ms, \u03b8 = 20.82°
+2026-02-11 07:39:55,619 - INFO - Reference(geometry): \u03c4 = 1.450 ms, \u03b8 = 20.82°
+2026-02-11 07:39:55,619 - INFO - Distances: d_left = 2.500 m, d_right = 2.002 m
+2026-02-11 07:39:55,619 - INFO - 
+Loading audio files...
+2026-02-11 07:39:57,012 - INFO - Sample rate: 48000 Hz
+2026-02-11 07:39:57,012 - INFO - Duration: 1043.97 s
+Traceback (most recent call last):
+  File "C:\Users\Jenner\Documents\SBP Lab\LDVReorientation\worktree\exp-ldv-perfect-geometry-cloud\exp-validation\ldv-perfect-geometry\scripts\stage4_doa_validation.py", line 1378, in <module>
+    main()
+  File "C:\Users\Jenner\Documents\SBP Lab\LDVReorientation\worktree\exp-ldv-perfect-geometry-cloud\exp-validation\ldv-perfect-geometry\scripts\stage4_doa_validation.py", line 1351, in main
+    results = run_stage4_evaluation(
+  File "C:\Users\Jenner\Documents\SBP Lab\LDVReorientation\worktree\exp-ldv-perfect-geometry-cloud\exp-validation\ldv-perfect-geometry\scripts\stage4_doa_validation.py", line 936, in run_stage4_evaluation
+    raise ValueError(
+ValueError: segment_mode=scan selected 0 segments. Try relaxing --scan_tau_err_max_ms / --scan_psr_min_db or set --scan_allow_fallback.
