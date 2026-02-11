@@ -44,6 +44,8 @@ def summarize_run(run_dir: Path, speakers: list[str]) -> dict:
     pass_flags = [s.get("passed", False) for s in summaries]
     theta_errs = [s["result"]["theta_error_median_deg"] for s in summaries]
     psrs = [s["result"]["psr_median_db"] for s in summaries]
+    pass_modes = [s.get("pass_mode") for s in summaries if s.get("pass_mode")]
+    pass_mode = pass_modes[0] if pass_modes else None
 
     return {
         "run_dir": str(run_dir),
@@ -52,7 +54,61 @@ def summarize_run(run_dir: Path, speakers: list[str]) -> dict:
         "theta_err_median_deg": float(median(theta_errs)),
         "psr_median_db": float(median(psrs)),
         "n_summaries": len(summaries),
+        "pass_mode": pass_mode,
     }
+
+
+def write_detailed_report(output_dir: Path, grid_rows: list[dict], speakers: list[str]) -> None:
+    lines = []
+    lines.append("# LDV-vs-Mic Detailed Report (GCC-PHAT)")
+    lines.append("")
+    lines.append(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    lines.append("")
+    lines.append("Pass criteria:")
+    lines.append("- `omp_vs_raw`: OMP theta error < Raw theta error and < pass_theta_max_deg (plus optional PSR minimum).")
+    lines.append("- `theta_only`: theta error < pass_theta_max_deg (plus optional PSR minimum).")
+    lines.append("")
+
+    for row in grid_rows:
+        run_dir = Path(row["run_dir"])
+        lines.append(f"## {row.get('label', run_dir.name)}")
+        lines.append("")
+        lines.append(f"- truth_type: {row.get('truth_type')}")
+        lines.append(f"- pass_mode: {row.get('pass_mode', 'NA')}")
+        lines.append("")
+        lines.append(
+            "| Speaker | theta_ref_deg | theta_omp_deg | theta_err_deg | "
+            "theta_raw_deg | theta_raw_err_deg | omp_better_than_raw | "
+            "psr_omp_db | psr_raw_db | passed |"
+        )
+        lines.append("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |")
+        pass_count = 0
+        for sp in speakers:
+            summary = load_summary(run_dir / sp / "summary.json")
+            if not summary:
+                lines.append(f"| {sp} | NA | NA | NA | NA | NA | NA | NA | NA | False |")
+                continue
+            theta_ref = summary["truth_reference"]["theta_ref_deg"]
+            theta_omp = summary["result"]["theta_median_deg"]
+            theta_err = summary["result"]["theta_error_median_deg"]
+            psr_omp = summary["result"]["psr_median_db"]
+            raw = summary.get("result_raw")
+            theta_raw = raw["theta_median_deg"] if raw else "NA"
+            theta_raw_err = raw["theta_error_median_deg"] if raw else "NA"
+            psr_raw = raw["psr_median_db"] if raw else "NA"
+            omp_better = summary.get("pass_conditions", {}).get("omp_better_than_raw", "NA")
+            passed = bool(summary.get("passed", False))
+            if passed:
+                pass_count += 1
+            lines.append(
+                f"| {sp} | {theta_ref} | {theta_omp} | {theta_err} | "
+                f"{theta_raw} | {theta_raw_err} | {omp_better} | {psr_omp} | {psr_raw} | {passed} |"
+            )
+        lines.append("")
+        lines.append(f"Pass count: {pass_count}/{len(speakers)}")
+        lines.append("")
+
+    (output_dir / "detailed_report.md").write_text("\n".join(lines), encoding="utf-8")
 
 
 def main() -> None:
@@ -102,13 +158,14 @@ def main() -> None:
     report_lines.append("")
     report_lines.append(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     report_lines.append("")
-    report_lines.append("| label | truth_type | tau_err_max_ms | bandpass | pass_count | pass_rate | theta_err_median_deg | psr_median_db |")
-    report_lines.append("| --- | --- | --- | --- | --- | --- | --- | --- |")
+    report_lines.append("| label | truth_type | tau_err_max_ms | bandpass | pass_mode | pass_count | pass_rate | theta_err_median_deg | psr_median_db |")
+    report_lines.append("| --- | --- | --- | --- | --- | --- | --- | --- | --- |")
     for row in analysis_rows:
         band = f"{row['bandpass_low']}-{row['bandpass_high']}"
         report_lines.append(
             f"| {row['label']} | {row['truth_type']} | {row['tau_err_max_ms']} | {band} | "
-            f"{row['pass_count']} | {row['pass_rate']:.2f} | {row['theta_err_median_deg']} | {row['psr_median_db']} |"
+            f"{row.get('pass_mode')} | {row['pass_count']} | {row['pass_rate']:.2f} | "
+            f"{row['theta_err_median_deg']} | {row['psr_median_db']} |"
         )
 
     if args.compare_to_baseline:
@@ -124,6 +181,8 @@ def main() -> None:
         "rows": analysis_rows,
     }
     (output_dir / "analysis_summary.json").write_text(json.dumps(analysis_summary, indent=2), encoding="utf-8")
+
+    write_detailed_report(output_dir, rows, speakers)
 
     logger.info("Analysis complete: %s", output_dir)
 

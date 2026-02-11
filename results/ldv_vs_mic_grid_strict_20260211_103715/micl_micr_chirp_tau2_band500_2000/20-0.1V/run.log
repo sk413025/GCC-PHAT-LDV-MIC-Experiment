@@ -1,0 +1,16 @@
+2026-02-11 10:51:26,844 - INFO - ======================================================================
+2026-02-11 10:51:26,845 - INFO - Stage 4: LDV-vs-Mic DoA (GCC-PHAT)
+2026-02-11 10:51:26,845 - INFO - ======================================================================
+2026-02-11 10:51:26,845 - INFO - Speaker: 20-0.1V
+2026-02-11 10:51:26,845 - INFO - Signal pair: micl_micr
+2026-02-11 10:51:26,845 - INFO - Geometry truth: tau=0.000 ms, theta=0.00 deg
+2026-02-11 10:51:26,845 - INFO - Reference(override): tau=0.222 ms, theta=3.12 deg
+2026-02-11 10:51:26,845 - INFO - Pass mode: theta_only
+2026-02-11 10:51:28,298 - INFO - Duration: 1044.65 s
+2026-02-11 10:52:02,419 - INFO - Evaluating 5 segments
+2026-02-11 10:52:02,419 - INFO - Segment 1/5: center_t=346.00s
+2026-02-11 10:52:02,493 - INFO - Segment 2/5: center_t=201.00s
+2026-02-11 10:52:02,556 - INFO - Segment 3/5: center_t=241.00s
+2026-02-11 10:52:02,621 - INFO - Segment 4/5: center_t=547.00s
+2026-02-11 10:52:02,686 - INFO - Segment 5/5: center_t=372.00s
+2026-02-11 10:52:02,753 - INFO - Results saved to: results\ldv_vs_mic_grid_strict_20260211_103715\micl_micr_chirp_tau2_band500_2000\20-0.1V\summary.json

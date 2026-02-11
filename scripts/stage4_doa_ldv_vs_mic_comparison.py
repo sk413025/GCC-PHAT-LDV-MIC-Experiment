@@ -538,6 +538,7 @@ def run_stage4_evaluation(
     truth_label: str | None,
     pass_theta_max_deg: float,
     pass_psr_min_db: float | None,
+    pass_mode: str,
     speaker_key_override: str | None,
 ) -> dict:
     logger.info("=" * 70)
@@ -566,6 +567,13 @@ def run_stage4_evaluation(
 
     logger.info("Geometry truth: tau=%.3f ms, theta=%.2f deg", tau_geom_ms, theta_geom_deg)
     logger.info("Reference(%s): tau=%.3f ms, theta=%.2f deg", truth_mode, tau_ref_ms, theta_ref_deg)
+
+    effective_pass_mode = pass_mode
+    if pass_mode == "auto":
+        effective_pass_mode = "omp_vs_raw" if signal_pair == "ldv_micl" else "theta_only"
+    if effective_pass_mode not in {"omp_vs_raw", "theta_only"}:
+        raise ValueError(f"Invalid pass_mode: {pass_mode}")
+    logger.info("Pass mode: %s", effective_pass_mode)
 
     sr_ldv, ldv_signal = load_wav(ldv_path)
     sr_mic_l, mic_left_signal = load_wav(mic_left_path)
@@ -665,6 +673,7 @@ def run_stage4_evaluation(
     use_guided_gcc = gcc_guided_radius_ms is not None and float(gcc_guided_radius_ms) > 0
 
     per_segment = []
+    per_segment_raw = [] if signal_pair == "ldv_micl" else None
 
     for seg_idx, center_sec in enumerate(segment_centers_sec):
         logger.info("Segment %d/%d: center_t=%.2fs", seg_idx + 1, n_segments_used, center_sec)
@@ -714,6 +723,7 @@ def run_stage4_evaluation(
                 "applied_delay_ms": float(delay_sec * 1000.0),
             }
 
+        raw_result = None
         if signal_pair == "ldv_micl":
             _, _, Zxx_ldv = stft(
                 ldv_for_alignment_slice,
@@ -772,6 +782,16 @@ def run_stage4_evaluation(
                 guided_tau_ms=float(tau_ref_ms) if use_guided_gcc else None,
                 guided_radius_ms=float(gcc_guided_radius_ms) if use_guided_gcc else None,
             )
+            raw_result = estimate_tdoa_gcc_phat(
+                ldv_slice[t_start:t_end],
+                mic_right_seg,
+                config["fs"],
+                max_lag_samples=max_lag_samples,
+                bandpass=bp,
+                psr_exclude_samples=psr_exclude_samples,
+                guided_tau_ms=float(tau_ref_ms) if use_guided_gcc else None,
+                guided_radius_ms=float(gcc_guided_radius_ms) if use_guided_gcc else None,
+            )
         else:
             mic_left_seg = mic_left_slice[t_start:t_end]
             mic_right_seg = mic_right_slice[t_start:t_end]
@@ -793,15 +813,57 @@ def run_stage4_evaluation(
             result["prealign"] = prealign_info
 
         per_segment.append(result)
+        if raw_result is not None and per_segment_raw is not None:
+            raw_result["theta_deg"] = float(tau_to_doa(raw_result["tau_ms"], config))
+            raw_result["theta_error_deg"] = float(abs(raw_result["theta_deg"] - theta_ref_deg))
+            raw_result["center_sec"] = float(center_sec)
+            per_segment_raw.append(raw_result)
 
     tau_median = float(np.median([r["tau_ms"] for r in per_segment]))
     theta_median = float(np.median([r["theta_deg"] for r in per_segment]))
     theta_err_median = float(np.median([r["theta_error_deg"] for r in per_segment]))
     psr_median = float(np.median([r["psr_db"] for r in per_segment]))
 
-    passed = bool(theta_err_median <= pass_theta_max_deg)
-    if pass_psr_min_db is not None:
-        passed = bool(passed and psr_median >= pass_psr_min_db)
+    raw_summary = None
+    if per_segment_raw:
+        raw_tau_median = float(np.median([r["tau_ms"] for r in per_segment_raw]))
+        raw_theta_median = float(np.median([r["theta_deg"] for r in per_segment_raw]))
+        raw_theta_err_median = float(np.median([r["theta_error_deg"] for r in per_segment_raw]))
+        raw_psr_median = float(np.median([r["psr_db"] for r in per_segment_raw]))
+        raw_summary = {
+            "tau_median_ms": raw_tau_median,
+            "theta_median_deg": raw_theta_median,
+            "theta_error_median_deg": raw_theta_err_median,
+            "psr_median_db": raw_psr_median,
+            "per_segment": per_segment_raw,
+        }
+
+    psr_min_ok = True if pass_psr_min_db is None else bool(psr_median >= pass_psr_min_db)
+    if effective_pass_mode == "omp_vs_raw":
+        if raw_summary is None:
+            raise ValueError("pass_mode=omp_vs_raw requires raw LDV evaluation")
+        omp_better_than_raw = bool(theta_err_median < raw_summary["theta_error_median_deg"])
+        omp_error_small = bool(theta_err_median < pass_theta_max_deg)
+        passed = bool(omp_better_than_raw and omp_error_small and psr_min_ok)
+        pass_conditions = {
+            "pass_mode": "omp_vs_raw",
+            "omp_better_than_raw": omp_better_than_raw,
+            "omp_error_small": omp_error_small,
+            "omp_psr_improved": bool(psr_median > raw_summary["psr_median_db"]),
+            "psr_min_db": None if pass_psr_min_db is None else float(pass_psr_min_db),
+            "psr_min_ok": psr_min_ok,
+            "passed": passed,
+        }
+    else:
+        theta_error_small = bool(theta_err_median < pass_theta_max_deg)
+        passed = bool(theta_error_small and psr_min_ok)
+        pass_conditions = {
+            "pass_mode": "theta_only",
+            "theta_error_small": theta_error_small,
+            "psr_min_db": None if pass_psr_min_db is None else float(pass_psr_min_db),
+            "psr_min_ok": psr_min_ok,
+            "passed": passed,
+        }
 
     summary = {
         "speaker_id": speaker_id,
@@ -831,11 +893,14 @@ def run_stage4_evaluation(
             "psr_median_db": psr_median,
             "per_segment": per_segment,
         },
+        "result_raw": raw_summary,
         "pass_thresholds": {
             "theta_error_max_deg": float(pass_theta_max_deg),
             "psr_min_db": None if pass_psr_min_db is None else float(pass_psr_min_db),
         },
         "passed": bool(passed),
+        "pass_conditions": pass_conditions,
+        "pass_mode": effective_pass_mode,
         "timestamp": datetime.now().isoformat(),
     }
 
@@ -891,6 +956,13 @@ def main() -> None:
 
     parser.add_argument("--pass_theta_max_deg", type=float, default=5.0)
     parser.add_argument("--pass_psr_min_db", type=float, default=None)
+    parser.add_argument(
+        "--pass_mode",
+        type=str,
+        default="auto",
+        choices=["auto", "theta_only", "omp_vs_raw"],
+        help="Pass criteria: auto=omp_vs_raw for ldv_micl, theta_only for micl_micr.",
+    )
 
     args = parser.parse_args()
 
@@ -960,6 +1032,7 @@ def main() -> None:
             truth_label=truth_label,
             pass_theta_max_deg=args.pass_theta_max_deg,
             pass_psr_min_db=args.pass_psr_min_db,
+            pass_mode=args.pass_mode,
             speaker_key_override=args.speaker_key,
         )
     except Exception as exc:

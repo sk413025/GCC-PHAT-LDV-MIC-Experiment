@@ -1,0 +1,195 @@
+{
+  "speaker_id": "21-0.1V",
+  "signal_pair": "ldv_micl",
+  "pair_description": "LDV aligned to MicL (OMP) paired with MicR",
+  "ground_truth": {
+    "tau_true_ms": -0.7585061238687961,
+    "theta_true_deg": -10.709760310799183,
+    "d_left": 2.0223748416156684,
+    "d_right": 2.2825424421026654,
+    "speaker_pos": [
+      -0.4,
+      0.0
+    ]
+  },
+  "truth_reference": {
+    "mode": "override",
+    "label": "chirp 24 mic truth-ref (5s)",
+    "tau_ref_ms": -0.6354575282303851,
+    "theta_ref_deg": -8.956647639640721
+  },
+  "n_segments": 5,
+  "segment_mode": "scan",
+  "scan_summary": {
+    "n_scanned": 501,
+    "n_candidates": 501,
+    "n_filtered": 501,
+    "n_selected": 5,
+    "scan_sort_by": "tau_err",
+    "scan_psr_min_db": -20.0,
+    "scan_tau_err_max_ms": 2.0,
+    "scan_ldv_micl_psr_min_db": null
+  },
+  "segment_centers_sec": [
+    279.0,
+    397.0,
+    101.0,
+    269.0,
+    358.0
+  ],
+  "ldv_prealign": "gcc_phat",
+  "config": {
+    "fs": 48000,
+    "n_fft": 6144,
+    "hop_length": 160,
+    "max_lag": 50,
+    "max_k": 3,
+    "tw": 64,
+    "freq_min": 100,
+    "freq_max": 8000,
+    "gcc_max_lag_ms": 10.0,
+    "gcc_bandpass_low": 0.0,
+    "gcc_bandpass_high": 0.0,
+    "psr_exclude_samples": 50,
+    "gcc_guided_peak_radius_ms": 0.3,
+    "analysis_slice_sec": 5.0,
+    "eval_window_sec": 5.0,
+    "segment_spacing_sec": 50.0,
+    "segment_offset_sec": 100.0,
+    "ldv_prealign": "gcc_phat",
+    "speed_of_sound": 343.0,
+    "mic_spacing": 1.4
+  },
+  "result": {
+    "tau_median_ms": -0.6239574476972183,
+    "theta_median_deg": -8.793259414140453,
+    "theta_error_median_deg": 0.292947747892784,
+    "psr_median_db": 0.12031310191626551,
+    "per_segment": [
+      {
+        "tau_ms": -0.6386249568755287,
+        "psr_db": -0.7254035279972595,
+        "theta_deg": -9.00166195456696,
+        "theta_error_deg": 0.045014314926238086,
+        "center_sec": 279.0,
+        "prealign": {
+          "mode": "gcc_phat",
+          "tau_ldv_to_micl_ms": 3.024559149041937,
+          "psr_ldv_to_micl_db": 4.130705883025642,
+          "applied_delay_ms": -3.024559149041937
+        }
+      },
+      {
+        "tau_ms": -0.588311269173493,
+        "psr_db": 0.6043119220959413,
+        "theta_deg": -8.28726518019793,
+        "theta_error_deg": 0.669382459442792,
+        "center_sec": 397.0,
+        "prealign": {
+          "mode": "gcc_phat",
+          "tau_ldv_to_micl_ms": 3.0206532392335523,
+          "psr_ldv_to_micl_db": 3.187394144193209,
+          "applied_delay_ms": -3.0206532392335523
+        }
+      },
+      {
+        "tau_ms": -0.6029903694855783,
+        "psr_db": 0.12031310191626551,
+        "theta_deg": -8.495552542332492,
+        "theta_error_deg": 0.4610950973082293,
+        "center_sec": 101.0,
+        "prealign": {
+          "mode": "gcc_phat",
+          "tau_ldv_to_micl_ms": 3.025591967806745,
+          "psr_ldv_to_micl_db": 3.7068630433143532,
+          "applied_delay_ms": -3.025591967806745
+        }
+      },
+      {
+        "tau_ms": -0.6560636555485649,
+        "psr_db": -0.806955132208637,
+        "theta_deg": -9.249595387533505,
+        "theta_error_deg": 0.292947747892784,
+        "center_sec": 269.0,
+        "prealign": {
+          "mode": "gcc_phat",
+          "tau_ldv_to_micl_ms": 3.0315877850428135,
+          "psr_ldv_to_micl_db": 4.684081365053231,
+          "applied_delay_ms": -3.0315877850428135
+        }
+      },
+      {
+        "tau_ms": -0.6239574476972183,
+        "psr_db": 0.7982709536968212,
+        "theta_deg": -8.793259414140453,
+        "theta_error_deg": 0.16338822550026855,
+        "center_sec": 358.0,
+        "prealign": {
+          "mode": "gcc_phat",
+          "tau_ldv_to_micl_ms": 3.02273032504101,
+          "psr_ldv_to_micl_db": 5.94544660481196,
+          "applied_delay_ms": -3.02273032504101
+        }
+      }
+    ]
+  },
+  "result_raw": {
+    "tau_median_ms": -0.9198838979849467,
+    "theta_median_deg": -13.024727888523847,
+    "theta_error_median_deg": 4.068080248883126,
+    "psr_median_db": -7.4696133697259945,
+    "per_segment": [
+      {
+        "tau_ms": -0.648609345383695,
+        "psr_db": -8.33367802098136,
+        "theta_deg": -9.143593170041356,
+        "theta_error_deg": 0.1869455304006351,
+        "center_sec": 279.0
+      },
+      {
+        "tau_ms": -0.9340703904224321,
+        "psr_db": -7.70098398574238,
+        "theta_deg": -13.229213785856357,
+        "theta_error_deg": 4.272566146215636,
+        "center_sec": 397.0
+      },
+      {
+        "tau_ms": -0.9198838979849467,
+        "psr_db": -7.384377063572078,
+        "theta_deg": -13.024727888523847,
+        "theta_error_deg": 4.068080248883126,
+        "center_sec": 101.0
+      },
+      {
+        "tau_ms": -0.6302610628552267,
+        "psr_db": -7.4696133697259945,
+        "theta_deg": -8.88280946941946,
+        "theta_error_deg": 0.07383817022126138,
+        "center_sec": 269.0
+      },
+      {
+        "tau_ms": -0.9224214758406615,
+        "psr_db": -7.301731742052039,
+        "theta_deg": -13.06129238200214,
+        "theta_error_deg": 4.104644742361419,
+        "center_sec": 358.0
+      }
+    ]
+  },
+  "pass_thresholds": {
+    "theta_error_max_deg": 5.0,
+    "psr_min_db": null
+  },
+  "passed": true,
+  "pass_conditions": {
+    "pass_mode": "omp_vs_raw",
+    "omp_better_than_raw": true,
+    "omp_error_small": true,
+    "omp_psr_improved": true,
+    "psr_min_db": null,
+    "psr_min_ok": true,
+    "passed": true
+  },
+  "pass_mode": "omp_vs_raw",
+  "timestamp": "2026-02-11T10:41:53.781867"
+}

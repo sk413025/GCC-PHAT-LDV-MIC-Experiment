@@ -103,20 +103,29 @@ def write_summary_table(run_dir: Path, summaries: dict[str, dict]) -> None:
     lines.append("")
     lines.append(f"Run dir: {run_dir}")
     lines.append("")
-    lines.append("| Speaker | tau_ref_ms | theta_ref_deg | theta_omp_deg | theta_err_deg | psr_db | pass |")
-    lines.append("| --- | --- | --- | --- | --- | --- | --- |")
+    lines.append(
+        "| Speaker | tau_ref_ms | theta_ref_deg | theta_omp_deg | theta_err_deg | "
+        "theta_raw_deg | theta_raw_err_deg | omp_better_than_raw | psr_omp_db | psr_raw_db | pass |"
+    )
+    lines.append("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |")
     for sp, summary in summaries.items():
         if summary is None:
-            lines.append(f"| {sp} | NA | NA | NA | NA | NA | False |")
+            lines.append(f"| {sp} | NA | NA | NA | NA | NA | NA | NA | NA | NA | False |")
             continue
         tau_ref = summary["truth_reference"]["tau_ref_ms"]
         theta_ref = summary["truth_reference"]["theta_ref_deg"]
         theta_omp = summary["result"]["theta_median_deg"]
         theta_err = summary["result"]["theta_error_median_deg"]
         psr_db = summary["result"]["psr_median_db"]
+        raw = summary.get("result_raw")
+        raw_theta = raw["theta_median_deg"] if raw else "NA"
+        raw_err = raw["theta_error_median_deg"] if raw else "NA"
+        raw_psr = raw["psr_median_db"] if raw else "NA"
+        omp_better = summary.get("pass_conditions", {}).get("omp_better_than_raw", "NA")
         passed = summary["passed"]
         lines.append(
-            f"| {sp} | {tau_ref} | {theta_ref} | {theta_omp} | {theta_err} | {psr_db} | {passed} |"
+            f"| {sp} | {tau_ref} | {theta_ref} | {theta_omp} | {theta_err} | "
+            f"{raw_theta} | {raw_err} | {omp_better} | {psr_db} | {raw_psr} | {passed} |"
         )
     lines.append("")
     pass_count = sum(1 for s in summaries.values() if s and s.get("passed"))
@@ -134,12 +143,12 @@ def write_grid_summary(output_base: Path, grid_rows: list[dict]) -> None:
     lines = []
     lines.append("# LDV-vs-Mic Grid Summary (GCC-PHAT)")
     lines.append("")
-    lines.append("| truth_type | config | tau_err_max_ms | bandpass | pass_count | failing_speakers | run_dir |")
-    lines.append("| --- | --- | --- | --- | --- | --- | --- |")
+    lines.append("| truth_type | config | tau_err_max_ms | bandpass | pass_mode | pass_count | failing_speakers | run_dir |")
+    lines.append("| --- | --- | --- | --- | --- | --- | --- | --- |")
     for row in grid_rows:
         lines.append(
             f"| {row['truth_type']} | {row['label']} | {row['tau_err_max_ms']} | "
-            f"{row['bandpass_low']}-{row['bandpass_high']} | {row['pass_count']} | "
+            f"{row['bandpass_low']}-{row['bandpass_high']} | {row.get('pass_mode', 'NA')} | {row['pass_count']} | "
             f"{', '.join(row['failing_speakers'])} | {row['run_dir']} |"
         )
     (output_base / "grid_summary.md").write_text("\n".join(lines), encoding="utf-8")
@@ -161,12 +170,12 @@ def write_grid_report(output_base: Path, grid_rows: list[dict], data_root: Path,
     lines.append("")
     lines.append("## Grid Summary")
     lines.append("")
-    lines.append("| truth_type | config | tau_err_max_ms | bandpass | pass_count | failing_speakers | run_dir |")
-    lines.append("| --- | --- | --- | --- | --- | --- | --- |")
+    lines.append("| truth_type | config | tau_err_max_ms | bandpass | pass_mode | pass_count | failing_speakers | run_dir |")
+    lines.append("| --- | --- | --- | --- | --- | --- | --- | --- |")
     for row in grid_rows:
         lines.append(
             f"| {row['truth_type']} | {row['label']} | {row['tau_err_max_ms']} | "
-            f"{row['bandpass_low']}-{row['bandpass_high']} | {row['pass_count']} | "
+            f"{row['bandpass_low']}-{row['bandpass_high']} | {row.get('pass_mode', 'NA')} | {row['pass_count']} | "
             f"{', '.join(row['failing_speakers'])} | {row['run_dir']} |"
         )
     lines.append("")
@@ -228,6 +237,7 @@ def main() -> None:
         run_dir.mkdir(parents=True, exist_ok=True)
 
         summaries = {}
+        pass_mode = "omp_vs_raw" if cfg["signal_pair"] == "ldv_micl" else "theta_only"
         for sp in speakers:
             speaker_dir = run_dir / sp
             speaker_dir.mkdir(parents=True, exist_ok=True)
@@ -280,6 +290,8 @@ def main() -> None:
                 "gcc_phat",
                 "--pass_theta_max_deg",
                 "5.0",
+                "--pass_mode",
+                pass_mode,
             ]
 
             if cfg["truth_type"] == "chirp":
@@ -308,6 +320,7 @@ def main() -> None:
 
         run_config = {
             "config": cfg,
+            "pass_mode": pass_mode,
             "speakers": speakers,
             "segment_mode": "scan",
             "analysis_slice_sec": 5,
@@ -337,6 +350,7 @@ def main() -> None:
                 "tau_err_max_ms": cfg["tau_err_max_ms"],
                 "bandpass_low": cfg["bandpass_low"],
                 "bandpass_high": cfg["bandpass_high"],
+                "pass_mode": pass_mode,
                 "pass_count": pass_count,
                 "failing_speakers": failing,
                 "run_dir": str(run_dir),
