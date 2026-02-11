@@ -1,0 +1,55 @@
+{
+  "generated": "2026-02-11T10:05:23.347273",
+  "rows": [
+    {
+      "truth_type": "chirp",
+      "label": "ldv_micl_chirp_tau2_band0",
+      "tau_err_max_ms": 2.0,
+      "bandpass_low": 0,
+      "bandpass_high": 0,
+      "pass_count": 5,
+      "failing_speakers": [],
+      "run_dir": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\worktree\\exp-ldv-vs-mic-doa-comparison\\results\\ldv_vs_mic_grid_20260211_093529\\ldv_micl_chirp_tau2_band0"
+    },
+    {
+      "truth_type": "chirp",
+      "label": "ldv_micl_chirp_tau2_band500_2000",
+      "tau_err_max_ms": 2.0,
+      "bandpass_low": 500,
+      "bandpass_high": 2000,
+      "pass_count": 5,
+      "failing_speakers": [],
+      "run_dir": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\worktree\\exp-ldv-vs-mic-doa-comparison\\results\\ldv_vs_mic_grid_20260211_093529\\ldv_micl_chirp_tau2_band500_2000"
+    },
+    {
+      "truth_type": "chirp",
+      "label": "micl_micr_chirp_tau2_band500_2000",
+      "tau_err_max_ms": 2.0,
+      "bandpass_low": 500,
+      "bandpass_high": 2000,
+      "pass_count": 5,
+      "failing_speakers": [],
+      "run_dir": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\worktree\\exp-ldv-vs-mic-doa-comparison\\results\\ldv_vs_mic_grid_20260211_093529\\micl_micr_chirp_tau2_band500_2000"
+    },
+    {
+      "truth_type": "geometry",
+      "label": "ldv_micl_geometry_tau2_band500_2000",
+      "tau_err_max_ms": 2.0,
+      "bandpass_low": 500,
+      "bandpass_high": 2000,
+      "pass_count": 5,
+      "failing_speakers": [],
+      "run_dir": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\worktree\\exp-ldv-vs-mic-doa-comparison\\results\\ldv_vs_mic_grid_20260211_093529\\ldv_micl_geometry_tau2_band500_2000"
+    },
+    {
+      "truth_type": "chirp",
+      "label": "ldv_micl_chirp_tau0p3_band500_2000",
+      "tau_err_max_ms": 0.3,
+      "bandpass_low": 500,
+      "bandpass_high": 2000,
+      "pass_count": 5,
+      "failing_speakers": [],
+      "run_dir": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\worktree\\exp-ldv-vs-mic-doa-comparison\\results\\ldv_vs_mic_grid_20260211_093529\\ldv_micl_chirp_tau0p3_band500_2000"
+    }
+  ]
+}

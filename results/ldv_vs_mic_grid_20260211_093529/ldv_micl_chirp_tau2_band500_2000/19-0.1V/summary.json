@@ -1,0 +1,142 @@
+{
+  "speaker_id": "19-0.1V",
+  "signal_pair": "ldv_micl",
+  "pair_description": "LDV aligned to MicL (OMP) paired with MicR",
+  "ground_truth": {
+    "tau_true_ms": 0.7585061238687961,
+    "theta_true_deg": 10.709760310799183,
+    "d_left": 2.2825424421026654,
+    "d_right": 2.0223748416156684,
+    "speaker_pos": [
+      0.4,
+      0.0
+    ]
+  },
+  "truth_reference": {
+    "mode": "override",
+    "label": "chirp 28 mic truth-ref (5s)",
+    "tau_ref_ms": 0.9146816249912124,
+    "theta_ref_deg": 12.949784096599064
+  },
+  "n_segments": 5,
+  "segment_mode": "scan",
+  "scan_summary": {
+    "n_scanned": 501,
+    "n_candidates": 501,
+    "n_filtered": 455,
+    "n_selected": 5,
+    "scan_sort_by": "tau_err",
+    "scan_psr_min_db": -20.0,
+    "scan_tau_err_max_ms": 2.0,
+    "scan_ldv_micl_psr_min_db": null
+  },
+  "segment_centers_sec": [
+    593.0,
+    471.0,
+    154.0,
+    338.0,
+    232.0
+  ],
+  "ldv_prealign": "gcc_phat",
+  "config": {
+    "fs": 48000,
+    "n_fft": 6144,
+    "hop_length": 160,
+    "max_lag": 50,
+    "max_k": 3,
+    "tw": 64,
+    "freq_min": 100,
+    "freq_max": 8000,
+    "gcc_max_lag_ms": 10.0,
+    "gcc_bandpass_low": 500.0,
+    "gcc_bandpass_high": 2000.0,
+    "psr_exclude_samples": 50,
+    "gcc_guided_peak_radius_ms": 0.3,
+    "analysis_slice_sec": 5.0,
+    "eval_window_sec": 5.0,
+    "segment_spacing_sec": 50.0,
+    "segment_offset_sec": 100.0,
+    "ldv_prealign": "gcc_phat",
+    "speed_of_sound": 343.0,
+    "mic_spacing": 1.4
+  },
+  "result": {
+    "tau_median_ms": 1.1036482106897334,
+    "theta_median_deg": 15.687702273799399,
+    "theta_error_median_deg": 2.808059748282419,
+    "psr_median_db": -28.09080818383572,
+    "per_segment": [
+      {
+        "tau_ms": 0.5947748778779148,
+        "psr_db": -2.2264350914602087,
+        "theta_deg": 8.378966037473482,
+        "theta_error_deg": 4.570818059125582,
+        "center_sec": 593.0,
+        "prealign": {
+          "mode": "gcc_phat",
+          "tau_ldv_to_micl_ms": -0.01825575195420393,
+          "psr_ldv_to_micl_db": 14.676152855527791,
+          "applied_delay_ms": 0.01825575195420393
+        }
+      },
+      {
+        "tau_ms": 1.0616828274663912,
+        "psr_db": -29.925997564915644,
+        "theta_deg": 15.076725300226762,
+        "theta_error_deg": 2.1269412036276982,
+        "center_sec": 471.0,
+        "prealign": {
+          "mode": "gcc_phat",
+          "tau_ldv_to_micl_ms": 0.005555497695244563,
+          "psr_ldv_to_micl_db": 29.40852586043095,
+          "applied_delay_ms": -0.005555497695244563
+        }
+      },
+      {
+        "tau_ms": 1.1091884696869734,
+        "psr_db": -28.09080818383572,
+        "theta_deg": 15.76849857867701,
+        "theta_error_deg": 2.8187144820779455,
+        "center_sec": 154.0,
+        "prealign": {
+          "mode": "gcc_phat",
+          "tau_ldv_to_micl_ms": -0.020076061575755883,
+          "psr_ldv_to_micl_db": 15.73587000173703,
+          "applied_delay_ms": 0.020076061575755883
+        }
+      },
+      {
+        "tau_ms": 1.1036482106897334,
+        "psr_db": -35.80170964281268,
+        "theta_deg": 15.687702273799399,
+        "theta_error_deg": 2.737918177200335,
+        "center_sec": 338.0,
+        "prealign": {
+          "mode": "gcc_phat",
+          "tau_ldv_to_micl_ms": 0.00023511950907031175,
+          "psr_ldv_to_micl_db": 33.63518408243461,
+          "applied_delay_ms": -0.00023511950907031175
+        }
+      },
+      {
+        "tau_ms": 1.1084579931737553,
+        "psr_db": -13.378093815937236,
+        "theta_deg": 15.757843844881483,
+        "theta_error_deg": 2.808059748282419,
+        "center_sec": 232.0,
+        "prealign": {
+          "mode": "gcc_phat",
+          "tau_ldv_to_micl_ms": 0.002138895563710825,
+          "psr_ldv_to_micl_db": 30.362854113265627,
+          "applied_delay_ms": -0.002138895563710825
+        }
+      }
+    ]
+  },
+  "pass_thresholds": {
+    "theta_error_max_deg": 5.0,
+    "psr_min_db": null
+  },
+  "passed": true,
+  "timestamp": "2026-02-11T09:44:04.337765"
+}

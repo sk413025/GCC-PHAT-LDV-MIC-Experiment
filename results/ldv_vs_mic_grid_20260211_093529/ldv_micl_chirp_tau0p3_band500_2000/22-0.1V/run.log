@@ -1,0 +1,15 @@
+2026-02-11 10:03:51,953 - INFO - ======================================================================
+2026-02-11 10:03:51,953 - INFO - Stage 4: LDV-vs-Mic DoA (GCC-PHAT)
+2026-02-11 10:03:51,953 - INFO - ======================================================================
+2026-02-11 10:03:51,953 - INFO - Speaker: 22-0.1V
+2026-02-11 10:03:51,953 - INFO - Signal pair: ldv_micl
+2026-02-11 10:03:51,954 - INFO - Geometry truth: tau=-1.450 ms, theta=-20.82 deg
+2026-02-11 10:03:51,954 - INFO - Reference(override): tau=-1.307 ms, theta=-18.68 deg
+2026-02-11 10:03:53,459 - INFO - Duration: 1043.46 s
+2026-02-11 10:05:01,338 - INFO - Evaluating 5 segments
+2026-02-11 10:05:01,338 - INFO - Segment 1/5: center_t=544.00s
+2026-02-11 10:05:03,410 - INFO - Segment 2/5: center_t=284.00s
+2026-02-11 10:05:05,542 - INFO - Segment 3/5: center_t=314.00s
+2026-02-11 10:05:07,680 - INFO - Segment 4/5: center_t=248.00s
+2026-02-11 10:05:09,791 - INFO - Segment 5/5: center_t=576.00s
+2026-02-11 10:05:11,911 - INFO - Results saved to: C:\Users\Jenner\Documents\SBP Lab\LDVReorientation\worktree\exp-ldv-vs-mic-doa-comparison\results\ldv_vs_mic_grid_20260211_093529\ldv_micl_chirp_tau0p3_band500_2000\22-0.1V\summary.json
