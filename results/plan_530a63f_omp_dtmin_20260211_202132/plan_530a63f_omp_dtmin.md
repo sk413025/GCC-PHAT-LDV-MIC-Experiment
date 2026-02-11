@@ -12,6 +12,7 @@ Primary publication goal:
 - Keep the Stage4 strict comparability protocol from `530a63f`.
 - Add a learned DTmin policy trained from OMP teacher trajectories.
 - Report whether DTmin preserves or improves strict-pass outcomes.
+- Keep sparsity-step setting fixed at `K=3` for both teacher generation and student rollout to match the current OMP baseline behavior.
 
 ## 2) What Commit 530a63f Already Established
 
@@ -39,6 +40,7 @@ Strict baseline outputs include:
 For each `(speaker, selected 5s segment, frequency bin)`:
 - Build lag dictionary over `[-max_lag, +max_lag]`.
 - Run OMP (or penalty-OMP with STOP) to produce step-wise lag selections.
+- Fix OMP step budget to `max_k=3` (no K sweep in baseline-comparable run).
 - Save trajectory blocks with required fields:
   - `corrs`: per-step correlation features
   - `actions`: selected lag ids
@@ -56,6 +58,7 @@ Train DTmin on teacher trajectories:
 - Inputs: correlation state (and optional RTG channels)
 - Outputs: lag action (plus optional STOP token)
 - Loss: action cross-entropy (plus optional STOP supervision)
+- Sequence horizon fixed to `3` steps to align with teacher `max_k=3`.
 
 Candidate implementation references:
 - `worktree/exp-interspeech-GRU2/scripts/h_exploration/train_dt_lag_seq_rtg.py`
@@ -76,6 +79,7 @@ Do not change these controls versus `530a63f`:
 - same scan windows / guided peak logic
 - same chirp truth source file
 - same strict pass definition and report structure
+- same OMP sparsity-step budget: `max_k=3`
 
 ## 4) Does 530a63f Need Full Re-run?
 
@@ -192,17 +196,20 @@ Required full re-run scope (minimum):
 python scripts/generate_omp_dtmin_trajectories.py \
   --data_root "C:/Users/Jenner/Documents/SBP Lab/LDVReorientation/dataset/GCC-PHAT-LDV-MIC-Experiment" \
   --speakers "20-0.1V" \
+  --max_k 3 \
   --out_dir "results/ldv_vs_mic_dtmin_strict_<ts>/teacher_trajectories_smoke"
 
 # 2) Teacher trajectories (full strict subset)
 python scripts/generate_omp_dtmin_trajectories.py \
   --data_root "C:/Users/Jenner/Documents/SBP Lab/LDVReorientation/dataset/GCC-PHAT-LDV-MIC-Experiment" \
   --speakers "18-0.1V,19-0.1V,20-0.1V,21-0.1V,22-0.1V" \
+  --max_k 3 \
   --out_dir "results/ldv_vs_mic_dtmin_strict_<ts>/teacher_trajectories"
 
 # 3) Train DTmin
 python scripts/train_dtmin_from_omp_trajectories.py \
   --traj_path "results/ldv_vs_mic_dtmin_strict_<ts>/teacher_trajectories/lag_trajectories.pt" \
+  --horizon 3 \
   --out_dir "results/ldv_vs_mic_dtmin_strict_<ts>/dtmin_model"
 
 # 4) Strict grid re-run with DTmin
@@ -210,6 +217,7 @@ python scripts/run_ldv_vs_mic_grid.py \
   --data_root "C:/Users/Jenner/Documents/SBP Lab/LDVReorientation/dataset/GCC-PHAT-LDV-MIC-Experiment" \
   --chirp_truth_file "C:/Users/Jenner/Documents/SBP Lab/LDVReorientation/worktree/exp-ldv-perfect-geometry-cloud/exp-validation/ldv-perfect-geometry/validation-results/stage4_doa_validation_speech_truthref_chirp_scan_guided_5s_local_20260209_170241/chirp_truthref_5s.json" \
   --alignment_mode dtmin \
+  --max_k 3 \
   --output_base "results/ldv_vs_mic_dtmin_strict_<ts>"
 
 # 5) Analyze
