@@ -5,6 +5,7 @@ Stage 4 DoA: LDV-vs-Mic comparison (GCC-PHAT, guided search)
 Signal pairs:
 - micl_micr: MicL-MicR baseline
 - ldv_micl: LDV aligned to MicL via OMP, then paired with MicR
+- ldv_micr: LDV aligned to MicR via OMP/DTmin, then paired with MicL
 
 Truth reference:
 - Geometry truth (default)
@@ -509,6 +510,7 @@ def scan_segment_centers_by_mic_mic(
     ldv_signal: np.ndarray | None,
     mic_left_signal: np.ndarray,
     mic_right_signal: np.ndarray,
+    ldv_ref_signal: np.ndarray | None = None,
     *,
     fs: int,
     eval_window_sec: float,
@@ -581,19 +583,27 @@ def scan_segment_centers_by_mic_mic(
         }
 
         if ldv_signal is not None:
-            if t_end <= len(ldv_signal):
+            if t_end <= len(ldv_signal) and ldv_ref_signal is not None and t_end <= len(ldv_ref_signal):
                 ldv_seg = ldv_signal[t_start:t_end]
-                tau_ldv_micl_sec, psr_ldv_micl_db = gcc_phat_full_analysis(
+                ldv_ref_seg = ldv_ref_signal[t_start:t_end]
+                tau_ldv_ref_sec, psr_ldv_ref_db = gcc_phat_full_analysis(
                     ldv_seg.astype(np.float64, copy=False),
-                    mic_l_seg.astype(np.float64, copy=False),
+                    ldv_ref_seg.astype(np.float64, copy=False),
                     fs,
                     max_tau=max_tau,
                     bandpass=bandpass,
                     psr_exclude_samples=psr_exclude_samples,
                 )
-                cand["ldv_micl_tau_ms"] = float(tau_ldv_micl_sec * 1000.0)
-                cand["ldv_micl_psr_db"] = float(psr_ldv_micl_db)
+                ldv_tau_ms = float(tau_ldv_ref_sec * 1000.0)
+                ldv_psr_db = float(psr_ldv_ref_db)
+                cand["ldv_ref_tau_ms"] = ldv_tau_ms
+                cand["ldv_ref_psr_db"] = ldv_psr_db
+                # Backward-compatible keys retained for legacy reports.
+                cand["ldv_micl_tau_ms"] = ldv_tau_ms
+                cand["ldv_micl_psr_db"] = ldv_psr_db
             else:
+                cand["ldv_ref_tau_ms"] = None
+                cand["ldv_ref_psr_db"] = None
                 cand["ldv_micl_tau_ms"] = None
                 cand["ldv_micl_psr_db"] = None
 
@@ -607,7 +617,7 @@ def scan_segment_centers_by_mic_mic(
         if scan_tau_err_max_ms is not None and cand["tau_err_ms"] > scan_tau_err_max_ms:
             continue
         if scan_ldv_micl_psr_min_db is not None:
-            ldv_psr = cand.get("ldv_micl_psr_db")
+            ldv_psr = cand.get("ldv_ref_psr_db", cand.get("ldv_micl_psr_db"))
             if ldv_psr is None or ldv_psr < scan_ldv_micl_psr_min_db:
                 continue
         filtered.append(cand)
@@ -639,6 +649,7 @@ def scan_segment_centers_by_mic_mic(
         "scan_sort_by": scan_sort_by,
         "scan_psr_min_db": scan_psr_min_db,
         "scan_tau_err_max_ms": scan_tau_err_max_ms,
+        "scan_ldv_ref_psr_min_db": scan_ldv_micl_psr_min_db,
         "scan_ldv_micl_psr_min_db": scan_ldv_micl_psr_min_db,
     }
 
@@ -709,7 +720,7 @@ def run_stage4_evaluation(
 
     effective_pass_mode = pass_mode
     if pass_mode == "auto":
-        effective_pass_mode = "omp_vs_raw" if signal_pair == "ldv_micl" else "theta_only"
+        effective_pass_mode = "omp_vs_raw" if signal_pair.startswith("ldv_") else "theta_only"
     if effective_pass_mode not in {"omp_vs_raw", "theta_only"}:
         raise ValueError(f"Invalid pass_mode: {pass_mode}")
     logger.info("Pass mode: %s", effective_pass_mode)
@@ -717,7 +728,7 @@ def run_stage4_evaluation(
     if alignment_mode not in {"omp", "dtmin"}:
         raise ValueError(f"Invalid alignment_mode={alignment_mode!r} (expected: omp|dtmin)")
     dtmin_policy = None
-    if signal_pair == "ldv_micl" and alignment_mode == "dtmin":
+    if signal_pair.startswith("ldv_") and alignment_mode == "dtmin":
         if not dtmin_model_path:
             raise ValueError("alignment_mode=dtmin requires dtmin_model_path")
         n_lags = 2 * int(config["max_lag"]) + 1
@@ -763,11 +774,13 @@ def run_stage4_evaluation(
     if segment_mode == "scan":
         if scan_min_separation_sec is None:
             scan_min_separation_sec = float(config.get("eval_window_sec", 1.0))
-        scan_use_ldv = scan_ldv_micl_psr_min_db is not None or signal_pair == "ldv_micl"
+        ldv_ref_signal = mic_left_signal if signal_pair == "ldv_micl" else mic_right_signal
+        scan_use_ldv = scan_ldv_micl_psr_min_db is not None or signal_pair.startswith("ldv_")
         segment_centers_sec, scan_summary = scan_segment_centers_by_mic_mic(
             ldv_signal if scan_use_ldv else None,
             mic_left_signal,
             mic_right_signal,
+            ldv_ref_signal=ldv_ref_signal if scan_use_ldv else None,
             fs=config["fs"],
             eval_window_sec=float(config.get("eval_window_sec", 1.0)),
             max_lag_ms=float(config["gcc_max_lag_ms"]),
@@ -825,7 +838,7 @@ def run_stage4_evaluation(
     use_guided_gcc = gcc_guided_radius_ms is not None and float(gcc_guided_radius_ms) > 0
 
     per_segment = []
-    per_segment_raw = [] if signal_pair == "ldv_micl" else None
+    per_segment_raw = [] if signal_pair.startswith("ldv_") else None
 
     for seg_idx, center_sec in enumerate(segment_centers_sec):
         logger.info("Segment %d/%d: center_t=%.2fs", seg_idx + 1, n_segments_used, center_sec)
@@ -855,28 +868,37 @@ def run_stage4_evaluation(
 
         prealign_info = None
         ldv_for_alignment_slice = ldv_slice
-        if signal_pair == "ldv_micl" and ldv_prealign == "gcc_phat":
+        if signal_pair.startswith("ldv_") and ldv_prealign == "gcc_phat":
+            ldv_ref_label = "micl" if signal_pair == "ldv_micl" else "micr"
+            ldv_ref_slice = mic_left_slice if signal_pair == "ldv_micl" else mic_right_slice
             ldv_seg_for_tau = ldv_slice[t_start:t_end]
-            mic_l_seg_for_tau = mic_left_slice[t_start:t_end]
-            tau_ldv_to_micl_sec, psr_ldv_to_micl_db = gcc_phat_full_analysis(
+            ref_seg_for_tau = ldv_ref_slice[t_start:t_end]
+            tau_ldv_to_ref_sec, psr_ldv_to_ref_db = gcc_phat_full_analysis(
                 ldv_seg_for_tau.astype(np.float64, copy=False),
-                mic_l_seg_for_tau.astype(np.float64, copy=False),
+                ref_seg_for_tau.astype(np.float64, copy=False),
                 config["fs"],
                 max_tau=float(config["gcc_max_lag_ms"]) / 1000.0,
                 bandpass=bp,
                 psr_exclude_samples=psr_exclude_samples,
             )
-            delay_sec = -float(tau_ldv_to_micl_sec)
+            delay_sec = -float(tau_ldv_to_ref_sec)
             ldv_for_alignment_slice = apply_fractional_delay_fd(ldv_slice, config["fs"], delay_sec)
             prealign_info = {
                 "mode": "gcc_phat",
-                "tau_ldv_to_micl_ms": float(tau_ldv_to_micl_sec * 1000.0),
-                "psr_ldv_to_micl_db": float(psr_ldv_to_micl_db),
+                f"tau_ldv_to_{ldv_ref_label}_ms": float(tau_ldv_to_ref_sec * 1000.0),
+                f"psr_ldv_to_{ldv_ref_label}_db": float(psr_ldv_to_ref_db),
                 "applied_delay_ms": float(delay_sec * 1000.0),
             }
 
         raw_result = None
-        if signal_pair == "ldv_micl":
+        if signal_pair.startswith("ldv_"):
+            if signal_pair == "ldv_micl":
+                mic_ref_slice = mic_left_slice
+                mic_pair_slice = mic_right_slice
+            else:
+                mic_ref_slice = mic_right_slice
+                mic_pair_slice = mic_left_slice
+
             _, _, Zxx_ldv = stft(
                 ldv_for_alignment_slice,
                 fs=config["fs"],
@@ -884,15 +906,15 @@ def run_stage4_evaluation(
                 noverlap=config["n_fft"] - config["hop_length"],
                 window="hann",
             )
-            _, _, Zxx_mic_left = stft(
-                mic_left_slice,
+            _, _, Zxx_mic_ref = stft(
+                mic_ref_slice,
                 fs=config["fs"],
                 nperseg=config["n_fft"],
                 noverlap=config["n_fft"] - config["hop_length"],
                 window="hann",
             )
 
-            n_time = min(Zxx_ldv.shape[1], Zxx_mic_left.shape[1])
+            n_time = min(Zxx_ldv.shape[1], Zxx_mic_ref.shape[1])
             tw = int(config["tw"])
             max_lag = int(config["max_lag"])
             desired_frame = int(
@@ -908,9 +930,9 @@ def run_stage4_evaluation(
                 )
 
             if alignment_mode == "omp":
-                Zxx_omp = apply_omp_alignment(Zxx_ldv, Zxx_mic_left, config, start_t)
+                Zxx_omp = apply_omp_alignment(Zxx_ldv, Zxx_mic_ref, config, start_t)
             else:
-                Zxx_omp = apply_dtmin_alignment(Zxx_ldv, Zxx_mic_left, config, start_t, dtmin_policy)
+                Zxx_omp = apply_dtmin_alignment(Zxx_ldv, Zxx_mic_ref, config, start_t, dtmin_policy)
             _, ldv_omp_td = istft(
                 Zxx_omp,
                 fs=config["fs"],
@@ -919,34 +941,57 @@ def run_stage4_evaluation(
                 window="hann",
             )
 
-            max_len = min(len(ldv_omp_td), len(mic_right_slice))
+            max_len = min(len(ldv_omp_td), len(mic_pair_slice))
             if t_end > max_len:
                 t_end = max_len
                 t_start = max(0, t_end - eval_window_samples)
 
             ldv_omp_seg = ldv_omp_td[t_start:t_end]
-            mic_right_seg = mic_right_slice[t_start:t_end]
+            mic_pair_seg = mic_pair_slice[t_start:t_end]
+            ldv_raw_seg = ldv_slice[t_start:t_end]
 
-            result = estimate_tdoa_gcc_phat(
-                ldv_omp_seg,
-                mic_right_seg,
-                config["fs"],
-                max_lag_samples=max_lag_samples,
-                bandpass=bp,
-                psr_exclude_samples=psr_exclude_samples,
-                guided_tau_ms=float(tau_ref_ms) if use_guided_gcc else None,
-                guided_radius_ms=float(gcc_guided_radius_ms) if use_guided_gcc else None,
-            )
-            raw_result = estimate_tdoa_gcc_phat(
-                ldv_slice[t_start:t_end],
-                mic_right_seg,
-                config["fs"],
-                max_lag_samples=max_lag_samples,
-                bandpass=bp,
-                psr_exclude_samples=psr_exclude_samples,
-                guided_tau_ms=float(tau_ref_ms) if use_guided_gcc else None,
-                guided_radius_ms=float(gcc_guided_radius_ms) if use_guided_gcc else None,
-            )
+            if signal_pair == "ldv_micl":
+                result = estimate_tdoa_gcc_phat(
+                    ldv_omp_seg,
+                    mic_pair_seg,
+                    config["fs"],
+                    max_lag_samples=max_lag_samples,
+                    bandpass=bp,
+                    psr_exclude_samples=psr_exclude_samples,
+                    guided_tau_ms=float(tau_ref_ms) if use_guided_gcc else None,
+                    guided_radius_ms=float(gcc_guided_radius_ms) if use_guided_gcc else None,
+                )
+                raw_result = estimate_tdoa_gcc_phat(
+                    ldv_raw_seg,
+                    mic_pair_seg,
+                    config["fs"],
+                    max_lag_samples=max_lag_samples,
+                    bandpass=bp,
+                    psr_exclude_samples=psr_exclude_samples,
+                    guided_tau_ms=float(tau_ref_ms) if use_guided_gcc else None,
+                    guided_radius_ms=float(gcc_guided_radius_ms) if use_guided_gcc else None,
+                )
+            else:
+                result = estimate_tdoa_gcc_phat(
+                    mic_pair_seg,
+                    ldv_omp_seg,
+                    config["fs"],
+                    max_lag_samples=max_lag_samples,
+                    bandpass=bp,
+                    psr_exclude_samples=psr_exclude_samples,
+                    guided_tau_ms=float(tau_ref_ms) if use_guided_gcc else None,
+                    guided_radius_ms=float(gcc_guided_radius_ms) if use_guided_gcc else None,
+                )
+                raw_result = estimate_tdoa_gcc_phat(
+                    mic_pair_seg,
+                    ldv_raw_seg,
+                    config["fs"],
+                    max_lag_samples=max_lag_samples,
+                    bandpass=bp,
+                    psr_exclude_samples=psr_exclude_samples,
+                    guided_tau_ms=float(tau_ref_ms) if use_guided_gcc else None,
+                    guided_radius_ms=float(gcc_guided_radius_ms) if use_guided_gcc else None,
+                )
         else:
             mic_left_seg = mic_left_slice[t_start:t_end]
             mic_right_seg = mic_right_slice[t_start:t_end]
@@ -1031,7 +1076,11 @@ def run_stage4_evaluation(
         "pair_description": (
             f"LDV aligned to MicL ({alignment_mode.upper()}) paired with MicR"
             if signal_pair == "ldv_micl"
-            else "MicL-MicR"
+            else (
+                f"LDV aligned to MicR ({alignment_mode.upper()}) paired with MicL"
+                if signal_pair == "ldv_micr"
+                else "MicL-MicR"
+            )
         ),
         "ground_truth": ground_truth,
         "truth_reference": {
@@ -1087,7 +1136,7 @@ def main() -> None:
     parser.add_argument("--speaker", type=str, required=True, help="Speaker folder (e.g., 20-0.1V)")
     parser.add_argument("--speaker_key", type=str, default=None, help="Override geometry speaker key")
     parser.add_argument("--output_dir", type=str, required=True, help="Output directory")
-    parser.add_argument("--signal_pair", type=str, choices=["ldv_micl", "micl_micr"], default="ldv_micl")
+    parser.add_argument("--signal_pair", type=str, choices=["ldv_micl", "ldv_micr", "micl_micr"], default="ldv_micl")
 
     parser.add_argument("--n_segments", type=int, default=5)
     parser.add_argument("--segment_mode", type=str, default="scan", choices=["fixed", "scan"])
@@ -1127,7 +1176,7 @@ def main() -> None:
         type=str,
         default="auto",
         choices=["auto", "theta_only", "omp_vs_raw"],
-        help="Pass criteria: auto=omp_vs_raw for ldv_micl, theta_only for micl_micr.",
+        help="Pass criteria: auto=omp_vs_raw for ldv_micl/ldv_micr, theta_only for micl_micr.",
     )
 
     args = parser.parse_args()

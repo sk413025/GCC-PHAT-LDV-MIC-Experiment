@@ -1,0 +1,17 @@
+2026-02-12 15:01:10,180 - INFO - ======================================================================
+2026-02-12 15:01:10,181 - INFO - Stage 4: LDV-vs-Mic DoA (GCC-PHAT)
+2026-02-12 15:01:10,181 - INFO - ======================================================================
+2026-02-12 15:01:10,181 - INFO - Speaker: 21-0.1V
+2026-02-12 15:01:10,181 - INFO - Signal pair: ldv_micr
+2026-02-12 15:01:10,182 - INFO - Alignment mode: dtmin
+2026-02-12 15:01:10,182 - INFO - Geometry truth: tau=-0.759 ms, theta=-10.71 deg
+2026-02-12 15:01:10,182 - INFO - Reference(override): tau=-0.635 ms, theta=-8.96 deg
+2026-02-12 15:01:10,182 - INFO - Pass mode: omp_vs_raw
+2026-02-12 15:01:11,670 - INFO - Duration: 1043.97 s
+2026-02-12 15:02:07,720 - INFO - Evaluating 5 segments
+2026-02-12 15:02:07,720 - INFO - Segment 1/5: center_t=279.00s
+2026-02-12 15:02:10,045 - INFO - Segment 2/5: center_t=397.00s
+2026-02-12 15:02:12,425 - INFO - Segment 3/5: center_t=101.00s
+2026-02-12 15:02:14,780 - INFO - Segment 4/5: center_t=269.00s
+2026-02-12 15:02:17,174 - INFO - Segment 5/5: center_t=358.00s
+2026-02-12 15:02:19,541 - INFO - Results saved to: C:\Users\Jenner\Documents\SBP Lab\LDVReorientation\worktree\exp-ldv-vs-mic-doa-comparison\results\ldv_vs_mic_grid_ldv_micr_dtmin_20260212_145737\ldv_micr_chirp_tau2_band0\21-0.1V\summary.json

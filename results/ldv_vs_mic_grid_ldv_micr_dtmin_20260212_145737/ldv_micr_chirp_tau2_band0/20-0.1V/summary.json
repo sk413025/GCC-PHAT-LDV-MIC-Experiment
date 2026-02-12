@@ -1,0 +1,212 @@
+{
+  "speaker_id": "20-0.1V",
+  "signal_pair": "ldv_micr",
+  "pair_description": "LDV aligned to MicR (DTMIN) paired with MicL",
+  "ground_truth": {
+    "tau_true_ms": 0.0,
+    "theta_true_deg": 0.0,
+    "d_left": 2.118962010041709,
+    "d_right": 2.118962010041709,
+    "speaker_pos": [
+      0.0,
+      0.0
+    ]
+  },
+  "truth_reference": {
+    "mode": "override",
+    "label": "chirp 25 mic truth-ref (5s)",
+    "tau_ref_ms": 0.22239289589976383,
+    "theta_ref_deg": 3.123379435862821
+  },
+  "n_segments": 5,
+  "segment_mode": "scan",
+  "scan_summary": {
+    "n_scanned": 501,
+    "n_candidates": 501,
+    "n_filtered": 501,
+    "n_selected": 5,
+    "scan_sort_by": "tau_err",
+    "scan_psr_min_db": -20.0,
+    "scan_tau_err_max_ms": 2.0,
+    "scan_ldv_ref_psr_min_db": null,
+    "scan_ldv_micl_psr_min_db": null
+  },
+  "segment_centers_sec": [
+    553.0,
+    225.0,
+    171.0,
+    374.0,
+    384.0
+  ],
+  "ldv_prealign": "gcc_phat",
+  "alignment_mode": "dtmin",
+  "dtmin_model_path": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\worktree\\exp-ldv-vs-mic-doa-comparison\\results\\ldv_vs_mic_grid_dtmin_strict_20260211_215857\\dtmin_model\\model_dtmin_policy_k3.npz",
+  "dtmin_model_metadata": {
+    "generated": "2026-02-11T22:00:36.855258",
+    "traj_path": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\worktree\\exp-ldv-vs-mic-doa-comparison\\results\\ldv_vs_mic_grid_dtmin_strict_20260211_215857\\teacher_trajectories\\lag_trajectories.npz",
+    "n_samples": 25300,
+    "horizon": 3,
+    "n_lags": 101,
+    "model_type": "nearest_centroid_stepwise"
+  },
+  "config": {
+    "fs": 48000,
+    "n_fft": 6144,
+    "hop_length": 160,
+    "max_lag": 50,
+    "max_k": 3,
+    "tw": 64,
+    "freq_min": 100,
+    "freq_max": 8000,
+    "gcc_max_lag_ms": 10.0,
+    "gcc_bandpass_low": 0.0,
+    "gcc_bandpass_high": 0.0,
+    "psr_exclude_samples": 50,
+    "gcc_guided_peak_radius_ms": 0.3,
+    "analysis_slice_sec": 5.0,
+    "eval_window_sec": 5.0,
+    "segment_spacing_sec": 50.0,
+    "segment_offset_sec": 100.0,
+    "ldv_prealign": "gcc_phat",
+    "alignment_mode": "dtmin",
+    "dtmin_model_path": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\worktree\\exp-ldv-vs-mic-doa-comparison\\results\\ldv_vs_mic_grid_dtmin_strict_20260211_215857\\dtmin_model\\model_dtmin_policy_k3.npz",
+    "speed_of_sound": 343.0,
+    "mic_spacing": 1.4
+  },
+  "result": {
+    "tau_median_ms": 0.06619720884938878,
+    "theta_median_deg": 0.9292818090284949,
+    "theta_error_median_deg": 2.194097626834326,
+    "psr_median_db": -7.474899985912985,
+    "per_segment": [
+      {
+        "tau_ms": 0.22078633841501227,
+        "psr_db": -14.30356343200668,
+        "theta_deg": 3.1007941317745296,
+        "theta_error_deg": 0.02258530408829129,
+        "center_sec": 553.0,
+        "prealign": {
+          "mode": "gcc_phat",
+          "tau_ldv_to_micr_ms": 1.3289719834510814,
+          "psr_ldv_to_micr_db": 2.2403818153499433,
+          "applied_delay_ms": -1.3289719834510814
+        }
+      },
+      {
+        "tau_ms": -0.04384933487923302,
+        "psr_db": -6.17083341492271,
+        "theta_deg": -0.6155453874486025,
+        "theta_error_deg": 3.7389248233114234,
+        "center_sec": 225.0,
+        "prealign": {
+          "mode": "gcc_phat",
+          "tau_ldv_to_micr_ms": 2.0111992496097506,
+          "psr_ldv_to_micr_db": 2.583633125342314,
+          "applied_delay_ms": -2.0111992496097506
+        }
+      },
+      {
+        "tau_ms": 0.06619720884938878,
+        "psr_db": -11.88345891228437,
+        "theta_deg": 0.9292818090284949,
+        "theta_error_deg": 2.194097626834326,
+        "center_sec": 171.0,
+        "prealign": {
+          "mode": "gcc_phat",
+          "tau_ldv_to_micr_ms": 1.3378028781467393,
+          "psr_ldv_to_micr_db": 1.8411536564978674,
+          "applied_delay_ms": -1.3378028781467393
+        }
+      },
+      {
+        "tau_ms": 0.10497251241781715,
+        "psr_db": -7.474899985912985,
+        "theta_deg": 1.4737105616256077,
+        "theta_error_deg": 1.6496688742372132,
+        "center_sec": 374.0,
+        "prealign": {
+          "mode": "gcc_phat",
+          "tau_ldv_to_micr_ms": 2.0051752554369004,
+          "psr_ldv_to_micr_db": 3.2796855345236917,
+          "applied_delay_ms": -2.0051752554369004
+        }
+      },
+      {
+        "tau_ms": -0.06420082355248714,
+        "psr_db": -6.805804559384269,
+        "theta_deg": -0.9012540420349117,
+        "theta_error_deg": 4.024633477897733,
+        "center_sec": 384.0,
+        "prealign": {
+          "mode": "gcc_phat",
+          "tau_ldv_to_micr_ms": 2.0005551010739233,
+          "psr_ldv_to_micr_db": 2.5607016517535444,
+          "applied_delay_ms": -2.0005551010739233
+        }
+      }
+    ]
+  },
+  "result_raw": {
+    "tau_median_ms": -0.0013529093570633526,
+    "theta_median_deg": -0.01899141942251142,
+    "theta_error_median_deg": 3.159810031116878,
+    "psr_median_db": -9.823120793825156,
+    "per_segment": [
+      {
+        "tau_ms": -0.0013529093570633526,
+        "psr_db": -7.107429943626861,
+        "theta_deg": -0.01899141942251142,
+        "theta_error_deg": 3.1423708552853324,
+        "center_sec": 553.0
+      },
+      {
+        "tau_ms": 0.4647402966767341,
+        "psr_db": -13.317418131280398,
+        "theta_deg": 6.537955135227963,
+        "theta_error_deg": 3.4145756993651424,
+        "center_sec": 225.0
+      },
+      {
+        "tau_ms": 0.49927951189417463,
+        "psr_db": -13.783326299547527,
+        "theta_deg": 7.026216277944057,
+        "theta_error_deg": 3.902836842081236,
+        "center_sec": 171.0
+      },
+      {
+        "tau_ms": -0.0025952399706193627,
+        "psr_db": -9.30663878063988,
+        "theta_deg": -0.03643059525405738,
+        "theta_error_deg": 3.159810031116878,
+        "center_sec": 374.0
+      },
+      {
+        "tau_ms": -0.0018887197046585599,
+        "psr_db": -9.823120793825156,
+        "theta_deg": -0.026512839547408663,
+        "theta_error_deg": 3.1498922754102296,
+        "center_sec": 384.0
+      }
+    ]
+  },
+  "pass_thresholds": {
+    "theta_error_max_deg": 5.0,
+    "psr_min_db": null
+  },
+  "passed": true,
+  "pass_conditions": {
+    "pass_mode": "omp_vs_raw",
+    "alignment_mode": "dtmin",
+    "omp_better_than_raw": true,
+    "aligned_better_than_raw": true,
+    "omp_error_small": true,
+    "aligned_error_small": true,
+    "omp_psr_improved": true,
+    "aligned_psr_improved": true,
+    "psr_min_db": null,
+    "psr_min_ok": true,
+    "passed": true
+  },
+  "pass_mode": "omp_vs_raw",
+  "timestamp": "2026-02-12T15:01:09.189860"
+}

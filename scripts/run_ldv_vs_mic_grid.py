@@ -3,7 +3,7 @@
 Grid runner for LDV-vs-Mic DoA comparison (GCC-PHAT).
 
 Runs a configuration matrix over:
-- signal_pair: ldv_micl or micl_micr
+- signal_pair: ldv_micl / ldv_micr / micl_micr
 - truth_type: chirp or geometry
 - tau_err_max_ms: 2.0 (primary) and 0.3 (secondary)
 - bandpass: none or 500-2000
@@ -161,7 +161,7 @@ def write_grid_report(output_base: Path, grid_rows: list[dict], data_root: Path,
     lines.append(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     lines.append("")
     lines.append("## Purpose")
-    lines.append("Compare LDV-MicL and MicL-MicR under chirp and geometry guidance.")
+    lines.append("Compare LDV-MicL, LDV-MicR, and MicL-MicR under chirp and geometry guidance.")
     lines.append("")
     lines.append("## Data & Truth Sources")
     lines.append(f"- Speech data root: `{data_root}`")
@@ -195,6 +195,14 @@ def main() -> None:
     parser.add_argument("--alignment_mode", type=str, choices=["omp", "dtmin"], default="omp")
     parser.add_argument("--dtmin_model_path", type=str, default=None)
     parser.add_argument("--max_k", type=int, default=3)
+    parser.add_argument(
+        "--signal_pairs",
+        type=str,
+        nargs="+",
+        choices=["ldv_micl", "ldv_micr", "micl_micr"],
+        default=None,
+        help="Optional filter to run only selected signal pairs.",
+    )
     parser.add_argument("--skip_smoke", action="store_true")
     parser.add_argument("--skip_guardrail", action="store_true")
     parser.add_argument("--debug", action="store_true")
@@ -219,10 +227,20 @@ def main() -> None:
     configs = [
         {"label": "ldv_micl_chirp_tau2_band0", "signal_pair": "ldv_micl", "truth_type": "chirp", "tau_err_max_ms": 2.0, "bandpass_low": 0, "bandpass_high": 0},
         {"label": "ldv_micl_chirp_tau2_band500_2000", "signal_pair": "ldv_micl", "truth_type": "chirp", "tau_err_max_ms": 2.0, "bandpass_low": 500, "bandpass_high": 2000},
+        {"label": "ldv_micr_chirp_tau2_band0", "signal_pair": "ldv_micr", "truth_type": "chirp", "tau_err_max_ms": 2.0, "bandpass_low": 0, "bandpass_high": 0},
+        {"label": "ldv_micr_chirp_tau2_band500_2000", "signal_pair": "ldv_micr", "truth_type": "chirp", "tau_err_max_ms": 2.0, "bandpass_low": 500, "bandpass_high": 2000},
         {"label": "micl_micr_chirp_tau2_band500_2000", "signal_pair": "micl_micr", "truth_type": "chirp", "tau_err_max_ms": 2.0, "bandpass_low": 500, "bandpass_high": 2000},
         {"label": "ldv_micl_geometry_tau2_band500_2000", "signal_pair": "ldv_micl", "truth_type": "geometry", "tau_err_max_ms": 2.0, "bandpass_low": 500, "bandpass_high": 2000},
+        {"label": "ldv_micr_geometry_tau2_band500_2000", "signal_pair": "ldv_micr", "truth_type": "geometry", "tau_err_max_ms": 2.0, "bandpass_low": 500, "bandpass_high": 2000},
         {"label": "ldv_micl_chirp_tau0p3_band500_2000", "signal_pair": "ldv_micl", "truth_type": "chirp", "tau_err_max_ms": 0.3, "bandpass_low": 500, "bandpass_high": 2000},
+        {"label": "ldv_micr_chirp_tau0p3_band500_2000", "signal_pair": "ldv_micr", "truth_type": "chirp", "tau_err_max_ms": 0.3, "bandpass_low": 500, "bandpass_high": 2000},
     ]
+
+    if args.signal_pairs:
+        selected_pairs = set(args.signal_pairs)
+        configs = [cfg for cfg in configs if cfg["signal_pair"] in selected_pairs]
+        if not configs:
+            raise ValueError("No configs left after --signal_pairs filtering")
 
     speakers = list(args.speakers)
     if args.debug:
@@ -240,7 +258,7 @@ def main() -> None:
         run_dir.mkdir(parents=True, exist_ok=True)
 
         summaries = {}
-        pass_mode = "omp_vs_raw" if cfg["signal_pair"] == "ldv_micl" else "theta_only"
+        pass_mode = "omp_vs_raw" if cfg["signal_pair"].startswith("ldv_") else "theta_only"
         for sp in speakers:
             speaker_dir = run_dir / sp
             speaker_dir.mkdir(parents=True, exist_ok=True)
@@ -300,7 +318,7 @@ def main() -> None:
                 "--pass_mode",
                 pass_mode,
             ]
-            if cfg["signal_pair"] == "ldv_micl" and args.alignment_mode == "dtmin":
+            if cfg["signal_pair"].startswith("ldv_") and args.alignment_mode == "dtmin":
                 if not args.dtmin_model_path:
                     raise ValueError("--alignment_mode dtmin requires --dtmin_model_path")
                 args_list += ["--dtmin_model_path", str(args.dtmin_model_path)]
@@ -392,6 +410,39 @@ def main() -> None:
                 str(smoke_dir),
                 "--signal_pair",
                 "ldv_micl",
+                "--segment_mode",
+                "fixed",
+                "--n_segments",
+                "1",
+                "--analysis_slice_sec",
+                "2",
+                "--eval_window_sec",
+                "1",
+                "--ldv_prealign",
+                "gcc_phat",
+                "--alignment_mode",
+                str(args.alignment_mode),
+                "--max_k",
+                str(int(args.max_k)),
+            ]
+            + (["--dtmin_model_path", str(args.dtmin_model_path)] if args.alignment_mode == "dtmin" and args.dtmin_model_path else [])
+        )
+
+        smoke_dir = output_base / "smoke_ldv_micr_chirp"
+        smoke_dir.mkdir(parents=True, exist_ok=True)
+        run_cmd(
+            [
+                sys.executable,
+                "-u",
+                str(script_path),
+                "--data_root",
+                str(data_root),
+                "--speaker",
+                "20-0.1V",
+                "--output_dir",
+                str(smoke_dir),
+                "--signal_pair",
+                "ldv_micr",
                 "--segment_mode",
                 "fixed",
                 "--n_segments",

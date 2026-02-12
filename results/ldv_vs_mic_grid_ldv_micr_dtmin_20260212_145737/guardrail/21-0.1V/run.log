@@ -1,0 +1,17 @@
+2026-02-12 15:25:25,547 - INFO - ======================================================================
+2026-02-12 15:25:25,547 - INFO - Stage 4: LDV-vs-Mic DoA (GCC-PHAT)
+2026-02-12 15:25:25,547 - INFO - ======================================================================
+2026-02-12 15:25:25,547 - INFO - Speaker: 21-0.1V
+2026-02-12 15:25:25,547 - INFO - Signal pair: micl_micr
+2026-02-12 15:25:25,547 - INFO - Alignment mode: omp
+2026-02-12 15:25:25,547 - INFO - Geometry truth: tau=-0.759 ms, theta=-10.71 deg
+2026-02-12 15:25:25,547 - INFO - Reference(geometry): tau=-0.759 ms, theta=-10.71 deg
+2026-02-12 15:25:25,547 - INFO - Pass mode: theta_only
+2026-02-12 15:25:27,027 - INFO - Duration: 1043.97 s
+2026-02-12 15:25:27,146 - ERROR - Run failed: segment_mode=scan selected 0 segments. Try relaxing scan thresholds or allow fallback.
+Traceback (most recent call last):
+  File "C:\Users\Jenner\Documents\SBP Lab\LDVReorientation\worktree\exp-ldv-vs-mic-doa-comparison\scripts\stage4_doa_ldv_vs_mic_comparison.py", line 1233, in main
+    run_stage4_evaluation(
+  File "C:\Users\Jenner\Documents\SBP Lab\LDVReorientation\worktree\exp-ldv-vs-mic-doa-comparison\scripts\stage4_doa_ldv_vs_mic_comparison.py", line 808, in run_stage4_evaluation
+    raise ValueError(
+ValueError: segment_mode=scan selected 0 segments. Try relaxing scan thresholds or allow fallback.

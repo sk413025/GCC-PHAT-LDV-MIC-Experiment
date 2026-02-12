@@ -1,0 +1,33 @@
+{
+  "config": {
+    "label": "ldv_micr_chirp_tau0p3_band500_2000",
+    "signal_pair": "ldv_micr",
+    "truth_type": "chirp",
+    "tau_err_max_ms": 0.3,
+    "bandpass_low": 500,
+    "bandpass_high": 2000
+  },
+  "pass_mode": "omp_vs_raw",
+  "alignment_mode": "omp",
+  "dtmin_model_path": null,
+  "max_k": 3,
+  "speakers": [
+    "18-0.1V",
+    "19-0.1V",
+    "20-0.1V",
+    "21-0.1V",
+    "22-0.1V"
+  ],
+  "segment_mode": "scan",
+  "analysis_slice_sec": 5,
+  "eval_window_sec": 5,
+  "scan_start_sec": 100,
+  "scan_end_sec": 600,
+  "scan_hop_sec": 1,
+  "scan_psr_min_db": -20,
+  "scan_sort_by": "tau_err",
+  "scan_min_separation_sec": 5,
+  "gcc_guided_peak_radius_ms": 0.3,
+  "ldv_prealign": "gcc_phat",
+  "pass_theta_max_deg": 5.0
+}

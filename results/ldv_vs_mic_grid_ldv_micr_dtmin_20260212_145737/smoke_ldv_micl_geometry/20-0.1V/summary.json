@@ -1,0 +1,112 @@
+{
+  "speaker_id": "20-0.1V",
+  "signal_pair": "ldv_micl",
+  "pair_description": "LDV aligned to MicL (DTMIN) paired with MicR",
+  "ground_truth": {
+    "tau_true_ms": 0.0,
+    "theta_true_deg": 0.0,
+    "d_left": 2.118962010041709,
+    "d_right": 2.118962010041709,
+    "speaker_pos": [
+      0.0,
+      0.0
+    ]
+  },
+  "truth_reference": {
+    "mode": "geometry",
+    "label": null,
+    "tau_ref_ms": 0.0,
+    "theta_ref_deg": 0.0
+  },
+  "n_segments": 1,
+  "segment_mode": "fixed",
+  "scan_summary": null,
+  "segment_centers_sec": [
+    522.3253333333333
+  ],
+  "ldv_prealign": "none",
+  "alignment_mode": "dtmin",
+  "dtmin_model_path": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\worktree\\exp-ldv-vs-mic-doa-comparison\\results\\ldv_vs_mic_grid_dtmin_strict_20260211_215857\\dtmin_model\\model_dtmin_policy_k3.npz",
+  "dtmin_model_metadata": {
+    "generated": "2026-02-11T22:00:36.855258",
+    "traj_path": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\worktree\\exp-ldv-vs-mic-doa-comparison\\results\\ldv_vs_mic_grid_dtmin_strict_20260211_215857\\teacher_trajectories\\lag_trajectories.npz",
+    "n_samples": 25300,
+    "horizon": 3,
+    "n_lags": 101,
+    "model_type": "nearest_centroid_stepwise"
+  },
+  "config": {
+    "fs": 48000,
+    "n_fft": 6144,
+    "hop_length": 160,
+    "max_lag": 50,
+    "max_k": 3,
+    "tw": 64,
+    "freq_min": 100,
+    "freq_max": 8000,
+    "gcc_max_lag_ms": 10.0,
+    "gcc_bandpass_low": 0.0,
+    "gcc_bandpass_high": 0.0,
+    "psr_exclude_samples": 50,
+    "gcc_guided_peak_radius_ms": null,
+    "analysis_slice_sec": 2.0,
+    "eval_window_sec": 1.0,
+    "segment_spacing_sec": 50.0,
+    "segment_offset_sec": 100.0,
+    "ldv_prealign": "none",
+    "alignment_mode": "dtmin",
+    "dtmin_model_path": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\worktree\\exp-ldv-vs-mic-doa-comparison\\results\\ldv_vs_mic_grid_dtmin_strict_20260211_215857\\dtmin_model\\model_dtmin_policy_k3.npz",
+    "speed_of_sound": 343.0,
+    "mic_spacing": 1.4
+  },
+  "result": {
+    "tau_median_ms": -1.686303202171544,
+    "theta_median_deg": -24.402507488931953,
+    "theta_error_median_deg": 24.402507488931953,
+    "psr_median_db": 5.44523459705491,
+    "per_segment": [
+      {
+        "tau_ms": -1.686303202171544,
+        "psr_db": 5.44523459705491,
+        "theta_deg": -24.402507488931953,
+        "theta_error_deg": 24.402507488931953,
+        "center_sec": 522.3253333333333
+      }
+    ]
+  },
+  "result_raw": {
+    "tau_median_ms": 1.3367474130411252,
+    "theta_median_deg": 19.117294688485167,
+    "theta_error_median_deg": 19.117294688485167,
+    "psr_median_db": 1.1249666438241155,
+    "per_segment": [
+      {
+        "tau_ms": 1.3367474130411252,
+        "psr_db": 1.1249666438241155,
+        "theta_deg": 19.117294688485167,
+        "theta_error_deg": 19.117294688485167,
+        "center_sec": 522.3253333333333
+      }
+    ]
+  },
+  "pass_thresholds": {
+    "theta_error_max_deg": 5.0,
+    "psr_min_db": null
+  },
+  "passed": false,
+  "pass_conditions": {
+    "pass_mode": "omp_vs_raw",
+    "alignment_mode": "dtmin",
+    "omp_better_than_raw": false,
+    "aligned_better_than_raw": false,
+    "omp_error_small": false,
+    "aligned_error_small": false,
+    "omp_psr_improved": true,
+    "aligned_psr_improved": true,
+    "psr_min_db": null,
+    "psr_min_ok": true,
+    "passed": false
+  },
+  "pass_mode": "omp_vs_raw",
+  "timestamp": "2026-02-12T15:25:24.546799"
+}
