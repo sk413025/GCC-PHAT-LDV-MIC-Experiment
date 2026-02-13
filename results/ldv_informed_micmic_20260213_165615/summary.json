@@ -1,0 +1,46 @@
+{
+  "generated": "2026-02-13T16:56:55.202395",
+  "success_criteria": {
+    "p95_improvement_frac_ge_0p15": false,
+    "fail_rate_improvement_frac_ge_0p20": false,
+    "median_not_worse_frac_le_0p05": false,
+    "overall_pass": false,
+    "computed": {
+      "p95_improvement_frac": -0.3554577729862517,
+      "fail_rate_improvement_frac": -0.0623052959501557,
+      "median_worsening_frac": 0.6281181886477853
+    }
+  },
+  "pooled": {
+    "baseline": {
+      "theta_error_ref_deg": {
+        "count": 1255,
+        "median": 2.076846841216062,
+        "p90": 5.839097118146638,
+        "p95": 5.914545809073538
+      },
+      "theta_error_geo_deg": {
+        "count": 1255,
+        "median": 2.685401605704545,
+        "p90": 6.77533878546139,
+        "p95": 7.074776416002885
+      },
+      "fail_rate_ref_gt5deg": 0.2557768924302789
+    },
+    "teacher": {
+      "theta_error_ref_deg": {
+        "count": 1255,
+        "median": 3.3813521172195693,
+        "p90": 7.260524492860759,
+        "p95": 8.016917090591987
+      },
+      "theta_error_geo_deg": {
+        "count": 1255,
+        "median": 3.0602979694363976,
+        "p90": 6.6419574278024,
+        "p95": 7.225870939007324
+      },
+      "fail_rate_ref_gt5deg": 0.27171314741035857
+    }
+  }
+}

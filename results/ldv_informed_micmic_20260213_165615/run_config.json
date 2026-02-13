@@ -1,0 +1,33 @@
+{
+  "generated": "2026-02-13T16:56:16.083247",
+  "data_root": "/home/sbplab/jiawei/data",
+  "truth_ref_root": "results/ldv_vs_mic_grid_20260211_093529/micl_micr_chirp_tau2_band500_2000",
+  "speakers": [
+    "18-0.1V",
+    "19-0.1V",
+    "20-0.1V",
+    "21-0.1V",
+    "22-0.1V"
+  ],
+  "fs_expected": 48000,
+  "window_sec": 5.0,
+  "center_start_sec": 100.0,
+  "center_end_sec": 600.0,
+  "center_step_sec": 1.0,
+  "band_hz": [
+    500.0,
+    2000.0
+  ],
+  "welch": {
+    "nperseg": 8192,
+    "noverlap": 4096
+  },
+  "gcc": {
+    "max_lag_ms": 10.0,
+    "guided_radius_ms": 0.3,
+    "psr_exclude_samples": 50
+  },
+  "silence_percent": 1.0,
+  "speech_rms_percentile": 50.0,
+  "n_bands": 64
+}

@@ -1,0 +1,5 @@
+2026-02-13 16:58:17,108 - INFO - Dataset: N=1255, bands=64
+2026-02-13 16:58:17,108 - INFO - Train: 937 samples, Test: 318 samples
+2026-02-13 16:58:17,109 - INFO - Saved model: results/ldv_weight_student_20260213_165817/student_model_linear_bandmask.npz
+2026-02-13 16:58:30,021 - INFO - Done. Results: results/ldv_weight_student_20260213_165817
+2026-02-13 16:58:30,021 - INFO - Acceptance overall_pass=False

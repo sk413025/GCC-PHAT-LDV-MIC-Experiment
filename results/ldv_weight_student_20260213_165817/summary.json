@@ -1,0 +1,78 @@
+{
+  "generated": "2026-02-13T16:58:30.020286",
+  "teacher_dataset": "results/ldv_informed_micmic_20260213_165615/teacher_dataset.npz",
+  "model_path": "results/ldv_weight_student_20260213_165817/student_model_linear_bandmask.npz",
+  "eval_split": {
+    "train_max_center_sec": 450.0
+  },
+  "acceptance": {
+    "teacher_p95_improvement_positive": false,
+    "student_reaches_80pct_teacher_p95_improvement": false,
+    "student_median_not_worse_frac_le_0p05": false,
+    "overall_pass": false,
+    "computed": {
+      "teacher_p95_improvement_frac": -0.297672658992175,
+      "student_p95_improvement_frac": -0.5214549191581583,
+      "student_fraction_of_teacher": NaN,
+      "student_median_worsening_frac": 0.3750022596940767
+    }
+  },
+  "test_metrics_vs_ref": {
+    "baseline": {
+      "theta_error_ref_deg": {
+        "count": 318,
+        "median": 2.1791395715870197,
+        "p90": 5.8453222304535855,
+        "p95": 5.9344093137289455
+      },
+      "fail_rate_gt5deg": 0.3081761006289308
+    },
+    "teacher": {
+      "theta_error_ref_deg": {
+        "count": 318,
+        "median": 3.29152418710029,
+        "p90": 7.27440346687405,
+        "p95": 7.700920713694569
+      },
+      "fail_rate_gt5deg": 0.24213836477987422
+    },
+    "student": {
+      "theta_error_ref_deg": {
+        "count": 318,
+        "median": 2.996321835120934,
+        "p90": 8.366321219370542,
+        "p95": 9.028936242670895
+      },
+      "fail_rate_gt5deg": 0.20440251572327045
+    }
+  },
+  "test_metrics_vs_geo": {
+    "baseline": {
+      "theta_error_geo_deg": {
+        "count": 318,
+        "median": 2.8303534975032973,
+        "p90": 6.951746115954207,
+        "p95": 7.112372927529384
+      },
+      "fail_rate_gt5deg": 0.1289308176100629
+    },
+    "teacher": {
+      "theta_error_geo_deg": {
+        "count": 318,
+        "median": 2.1690057960854165,
+        "p90": 6.041779443000125,
+        "p95": 6.775372190047449
+      },
+      "fail_rate_gt5deg": 0.3553459119496855
+    },
+    "student": {
+      "theta_error_geo_deg": {
+        "count": 318,
+        "median": 1.254731760213951,
+        "p90": 6.831498563478194,
+        "p95": 7.275823571512433
+      },
+      "fail_rate_gt5deg": 0.4371069182389937
+    }
+  }
+}

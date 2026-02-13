@@ -1,0 +1,7 @@
+{
+  "script_path": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/scripts/train_student_ldv_weight_mask.py",
+  "script_sha256": "b9da633cda1212a79f0089a16e5bb3a62d983f868e6946c1b156abd25fd0366b",
+  "git_head": "fee66c7ecd3b656d50d309ec2073d005baf73046",
+  "dirty": true,
+  "timestamp": "2026-02-13T16:58:17.105238"
+}
