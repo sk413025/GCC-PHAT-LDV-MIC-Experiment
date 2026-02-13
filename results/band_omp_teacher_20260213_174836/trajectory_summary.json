@@ -1,0 +1,14 @@
+{
+  "generated": "2026-02-13T17:52:11.173027",
+  "run_dir": "results/band_omp_teacher_20260213_174836",
+  "n_samples": 1255,
+  "k_horizon": 6,
+  "n_bands": 64,
+  "valid_len": {
+    "mean": 4.988844621513945,
+    "median": 6.0,
+    "p10": 1.0,
+    "p90": 6.0,
+    "frac_zero": 0.0
+  }
+}

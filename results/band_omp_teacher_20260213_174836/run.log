@@ -1,0 +1,12 @@
+2026-02-13 17:48:37,633 - INFO - Speaker 18-0.1V duration: 1043.97 s
+2026-02-13 17:48:38,278 - INFO - 18-0.1V: 501 candidate windows, 251 speech-active (RMS>=1.655e-03), 5 silence windows; forbidden bands raw=64 effective=0
+2026-02-13 17:49:30,499 - INFO - Speaker 19-0.1V duration: 1047.04 s
+2026-02-13 17:49:30,841 - INFO - 19-0.1V: 501 candidate windows, 251 speech-active (RMS>=1.761e-03), 5 silence windows; forbidden bands raw=64 effective=0
+2026-02-13 17:50:10,244 - INFO - Speaker 20-0.1V duration: 1044.65 s
+2026-02-13 17:50:10,471 - INFO - 20-0.1V: 501 candidate windows, 251 speech-active (RMS>=1.760e-03), 5 silence windows; forbidden bands raw=64 effective=0
+2026-02-13 17:50:51,042 - INFO - Speaker 21-0.1V duration: 1043.97 s
+2026-02-13 17:50:51,270 - INFO - 21-0.1V: 501 candidate windows, 251 speech-active (RMS>=1.728e-03), 5 silence windows; forbidden bands raw=64 effective=0
+2026-02-13 17:51:30,173 - INFO - Speaker 22-0.1V duration: 1043.46 s
+2026-02-13 17:51:30,403 - INFO - 22-0.1V: 501 candidate windows, 251 speech-active (RMS>=1.812e-03), 5 silence windows; forbidden bands raw=64 effective=0
+2026-02-13 17:52:11,173 - INFO - Done. Results: results/band_omp_teacher_20260213_174836
+2026-02-13 17:52:11,174 - INFO - Teacher sanity gate pass=True

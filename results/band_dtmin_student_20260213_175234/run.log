@@ -1,0 +1,5 @@
+2026-02-13 17:52:34,185 - INFO - Dataset: N=1255, horizon=6, bands=64
+2026-02-13 17:52:34,185 - INFO - Train: 937 samples, Test: 318 samples
+2026-02-13 17:52:34,190 - INFO - Saved model: results/band_dtmin_student_20260213_175234/model_dtmin_band_policy_k6.npz
+2026-02-13 17:54:50,592 - INFO - Done. Results: results/band_dtmin_student_20260213_175234
+2026-02-13 17:54:50,592 - INFO - Acceptance overall_pass=True
