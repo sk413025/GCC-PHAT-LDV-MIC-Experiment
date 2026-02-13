@@ -1,0 +1,117 @@
+2026-02-13 16:35:38,427 - INFO - ======================================================================
+2026-02-13 16:35:38,427 - INFO - Wall Panel Transfer Function Diagnostic
+2026-02-13 16:35:38,427 - INFO - ======================================================================
+2026-02-13 16:35:38,427 - INFO - Output: results/wall_tf_diagnostic_v2_20260213_163538
+2026-02-13 16:35:38,431 - INFO - ==================================================
+2026-02-13 16:35:38,431 - INFO - Processing speaker 18-0.1V (key=18)
+2026-02-13 16:35:38,431 - INFO -   Using 5 segments: [277.0, 337.0, 442.0, 493.0, 560.0]
+2026-02-13 16:35:38,612 - INFO - Loading WAV files for speaker 18 ...
+2026-02-13 16:35:39,233 - INFO -   Ground truths: tau1=1.450 ms, tau2=-4.538 ms, tau3=-3.088 ms
+2026-02-13 16:35:39,466 - INFO -   Checkpoint 0 (data sanity): PASS
+2026-02-13 16:35:39,484 - INFO -   Seg 0 (277.0s) CK1: FAIL (R²=0.911, γ²=0.277, τ_err=2.515ms)
+2026-02-13 16:35:39,499 - INFO -   Seg 0 CK2: PASS (band_ratio=0.106, frac_above=0.969)
+2026-02-13 16:35:39,499 - INFO -   Seg 0: running full diagnostic ...
+2026-02-13 16:35:45,697 - INFO -   Seg 1 (337.0s) CK1: FAIL (R²=0.901, γ²=0.273, τ_err=2.522ms)
+2026-02-13 16:35:45,705 - INFO -   Seg 1 CK2: PASS (band_ratio=0.608, frac_above=0.973)
+2026-02-13 16:35:45,705 - INFO -   Seg 1: running full diagnostic ...
+2026-02-13 16:35:52,398 - INFO -   Seg 2 (442.0s) CK1: FAIL (R²=0.931, γ²=0.305, τ_err=1.133ms)
+2026-02-13 16:35:52,405 - INFO -   Seg 2 CK2: PASS (band_ratio=1.179, frac_above=0.973)
+2026-02-13 16:35:52,405 - INFO -   Seg 2: running full diagnostic ...
+2026-02-13 16:35:59,191 - INFO -   Seg 3 (493.0s) CK1: FAIL (R²=0.764, γ²=0.272, τ_err=1.570ms)
+2026-02-13 16:35:59,198 - INFO -   Seg 3 CK2: PASS (band_ratio=0.795, frac_above=0.961)
+2026-02-13 16:35:59,198 - INFO -   Seg 3: running full diagnostic ...
+2026-02-13 16:36:05,988 - INFO -   Seg 4 (560.0s) CK1: FAIL (R²=0.716, γ²=0.295, τ_err=0.095ms)
+2026-02-13 16:36:05,995 - INFO -   Seg 4 CK2: PASS (band_ratio=0.256, frac_above=0.957)
+2026-02-13 16:36:05,995 - INFO -   Seg 4: running full diagnostic ...
+2026-02-13 16:36:12,855 - INFO - ==================================================
+2026-02-13 16:36:12,855 - INFO - Processing speaker 19-0.1V (key=19)
+2026-02-13 16:36:12,855 - INFO -   Using 5 segments: [122.0, 348.0, 353.0, 392.0, 538.0]
+2026-02-13 16:36:13,035 - INFO - Loading WAV files for speaker 19 ...
+2026-02-13 16:36:13,654 - INFO -   Ground truths: tau1=0.759 ms, tau2=-4.788 ms, tau3=-4.029 ms
+2026-02-13 16:36:13,888 - INFO -   Checkpoint 0 (data sanity): PASS
+2026-02-13 16:36:13,897 - INFO -   Seg 0 (122.0s) CK1: FAIL (R²=0.708, γ²=0.290, τ_err=0.672ms)
+2026-02-13 16:36:13,904 - INFO -   Seg 0 CK2: PASS (band_ratio=0.898, frac_above=0.977)
+2026-02-13 16:36:13,904 - INFO -   Seg 0: running full diagnostic ...
+2026-02-13 16:36:20,497 - INFO -   Seg 1 (348.0s) CK1: FAIL (R²=0.966, γ²=0.313, τ_err=1.653ms)
+2026-02-13 16:36:20,504 - INFO -   Seg 1 CK2: PASS (band_ratio=0.602, frac_above=0.984)
+2026-02-13 16:36:20,504 - INFO -   Seg 1: running full diagnostic ...
+2026-02-13 16:36:27,185 - INFO -   Seg 2 (353.0s) CK1: FAIL (R²=0.928, γ²=0.308, τ_err=2.601ms)
+2026-02-13 16:36:27,192 - INFO -   Seg 2 CK2: PASS (band_ratio=0.488, frac_above=0.965)
+2026-02-13 16:36:27,192 - INFO -   Seg 2: running full diagnostic ...
+2026-02-13 16:36:33,996 - INFO -   Seg 3 (392.0s) CK1: FAIL (R²=0.964, γ²=0.285, τ_err=1.699ms)
+2026-02-13 16:36:34,003 - INFO -   Seg 3 CK2: PASS (band_ratio=0.527, frac_above=0.977)
+2026-02-13 16:36:34,003 - INFO -   Seg 3: running full diagnostic ...
+2026-02-13 16:36:40,896 - INFO -   Seg 4 (538.0s) CK1: FAIL (R²=0.715, γ²=0.285, τ_err=0.629ms)
+2026-02-13 16:36:40,903 - INFO -   Seg 4 CK2: PASS (band_ratio=0.404, frac_above=0.973)
+2026-02-13 16:36:40,903 - INFO -   Seg 4: running full diagnostic ...
+2026-02-13 16:36:48,020 - INFO - ==================================================
+2026-02-13 16:36:48,020 - INFO - Processing speaker 20-0.1V (key=20)
+2026-02-13 16:36:48,020 - INFO -   Using 5 segments: [171.0, 225.0, 374.0, 384.0, 553.0]
+2026-02-13 16:36:48,200 - INFO - Loading WAV files for speaker 20 ...
+2026-02-13 16:36:48,817 - INFO -   Ground truths: tau1=0.000 ms, tau2=-4.720 ms, tau3=-4.720 ms
+2026-02-13 16:36:49,052 - INFO -   Checkpoint 0 (data sanity): PASS
+2026-02-13 16:36:49,061 - INFO -   Seg 0 (171.0s) CK1: FAIL (R²=0.907, γ²=0.300, τ_err=4.179ms)
+2026-02-13 16:36:49,068 - INFO -   Seg 0 CK2: PASS (band_ratio=0.504, frac_above=0.977)
+2026-02-13 16:36:49,068 - INFO -   Seg 0: running full diagnostic ...
+2026-02-13 16:36:55,756 - INFO -   Seg 1 (225.0s) CK1: FAIL (R²=0.940, γ²=0.287, τ_err=3.227ms)
+2026-02-13 16:36:55,763 - INFO -   Seg 1 CK2: PASS (band_ratio=0.747, frac_above=0.980)
+2026-02-13 16:36:55,763 - INFO -   Seg 1: running full diagnostic ...
+2026-02-13 16:37:02,756 - INFO -   Seg 2 (374.0s) CK1: FAIL (R²=0.932, γ²=0.315, τ_err=2.557ms)
+2026-02-13 16:37:02,763 - INFO -   Seg 2 CK2: PASS (band_ratio=0.355, frac_above=0.973)
+2026-02-13 16:37:02,763 - INFO -   Seg 2: running full diagnostic ...
+2026-02-13 16:37:09,764 - INFO -   Seg 3 (384.0s) CK1: FAIL (R²=0.932, γ²=0.294, τ_err=3.262ms)
+2026-02-13 16:37:09,771 - INFO -   Seg 3 CK2: PASS (band_ratio=0.459, frac_above=0.969)
+2026-02-13 16:37:09,771 - INFO -   Seg 3: running full diagnostic ...
+2026-02-13 16:37:16,786 - INFO -   Seg 4 (553.0s) CK1: FAIL (R²=0.758, γ²=0.306, τ_err=2.214ms)
+2026-02-13 16:37:16,794 - INFO -   Seg 4 CK2: PASS (band_ratio=0.529, frac_above=0.965)
+2026-02-13 16:37:16,794 - INFO -   Seg 4: running full diagnostic ...
+2026-02-13 16:37:24,052 - INFO - ==================================================
+2026-02-13 16:37:24,052 - INFO - Processing speaker 21-0.1V (key=21)
+2026-02-13 16:37:24,052 - INFO -   Using 5 segments: [101.0, 269.0, 279.0, 358.0, 397.0]
+2026-02-13 16:37:24,232 - INFO - Loading WAV files for speaker 21 ...
+2026-02-13 16:37:24,847 - INFO -   Ground truths: tau1=-0.759 ms, tau2=-4.029 ms, tau3=-4.788 ms
+2026-02-13 16:37:25,082 - INFO -   Checkpoint 0 (data sanity): PASS
+2026-02-13 16:37:25,092 - INFO -   Seg 0 (101.0s) CK1: FAIL (R²=0.931, γ²=0.295, τ_err=4.065ms)
+2026-02-13 16:37:25,099 - INFO -   Seg 0 CK2: PASS (band_ratio=1.253, frac_above=0.988)
+2026-02-13 16:37:25,099 - INFO -   Seg 0: running full diagnostic ...
+2026-02-13 16:37:32,117 - INFO -   Seg 1 (269.0s) CK1: FAIL (R²=0.911, γ²=0.325, τ_err=4.893ms)
+2026-02-13 16:37:32,124 - INFO -   Seg 1 CK2: PASS (band_ratio=1.713, frac_above=0.977)
+2026-02-13 16:37:32,124 - INFO -   Seg 1: running full diagnostic ...
+2026-02-13 16:37:39,278 - INFO -   Seg 2 (279.0s) CK1: FAIL (R²=0.788, γ²=0.307, τ_err=4.583ms)
+2026-02-13 16:37:39,285 - INFO -   Seg 2 CK2: PASS (band_ratio=0.212, frac_above=0.957)
+2026-02-13 16:37:39,285 - INFO -   Seg 2: running full diagnostic ...
+2026-02-13 16:37:46,101 - INFO -   Seg 3 (358.0s) CK1: FAIL (R²=0.763, γ²=0.309, τ_err=3.193ms)
+2026-02-13 16:37:46,109 - INFO -   Seg 3 CK2: PASS (band_ratio=1.735, frac_above=0.973)
+2026-02-13 16:37:46,109 - INFO -   Seg 3: running full diagnostic ...
+2026-02-13 16:37:52,990 - INFO -   Seg 4 (397.0s) CK1: FAIL (R²=0.916, γ²=0.305, τ_err=4.788ms)
+2026-02-13 16:37:52,997 - INFO -   Seg 4 CK2: PASS (band_ratio=1.148, frac_above=0.984)
+2026-02-13 16:37:52,997 - INFO -   Seg 4: running full diagnostic ...
+2026-02-13 16:38:00,139 - INFO - ==================================================
+2026-02-13 16:38:00,139 - INFO - Processing speaker 22-0.1V (key=22)
+2026-02-13 16:38:00,139 - INFO -   Using 5 segments: [112.0, 163.0, 234.0, 395.0, 449.0]
+2026-02-13 16:38:00,319 - INFO - Loading WAV files for speaker 22 ...
+2026-02-13 16:38:00,937 - INFO -   Ground truths: tau1=-1.450 ms, tau2=-3.088 ms, tau3=-4.538 ms
+2026-02-13 16:38:01,171 - INFO -   Checkpoint 0 (data sanity): PASS
+2026-02-13 16:38:01,180 - INFO -   Seg 0 (112.0s) CK1: FAIL (R²=0.966, γ²=0.314, τ_err=3.871ms)
+2026-02-13 16:38:01,188 - INFO -   Seg 0 CK2: PASS (band_ratio=0.431, frac_above=0.965)
+2026-02-13 16:38:01,188 - INFO -   Seg 0: running full diagnostic ...
+2026-02-13 16:38:08,097 - INFO -   Seg 1 (163.0s) CK1: FAIL (R²=0.882, γ²=0.326, τ_err=5.186ms)
+2026-02-13 16:38:08,104 - INFO -   Seg 1 CK2: PASS (band_ratio=0.370, frac_above=0.965)
+2026-02-13 16:38:08,104 - INFO -   Seg 1: running full diagnostic ...
+2026-02-13 16:38:15,231 - INFO -   Seg 2 (234.0s) CK1: FAIL (R²=0.936, γ²=0.327, τ_err=4.667ms)
+2026-02-13 16:38:15,238 - INFO -   Seg 2 CK2: PASS (band_ratio=1.137, frac_above=0.977)
+2026-02-13 16:38:15,238 - INFO -   Seg 2: running full diagnostic ...
+2026-02-13 16:38:22,489 - INFO -   Seg 3 (395.0s) CK1: FAIL (R²=0.964, γ²=0.298, τ_err=3.848ms)
+2026-02-13 16:38:22,496 - INFO -   Seg 3 CK2: PASS (band_ratio=0.842, frac_above=0.965)
+2026-02-13 16:38:22,496 - INFO -   Seg 3: running full diagnostic ...
+2026-02-13 16:38:29,750 - INFO -   Seg 4 (449.0s) CK1: FAIL (R²=0.907, γ²=0.332, τ_err=3.179ms)
+2026-02-13 16:38:29,757 - INFO -   Seg 4 CK2: PASS (band_ratio=0.201, frac_above=0.973)
+2026-02-13 16:38:29,757 - INFO -   Seg 4: running full diagnostic ...
+2026-02-13 16:38:37,211 - INFO - Computing speaker independence (Checkpoint 5) ...
+2026-02-13 16:38:37,217 - INFO -   γ² corr mean=0.946, jump overlap=0.482
+2026-02-13 16:38:37,217 - INFO - Hypothesis verdict: best_match=nonlinear_ldv (50%)
+2026-02-13 16:38:37,217 - INFO - Report saved: results/wall_tf_diagnostic_v2_20260213_163538/diagnostic_report.md
+2026-02-13 16:38:38,918 - INFO - Plots saved to results/wall_tf_diagnostic_v2_20260213_163538/plots
+2026-02-13 16:38:38,918 - INFO - ======================================================================
+2026-02-13 16:38:38,918 - INFO - DONE. All results in: results/wall_tf_diagnostic_v2_20260213_163538
+2026-02-13 16:38:38,918 - INFO - ======================================================================

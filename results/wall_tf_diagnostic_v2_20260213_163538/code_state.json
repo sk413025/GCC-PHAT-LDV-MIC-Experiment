@@ -1,0 +1,7 @@
+{
+  "script_path": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/scripts/diagnose_wall_transfer_function.py",
+  "script_sha256": "496425bde30d490d3fafb1bc35d12d6056a0c778c45ab1b2d0e5f82d9ffe3467",
+  "git_head": "a410ca4069ddeeeb55b587e86e90c62cc888c404",
+  "dirty": true,
+  "timestamp": "2026-02-13T16:35:38.430843"
+}
