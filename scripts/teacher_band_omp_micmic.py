@@ -22,6 +22,17 @@ python -u scripts/teacher_band_omp_micmic.py \\
   --truth_ref_root results/ldv_vs_mic_grid_20260211_093529/micl_micr_chirp_tau2_band500_2000 \\
   --out_dir results/band_omp_teacher_<YYYYMMDD_HHMMSS> \\
   --speakers 18-0.1V 19-0.1V 20-0.1V 21-0.1V 22-0.1V
+
+Observation mode (for mic-only / LDV-only ablations)
+----------------------------------------------------
+--obs_mode ldv_mic (default): z(ldv_psd)+z(mic_psd)+z(mic_coh)-2*z(cpl_band)
+--obs_mode mic_only_strict  : z(mic_psd)+z(mic_coh)-2*z(cpl_band_mic_only)
+--obs_mode ldv_only         : z(ldv_psd)-2*z(cpl_band)
+
+Notes:
+- Teacher actions are computed from MIC-MIC GCC score only (truth-guided) and do not
+  depend on obs_mode. Forbidden bands are always derived from the max-silence coherence
+  across the 3 pairs, so the action space is comparable across obs_mode runs.
 """
 
 from __future__ import annotations
@@ -361,14 +372,49 @@ def compute_silence_coupling_mask(
     )
 
 
+def compute_silence_coupling_mask_mic_only(
+    *,
+    silence_windows: list[dict[str, Any]],
+    edges_hz: np.ndarray,
+    fs: int,
+) -> np.ndarray:
+    """
+    Returns:
+      cpl_band_mic_only: (B,) in [0,1] (band-mean MIC coherence during silence)
+    """
+    if len(silence_windows) < 3:
+        raise ValueError(f"Need at least 3 silence windows, got {len(silence_windows)}")
+
+    acc_mic = None
+    f: np.ndarray | None = None
+    for w in silence_windows:
+        micl = w["micl"]
+        micr = w["micr"]
+        f, P_l = welch_psd(micl, fs=fs)
+        _f2, P_r = welch_psd(micr, fs=fs)
+        _f3, P_lr = welch_csd(micl, micr, fs=fs)
+        g_mic = gamma2_from_spectra(P_l, P_r, P_lr)
+        if acc_mic is None:
+            acc_mic = g_mic.copy()
+        else:
+            acc_mic += g_mic
+
+    assert acc_mic is not None
+    assert f is not None
+    g_mic_mean = acc_mic / float(len(silence_windows))
+    cpl_band_mic_only = band_means(g_mic_mean, f, edges_hz)
+    return cpl_band_mic_only.astype(np.float64, copy=False)
+
+
 def compute_obs_vector(
     *,
     ldv: np.ndarray,
     micl: np.ndarray,
     micr: np.ndarray,
     edges_hz: np.ndarray,
-    cpl_band: np.ndarray,
+    cpl_band_for_obs: np.ndarray,
     fs: int,
+    obs_mode: str,
 ) -> np.ndarray:
     f, P_ldv = welch_psd(ldv, fs=fs)
     _f2, P_l = welch_psd(micl, fs=fs)
@@ -382,12 +428,16 @@ def compute_obs_vector(
     mic_band = band_means(np.log(P_mic_avg + 1e-20), f, edges_hz)
     coh_band = band_means(mic_coh, f, edges_hz)
 
-    obs = (
-        zscore_inband(ldv_band)
-        + zscore_inband(mic_band)
-        + zscore_inband(coh_band)
-        - 2.0 * zscore_inband(cpl_band)
-    )
+    if obs_mode == "ldv_mic":
+        obs = zscore_inband(ldv_band) + zscore_inband(mic_band) + zscore_inband(coh_band)
+    elif obs_mode == "mic_only_strict":
+        obs = zscore_inband(mic_band) + zscore_inband(coh_band)
+    elif obs_mode == "ldv_only":
+        obs = zscore_inband(ldv_band)
+    else:
+        raise ValueError(f"Unknown obs_mode: {obs_mode}")
+
+    obs = obs - 2.0 * zscore_inband(cpl_band_for_obs)
     return obs.astype(np.float64, copy=False)
 
 
@@ -483,6 +533,13 @@ def main() -> None:
         default=["18-0.1V", "19-0.1V", "20-0.1V", "21-0.1V", "22-0.1V"],
         help="Speaker subdirectories to process (default: 18..22 at 0.1V)",
     )
+    parser.add_argument(
+        "--obs_mode",
+        type=str,
+        default="ldv_mic",
+        choices=["ldv_mic", "mic_only_strict", "ldv_only"],
+        help="Observation vector mode (for ablations). Default: ldv_mic.",
+    )
     args = parser.parse_args()
 
     out_dir = Path(args.out_dir)
@@ -492,12 +549,14 @@ def main() -> None:
     data_root = Path(args.data_root)
     truth_ref_root = Path(args.truth_ref_root)
     speakers = list(args.speakers)
+    obs_mode = str(args.obs_mode)
 
     run_config = {
         "generated": datetime.now().isoformat(),
         "data_root": str(data_root),
         "truth_ref_root": str(truth_ref_root),
         "speakers": speakers,
+        "obs_mode": obs_mode,
         "fs_expected": int(FS_EXPECTED),
         "window_sec": float(WINDOW_SEC),
         "center_grid": [float(CENTER_START_SEC), float(CENTER_END_SEC), float(CENTER_STEP_SEC)],
@@ -595,9 +654,21 @@ def main() -> None:
         n_silence = max(3, int(round(len(candidates) * (SILENCE_PERCENT / 100.0))))
         silence_windows = sorted(candidates, key=lambda d: float(d["rms_micl"]))[:n_silence]
 
-        cpl_band, forbidden_raw, forbidden = compute_silence_coupling_mask(
+        cpl_band_max, forbidden_raw, forbidden = compute_silence_coupling_mask(
             silence_windows=silence_windows, edges_hz=edges_hz, fs=FS_EXPECTED
         )
+
+        cpl_band_mic_only = None
+        if obs_mode == "mic_only_strict":
+            cpl_band_mic_only = compute_silence_coupling_mask_mic_only(
+                silence_windows=silence_windows, edges_hz=edges_hz, fs=FS_EXPECTED
+            )
+            cpl_band_for_obs = cpl_band_mic_only
+        else:
+            cpl_band_for_obs = cpl_band_max
+
+        if cpl_band_for_obs.shape != (N_BANDS,):
+            raise ValueError(f"cpl_band_for_obs wrong shape: {cpl_band_for_obs.shape}")
         forbidden_raw_idx = np.where(forbidden_raw)[0].tolist()
         forbidden_idx = np.where(forbidden)[0].tolist()
         forbid_degenerate = int(np.sum(forbidden_raw)) >= int(N_BANDS)
@@ -624,7 +695,10 @@ def main() -> None:
                 "band_edges_hz": edges_hz.tolist(),
                 "silence_percent": float(SILENCE_PERCENT),
                 "forbid_gamma2": float(COUPLING_FORBID_GAMMA2),
-                "cpl_band": cpl_band.tolist(),
+                "obs_mode": obs_mode,
+                "cpl_band_max": cpl_band_max.tolist(),
+                "cpl_band_mic_only": None if cpl_band_mic_only is None else cpl_band_mic_only.tolist(),
+                "cpl_band_for_obs": cpl_band_for_obs.tolist(),
                 "forbidden_bands_raw": forbidden_raw_idx,
                 "forbidden_bands_effective": forbidden_idx,
                 "forbid_rule_degenerated": bool(forbid_degenerate),
@@ -651,7 +725,13 @@ def main() -> None:
                 seg_ldv = w["ldv"]
 
                 obs_vec = compute_obs_vector(
-                    ldv=seg_ldv, micl=seg_micl, micr=seg_micr, edges_hz=edges_hz, cpl_band=cpl_band, fs=FS_EXPECTED
+                    ldv=seg_ldv,
+                    micl=seg_micl,
+                    micr=seg_micr,
+                    edges_hz=edges_hz,
+                    cpl_band_for_obs=cpl_band_for_obs,
+                    fs=FS_EXPECTED,
+                    obs_mode=obs_mode,
                 )
 
                 X = np.fft.rfft(seg_micl, n_fft)

@@ -1,0 +1,42 @@
+{
+  "generated": "2026-02-13T18:41:59.972428",
+  "run_dir": "results/ablation_teacher_mic_only_20260213_183424",
+  "pooled": {
+    "baseline": {
+      "theta_error_ref_deg": {
+        "count": 1255,
+        "median": 2.076846841216062,
+        "p90": 5.839097118146638,
+        "p95": 5.914545809073538
+      },
+      "theta_error_geo_deg": {
+        "count": 1255,
+        "median": 2.685401605704545,
+        "p90": 6.77533878546139,
+        "p95": 7.074776416002885
+      },
+      "fail_rate_ref_gt5deg": 0.2557768924302789
+    },
+    "teacher": {
+      "theta_error_ref_deg": {
+        "count": 1255,
+        "median": 0.14235438485186158,
+        "p90": 0.4674638065057554,
+        "p95": 0.5686094992358806
+      },
+      "theta_error_geo_deg": {
+        "count": 1255,
+        "median": 2.2101765876186388,
+        "p90": 3.2023114089481846,
+        "p95": 3.4464653126866747
+      },
+      "fail_rate_ref_gt5deg": 0.0
+    }
+  },
+  "teacher_sanity_gate": {
+    "median_not_worse_frac_le_0p05": true,
+    "computed": {
+      "median_worsening_frac": -0.9314564839218283
+    }
+  }
+}

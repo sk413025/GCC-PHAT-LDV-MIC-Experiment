@@ -1,0 +1,17 @@
+{
+  "generated": "2026-02-13T18:44:33.972701",
+  "traj_path": "results/ablation_teacher_mic_only_20260213_183424/teacher_trajectories.npz",
+  "n_samples": 1255,
+  "horizon": 6,
+  "n_actions": 64,
+  "model_type": "nearest_centroid_stepwise",
+  "non_empty_actions_per_step": [
+    42,
+    48,
+    54,
+    60,
+    60,
+    61
+  ],
+  "model_path": "results/ablation_student_mic_only_20260213_183424/model_dtmin_band_policy_k6.npz"
+}

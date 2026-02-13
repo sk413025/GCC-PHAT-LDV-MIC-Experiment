@@ -1,0 +1,47 @@
+{
+  "generated": "2026-02-13T18:46:51.384108",
+  "run_dir": "results/ablation_student_mic_only_20260213_183424",
+  "acceptance": {
+    "p95_improvement_frac_ge_0p15": true,
+    "fail_rate_improvement_frac_ge_0p20": true,
+    "median_not_worse_frac_le_0p05": true,
+    "overall_pass": true,
+    "computed": {
+      "p95_improvement_frac": 0.46274416387356837,
+      "fail_rate_improvement_frac": 0.9693877550988953,
+      "median_worsening_frac": -0.8872467454018697
+    }
+  },
+  "pooled": {
+    "baseline": {
+      "theta_error_ref_deg": {
+        "count": 318,
+        "median": 2.1791395715870197,
+        "p90": 5.8453222304535855,
+        "p95": 5.9344093137289455
+      },
+      "theta_error_geo_deg": {
+        "count": 318,
+        "median": 2.8303534975032973,
+        "p90": 6.951746115954207,
+        "p95": 7.112372927529384
+      },
+      "fail_rate_ref_gt5deg": 0.3081761006289308
+    },
+    "student": {
+      "theta_error_ref_deg": {
+        "count": 318,
+        "median": 0.24570507891912463,
+        "p90": 1.4877956072144876,
+        "p95": 3.188296037763465
+      },
+      "theta_error_geo_deg": {
+        "count": 318,
+        "median": 2.1453942965416655,
+        "p90": 3.43064788394991,
+        "p95": 3.889653522875352
+      },
+      "fail_rate_ref_gt5deg": 0.009433962264150943
+    }
+  }
+}
