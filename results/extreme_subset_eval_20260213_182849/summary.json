@@ -1,0 +1,42 @@
+{
+  "generated": "2026-02-13T18:28:56.195448",
+  "run_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/extreme_subset_eval_20260213_182849",
+  "acceptance": {
+    "generated": "2026-02-13T18:28:56.195442",
+    "criteria": {
+      "need_subsets_ge_2": 2,
+      "p95_improvement_frac_ge": 0.15,
+      "fail_rate_improvement_frac_ge": 0.2,
+      "need_near_fail_subset": true,
+      "near_fail_baseline_fail_rate_ge": 0.4,
+      "near_fail_student_fail_rate_le": 0.1
+    },
+    "computed": {
+      "n_subsets_meeting_p95_and_fail": 3,
+      "near_fail_subset_met": false
+    },
+    "per_subset": {
+      "LOW_COH": {
+        "p95_ok": true,
+        "fail_ok": true,
+        "count": 32
+      },
+      "HIGH_HF_IMB": {
+        "p95_ok": true,
+        "fail_ok": true,
+        "count": 32
+      },
+      "CLIPPED": {
+        "p95_ok": false,
+        "fail_ok": false,
+        "count": 0
+      },
+      "LOW_RMS": {
+        "p95_ok": true,
+        "fail_ok": true,
+        "count": 32
+      }
+    },
+    "overall_pass": false
+  }
+}
