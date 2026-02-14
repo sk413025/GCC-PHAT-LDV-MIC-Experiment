@@ -1,0 +1,64 @@
+{
+  "generated": "2026-02-14T17:40:23.504083",
+  "data_root": "/home/sbplab/jiawei/data",
+  "truth_ref_root": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/ldv_vs_mic_grid_20260211_093529/micl_micr_chirp_tau2_band500_2000",
+  "speakers": [
+    "20-0.1V"
+  ],
+  "obs_mode": "mic_only_control",
+  "coupling_mode": "mic_only",
+  "fs_expected": 48000,
+  "window_sec": 5.0,
+  "center_grid": [
+    100.0,
+    110.0,
+    1.0
+  ],
+  "band_hz": [
+    500.0,
+    2000.0
+  ],
+  "n_bands": 64,
+  "teacher": {
+    "k_horizon": 6,
+    "tau_norm_ms": 0.3,
+    "psr_norm_db": 3.0,
+    "stop_gain_min": 0.01
+  },
+  "welch": {
+    "nperseg": 8192,
+    "noverlap": 4096
+  },
+  "coupling": {
+    "silence_percent": 1.0,
+    "speech_rms_percentile": 50.0,
+    "forbid_gamma2": 0.2,
+    "coupling_hard_forbid_enable": false,
+    "dynamic_coh_gate_enable": true,
+    "dynamic_coh_min": 0.05,
+    "tau_ref_gate_enable": true,
+    "tau_ref_gate_ratio_min": 0.6
+  },
+  "gcc": {
+    "max_lag_ms": 10.0,
+    "guided_radius_ms": 0.3,
+    "psr_exclude_samples": 50
+  },
+  "corruption": {
+    "enabled": true,
+    "snr_db": 0.0,
+    "seed": 1337,
+    "preclip_gain": 100.0,
+    "clip_limit": 0.99,
+    "band_lo_hz": 500.0,
+    "band_hi_hz": 2000.0,
+    "occlusion": {
+      "enabled": true,
+      "target": "micr",
+      "kind": "lowpass",
+      "lowpass_hz": 800.0,
+      "tilt_k": 2.0,
+      "tilt_pivot_hz": 800.0
+    }
+  }
+}

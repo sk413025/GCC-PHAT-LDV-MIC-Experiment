@@ -70,10 +70,9 @@ Global seed: `1337`.
 
 ## Acceptance criteria (Claim 2)
 We accept Claim 2 if **any** grid point satisfies:
-1) Baseline near-fail: `fail_rate_ref(theta_error_ref_deg > 5°) >= 0.40`
-2) LDV+MIC feasibility: LDV+MIC student `fail_rate_ref(>5°) <= 0.10`
+1) Baseline near-fail: `fail_rate_ref(theta_error_ref_deg > 4°) >= 0.40`
+2) LDV+MIC feasibility: LDV+MIC student `fail_rate_ref(>4°) <= 0.10`
 3) Irreducibility (ablation): LDV+MIC student beats MIC-only student:
    - p95 improvement ≥ 10% and fail-rate improvement ≥ 20% (relative)
 
 If (1) never happens across the grid, record a negative result: the proxy did not create sufficiently extreme windows.
-

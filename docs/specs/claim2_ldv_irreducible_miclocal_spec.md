@@ -169,10 +169,10 @@ Under `results/.../per_speaker/<speaker>/windows.jsonl`, each record includes:
 ## 8) Acceptance criteria (Claim 2)
 Claim 2 is supported if at least one severity in `{0, -5, -10} dB` satisfies:
 
-1) Near-fail baseline: baseline MIC–MIC `fail_rate_ref(theta_error_ref_deg > 5°) >= 0.40`
-2) LDV feasibility: LDV+MIC student `fail_rate_ref(>5°) <= 0.10`
+1) Near-fail baseline: baseline MIC–MIC `fail_rate_ref(theta_error_ref_deg > 4°) >= 0.40`
+2) LDV feasibility: LDV+MIC student `fail_rate_ref(>4°) <= 0.10`
 3) Irreducibility: LDV+MIC student beats MIC-only student:
    - `p95(theta_error_ref_deg)` at least 10% lower than MIC-only
-   - `fail_rate_ref(>5°)` at least 20% lower (relative)
+   - `fail_rate_ref(>4°)` at least 20% lower (relative)
 
 If (1) never happens, record a negative result (the proxy did not create sufficiently extreme windows).

@@ -132,7 +132,10 @@ The run is valid only if:
 2) No NaNs; non-empty test set for each obs mode.
 
 Near-fail precondition:
-- Baseline pooled `fail_rate_ref(theta_error_ref_deg > 5°) >= 0.40`.
+- Baseline pooled near-fail criteria:
+  - `fail_rate_theta_gt4deg >= 0.40` AND
+  - `frac_psr_gt3db <= 0.10`
+  Note: with `guided_radius_ms=0.3` and sub-sample shift clamp, `theta_error_ref_deg > 5°` can be mathematically unreachable. The suite enforces a reachability guardrail.
 If not met, record “near-fail not reproduced” and do not interpret ablation differences.
 
 ---
@@ -142,8 +145,7 @@ Not a pass/fail claim—these are labels for the report narrative:
 
 - **Coherence nearly sufficient** if `mic_only_coh_only` is within:
   - `<= 5%` relative pooled p95 of `mic_only_control`, and
-  - `<= 0.02` absolute pooled fail-rate(>5°) of `mic_only_control`.
+  - `<= 0.02` absolute pooled fail-rate(>4°) of `mic_only_control`.
 - **PSD materially helps beyond coherence** if `mic_only_psd_only` closes `>= 50%` of the pooled p95 gap between `mic_only_coh_only` and `mic_only_control`.
 - **LDV adds marginal info beyond strong mic-only** if `ldv_mic` improves vs `mic_only_control` by:
   - `>= 10%` pooled p95 relative AND `>= 20%` pooled fail-rate relative.
-

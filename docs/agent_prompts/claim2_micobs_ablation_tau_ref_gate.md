@@ -42,7 +42,9 @@ Open `results/<run_name>/report.md` and confirm:
    - `dynamic_coh_gate_enable: True (coh_min=0.05)`
    - `tau_ref_gate_enable: True (ratio_min=0.60)`
 2) **Teacher identity checks**: PASS (actions/noise centers/forbidden mask identical across obs modes).
-3) **Near-fail precondition**: baseline `fail_rate_ref(>5°) >= 0.40`.
+3) **Near-fail precondition** (pooled test windows):
+   - `fail_rate_theta_gt4deg >= 0.40` AND
+   - `frac_psr_gt3db <= 0.10`
 4) **Negative transfer check (per speaker)**:
    - No speaker should be flagged.
 5) **Pooled guardrail**:
@@ -67,4 +69,3 @@ Under `results/<run_name>/`:
 - Do not optimize against geometry truth; evaluation is vs chirp-reference truth.
 - Do not write artifacts to repo root; everything goes under `results/<run_name>/`.
 - Remember `results/` may be gitignored; commit artifacts with `git add -f results/<run_name>/`.
-

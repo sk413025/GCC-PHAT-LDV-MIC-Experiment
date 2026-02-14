@@ -49,7 +49,7 @@ python -u scripts/train_dtmin_from_band_trajectories.py \
 - File: `results/band_dtmin_student_<ts>/eval_report.md`
 - Look at:
   - `p95(theta_error_ref)` improvement
-  - `fail_rate_ref(>5°)` improvement
+  - `fail_rate_ref(>4°)` improvement
   - `median(theta_error_ref)` worsening
   - `OVERALL: PASS/FAIL`
 

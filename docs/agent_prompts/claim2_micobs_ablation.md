@@ -30,7 +30,9 @@ python -u scripts/run_claim2_micobs_ablation_suite.py \
 ## What to check (verification)
 Open `results/<run_name>/report.md` and confirm:
 1) **Teacher identity checks**: PASS (actions/noise centers/forbidden mask identical across obs modes).
-2) **Near-fail precondition**: baseline `fail_rate_ref(>5°) >= 0.40`.
+2) **Near-fail precondition** (pooled test windows):
+   - `fail_rate_theta_gt4deg >= 0.40` AND
+   - `frac_psr_gt3db <= 0.10`
 3) Compare pooled `student p95` and `student fail` across obs modes:
    - `mic_only_coh_only` vs `mic_only_control` (is coherence nearly sufficient?)
    - `mic_only_psd_only` vs `mic_only_control` (does PSD help?)
@@ -53,4 +55,3 @@ Under `results/<run_name>/`:
 - Do not optimize against geometry truth; evaluation is vs chirp-reference truth.
 - Do not write artifacts to repo root; everything must go under `results/<run_name>/`.
 - Remember `results/` may be gitignored; commit artifacts with `git add -f results/<run_name>/`.
-

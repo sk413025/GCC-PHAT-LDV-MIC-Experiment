@@ -1,0 +1,50 @@
+{
+  "generated": "2026-02-14T17:41:01.806404",
+  "data_root": "/home/sbplab/jiawei/data",
+  "truth_ref_root": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/ldv_vs_mic_grid_20260211_093529/micl_micr_chirp_tau2_band500_2000",
+  "speakers": [
+    "18-0.1V",
+    "19-0.1V",
+    "20-0.1V",
+    "21-0.1V",
+    "22-0.1V"
+  ],
+  "smoke": false,
+  "analysis": {
+    "band_hz": [
+      500.0,
+      2000.0
+    ],
+    "n_bands": 64,
+    "k_horizon": 6,
+    "guided_radius_ms": 0.3,
+    "max_lag_ms": 10.0
+  },
+  "coupling_mode": "mic_only",
+  "coupling_hard_forbid_enable": false,
+  "dynamic_coh_gate_enable": true,
+  "dynamic_coh_min": 0.05,
+  "tau_ref_gate_enable": true,
+  "tau_ref_gate_ratio_min": 0.6,
+  "corruption": {
+    "corrupt_enable": 1,
+    "corrupt_snr_db": 0.0,
+    "corrupt_seed": 1337,
+    "preclip_gain": 100.0,
+    "clip_limit": 0.99
+  },
+  "occlusion": {
+    "occlusion_enable": 1,
+    "occlusion_target": "micr",
+    "occlusion_kind": "lowpass",
+    "occlusion_lowpass_hz": 800.0,
+    "occlusion_tilt_k": 2.0,
+    "occlusion_tilt_pivot_hz": 800.0
+  },
+  "obs_modes": [
+    "ldv_mic",
+    "mic_only_control",
+    "mic_only_coh_only",
+    "mic_only_psd_only"
+  ]
+}

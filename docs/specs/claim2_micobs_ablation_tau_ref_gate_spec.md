@@ -191,7 +191,10 @@ python -u scripts/run_claim2_micobs_ablation_suite.py \
 
 ### Validity guardrails
 1) `results/<run>/teacher_identity.json`: PASS (actions + noise centers + forbidden mask identical across obs modes).
-2) Baseline near-fail precondition (pooled test windows): `fail_rate_ref(>5°) >= 0.40`.
+2) Baseline near-fail precondition (pooled test windows):
+   - `fail_rate_theta_gt4deg >= 0.40` AND
+   - `frac_psr_gt3db <= 0.10`
+   Note: with `guided_radius_ms=0.3` and sub-sample shift clamp, `theta_error_ref_deg > 5°` can be mathematically unreachable. The suite enforces a reachability guardrail.
 3) No NaNs; non-empty test windows for every obs_mode.
 
 ### Fix acceptance (non-worse per speaker; locked)
@@ -206,4 +209,3 @@ On pooled test windows:
 - `fail_rate_improvement_frac(ldv_mic vs mic_only_control) >= 0.10`
 
 If any condition fails, commit the negative result with causal analysis and artifacts.
-

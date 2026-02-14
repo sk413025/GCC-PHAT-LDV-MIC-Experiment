@@ -1,0 +1,42 @@
+{
+  "generated": "2026-02-14T17:40:23.320930",
+  "run_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_micobs_ablation_metricfix_smoke_20260214_174021/teacher/ldv_mic",
+  "pooled": {
+    "baseline": {
+      "theta_error_ref_deg": {
+        "count": 6,
+        "median": 3.102504822958216,
+        "p90": 4.146999115446859,
+        "p95": 4.146999115446859
+      },
+      "theta_error_geo_deg": {
+        "count": 6,
+        "median": 0.9076253010022688,
+        "p90": 3.9332401431595017,
+        "p95": 5.388050374947233
+      },
+      "fail_rate_ref_gt5deg": 0.0
+    },
+    "teacher": {
+      "theta_error_ref_deg": {
+        "count": 6,
+        "median": 0.10318352142508336,
+        "p90": 0.5059340521242404,
+        "p95": 0.5863279147378577
+      },
+      "theta_error_geo_deg": {
+        "count": 6,
+        "median": 3.2265629572879044,
+        "p90": 3.629313487987061,
+        "p95": 3.7097073506006786
+      },
+      "fail_rate_ref_gt5deg": 0.0
+    }
+  },
+  "teacher_sanity_gate": {
+    "median_not_worse_frac_le_0p05": true,
+    "computed": {
+      "median_worsening_frac": -0.9667418659070237
+    }
+  }
+}

@@ -62,7 +62,7 @@ python -u scripts/compare_ablation_runs.py \
 ## Acceptance (Claim 2)
 On pooled test windows (vs chirp reference), we accept “LDV provides irreducible info” if:
 - p95(theta_error_ref) of LDV+MIC student is ≥ 10% lower than MIC-only student
-- fail_rate(theta_error_ref>5°) of LDV+MIC student is ≥ 20% lower than MIC-only student
+- fail_rate(theta_error_ref>4°) of LDV+MIC student is ≥ 20% lower than MIC-only student
 
 Read: `results/ablation_compare_<ts>/ablation_report.md`
 
@@ -70,4 +70,3 @@ Read: `results/ablation_compare_<ts>/ablation_report.md`
 1) Do not change the window split or evaluation; use the plan-locked student script.
 2) Do not change teacher scoring; actions must remain MIC-MIC truth-guided.
 3) Do not write artifacts to repo root; always under `results/<run_name>/`.
-

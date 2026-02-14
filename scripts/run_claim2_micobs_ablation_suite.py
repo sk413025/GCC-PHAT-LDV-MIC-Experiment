@@ -50,6 +50,30 @@ OCCLUSION = {
 
 OBS_MODES = ["ldv_mic", "mic_only_control", "mic_only_coh_only", "mic_only_psd_only"]
 
+# Report thresholds (must be physically reachable under the guided radius)
+THETA_FAIL_DEG = 4.0
+TAU_ERR_FAIL_MS = 0.25
+PSR_GOOD_DB = 3.0
+
+# Quadratic sub-sample refinement is clamped in both teacher and student
+SHIFT_CLAMP_SAMPLES = 0.5
+FS_HZ = 48_000
+SHIFT_CLAMP_MS = 1000.0 * SHIFT_CLAMP_SAMPLES / float(FS_HZ)
+
+
+def tau_to_theta_deg(tau_sec: float, *, c: float = 343.0, d: float = 1.4) -> float:
+    sin_theta = float(np.clip(float(tau_sec) * float(c) / float(d), -1.0, 1.0))
+    return float(np.degrees(np.arcsin(sin_theta)))
+
+
+def max_theta_error_possible_deg(*, tau_ref_ms: float, theta_ref_deg: float, guided_radius_ms: float) -> float:
+    tau_lo_sec = (float(tau_ref_ms) - float(guided_radius_ms) - float(SHIFT_CLAMP_MS)) / 1000.0
+    tau_hi_sec = (float(tau_ref_ms) + float(guided_radius_ms) + float(SHIFT_CLAMP_MS)) / 1000.0
+    theta_lo = tau_to_theta_deg(tau_lo_sec)
+    theta_hi = tau_to_theta_deg(tau_hi_sec)
+    ref = float(theta_ref_deg)
+    return float(max(abs(theta_lo - ref), abs(theta_hi - ref)))
+
 
 def configure_logging(out_dir: Path) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -106,7 +130,7 @@ def assert_np_equal(a: np.ndarray, b: np.ndarray, *, name: str) -> None:
         raise RuntimeError(f"Teacher identity check failed for {name}: diff_count={diff}")
 
 
-def summarize(vals: list[float]) -> dict[str, float]:
+def summarize_theta_err_deg(vals: list[float]) -> dict[str, float]:
     x = np.asarray(vals, dtype=np.float64)
     if x.size == 0:
         return {
@@ -114,14 +138,54 @@ def summarize(vals: list[float]) -> dict[str, float]:
             "median": float("nan"),
             "p90": float("nan"),
             "p95": float("nan"),
-            "fail_rate_gt5deg": float("nan"),
+            "fail_rate_gt4deg": float("nan"),
         }
     return {
         "count": int(x.size),
         "median": float(np.quantile(x, 0.5)),
         "p90": float(np.quantile(x, 0.9)),
         "p95": float(np.quantile(x, 0.95)),
-        "fail_rate_gt5deg": float(np.mean(x > 5.0)),
+        "fail_rate_gt4deg": float(np.mean(x > float(THETA_FAIL_DEG))),
+    }
+
+
+def summarize_tau_err_ms(vals: list[float]) -> dict[str, float]:
+    x = np.asarray(vals, dtype=np.float64)
+    if x.size == 0:
+        return {
+            "count": 0,
+            "median": float("nan"),
+            "p90": float("nan"),
+            "p95": float("nan"),
+            "fail_rate_gt0p25ms": float("nan"),
+        }
+    return {
+        "count": int(x.size),
+        "median": float(np.quantile(x, 0.5)),
+        "p90": float(np.quantile(x, 0.9)),
+        "p95": float(np.quantile(x, 0.95)),
+        "fail_rate_gt0p25ms": float(np.mean(x > float(TAU_ERR_FAIL_MS))),
+    }
+
+
+def summarize_psr_db(vals: list[float]) -> dict[str, float]:
+    x = np.asarray(vals, dtype=np.float64)
+    if x.size == 0:
+        return {
+            "count": 0,
+            "median": float("nan"),
+            "p90": float("nan"),
+            "p95": float("nan"),
+            "frac_gt3db": float("nan"),
+            "frac_gt0db": float("nan"),
+        }
+    return {
+        "count": int(x.size),
+        "median": float(np.quantile(x, 0.5)),
+        "p90": float(np.quantile(x, 0.9)),
+        "p95": float(np.quantile(x, 0.95)),
+        "frac_gt3db": float(np.mean(x > float(PSR_GOOD_DB))),
+        "frac_gt0db": float(np.mean(x > 0.0)),
     }
 
 
@@ -148,16 +212,50 @@ def load_test_windows(run_dir: Path) -> list[dict[str, Any]]:
 
 
 def metrics_from_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
-    baseline = summarize([float(r["baseline"]["theta_error_ref_deg"]) for r in rows])
-    student = summarize([float(r["student"]["theta_error_ref_deg"]) for r in rows])
+    baseline_theta = summarize_theta_err_deg([float(r["baseline"]["theta_error_ref_deg"]) for r in rows])
+    student_theta = summarize_theta_err_deg([float(r["student"]["theta_error_ref_deg"]) for r in rows])
+
+    baseline_tau_err = summarize_tau_err_ms(
+        [abs(float(r["baseline"]["tau_ms"]) - float(r["truth_reference"]["tau_ref_ms"])) for r in rows]
+    )
+    student_tau_err = summarize_tau_err_ms(
+        [abs(float(r["student"]["tau_ms"]) - float(r["truth_reference"]["tau_ref_ms"])) for r in rows]
+    )
+
+    baseline_psr = summarize_psr_db([float(r["baseline"]["psr_db"]) for r in rows])
+    student_psr = summarize_psr_db([float(r["student"]["psr_db"]) for r in rows])
     per_speaker: dict[str, Any] = {}
     for spk in sorted({str(r["speaker_id"]) for r in rows}):
         rs = [r for r in rows if str(r["speaker_id"]) == spk]
+        base_tau_err_spk = [abs(float(r["baseline"]["tau_ms"]) - float(r["truth_reference"]["tau_ref_ms"])) for r in rs]
+        stud_tau_err_spk = [abs(float(r["student"]["tau_ms"]) - float(r["truth_reference"]["tau_ref_ms"])) for r in rs]
         per_speaker[spk] = {
-            "baseline": summarize([float(r["baseline"]["theta_error_ref_deg"]) for r in rs]),
-            "student": summarize([float(r["student"]["theta_error_ref_deg"]) for r in rs]),
+            "baseline": {
+                "theta_error_ref_deg": summarize_theta_err_deg([float(r["baseline"]["theta_error_ref_deg"]) for r in rs]),
+                "tau_error_ref_ms": summarize_tau_err_ms(base_tau_err_spk),
+                "psr_db": summarize_psr_db([float(r["baseline"]["psr_db"]) for r in rs]),
+            },
+            "student": {
+                "theta_error_ref_deg": summarize_theta_err_deg([float(r["student"]["theta_error_ref_deg"]) for r in rs]),
+                "tau_error_ref_ms": summarize_tau_err_ms(stud_tau_err_spk),
+                "psr_db": summarize_psr_db([float(r["student"]["psr_db"]) for r in rs]),
+            },
         }
-    return {"pooled": {"baseline": baseline, "student": student}, "per_speaker": per_speaker}
+    return {
+        "pooled": {
+            "baseline": {
+                "theta_error_ref_deg": baseline_theta,
+                "tau_error_ref_ms": baseline_tau_err,
+                "psr_db": baseline_psr,
+            },
+            "student": {
+                "theta_error_ref_deg": student_theta,
+                "tau_error_ref_ms": student_tau_err,
+                "psr_db": student_psr,
+            },
+        },
+        "per_speaker": per_speaker,
+    }
 
 
 def main() -> None:
@@ -375,15 +473,41 @@ def main() -> None:
             "metrics": metrics_from_rows(rows),
         }
 
+    # Guardrail: ensure the theta-failure threshold is physically reachable given the guided radius.
+    # We use the first variant's test windows as reference for tau_ref/theta_ref per speaker.
+    guided_radius_ms = float(run_cfg["analysis"]["guided_radius_ms"])
+    ref_rows = load_test_windows(student_dirs[OBS_MODES[0]])
+    max_err_by_speaker: dict[str, float] = {}
+    for spk in sorted({str(r["speaker_id"]) for r in ref_rows}):
+        rs = [r for r in ref_rows if str(r["speaker_id"]) == spk]
+        tau_ref_ms = float(rs[0]["truth_reference"]["tau_ref_ms"])
+        theta_ref_deg = float(rs[0]["truth_reference"]["theta_ref_deg"])
+        max_err_by_speaker[spk] = max_theta_error_possible_deg(
+            tau_ref_ms=tau_ref_ms,
+            theta_ref_deg=theta_ref_deg,
+            guided_radius_ms=guided_radius_ms,
+        )
+    min_max_err = float(min(max_err_by_speaker.values())) if max_err_by_speaker else float("nan")
+    if not np.isfinite(min_max_err):
+        raise ValueError("Non-finite max theta-error bound (check tau_ref inputs)")
+    if float(THETA_FAIL_DEG) > min_max_err + 1e-6:
+        raise ValueError(
+            f"THETA_FAIL_DEG={THETA_FAIL_DEG:.3f} is unreachable under guided_radius_ms={guided_radius_ms:.3f} "
+            f"(min speaker max_err={min_max_err:.3f}). Lower THETA_FAIL_DEG or increase guided_radius_ms."
+        )
+
     # Baseline near-fail precondition (use first variant)
-    base_fail = float(metrics["variants"][OBS_MODES[0]]["metrics"]["pooled"]["baseline"]["fail_rate_gt5deg"])
-    near_fail = bool(base_fail >= 0.40)
+    pooled_base_theta = metrics["variants"][OBS_MODES[0]]["metrics"]["pooled"]["baseline"]["theta_error_ref_deg"]
+    pooled_base_psr = metrics["variants"][OBS_MODES[0]]["metrics"]["pooled"]["baseline"]["psr_db"]
+    base_fail_theta = float(pooled_base_theta["fail_rate_gt4deg"])
+    base_frac_psr_good = float(pooled_base_psr["frac_gt3db"])
+    near_fail = bool((base_fail_theta >= 0.40) and (base_frac_psr_good <= 0.10))
 
-    def pooled_student(obs_mode: str) -> dict[str, float]:
-        return metrics["variants"][obs_mode]["metrics"]["pooled"]["student"]
+    def pooled_student_metric(obs_mode: str, metric: str) -> dict[str, float]:
+        return metrics["variants"][obs_mode]["metrics"]["pooled"]["student"][metric]
 
-    def pooled_baseline(obs_mode: str) -> dict[str, float]:
-        return metrics["variants"][obs_mode]["metrics"]["pooled"]["baseline"]
+    def pooled_baseline_metric(obs_mode: str, metric: str) -> dict[str, float]:
+        return metrics["variants"][obs_mode]["metrics"]["pooled"]["baseline"][metric]
 
     deltas = {}
     for a, b in [
@@ -391,16 +515,28 @@ def main() -> None:
         ("mic_only_control", "mic_only_coh_only"),
         ("mic_only_control", "mic_only_psd_only"),
     ]:
-        pa = pooled_student(a)
-        pb = pooled_student(b)
+        pa = pooled_student_metric(a, "theta_error_ref_deg")
+        pb = pooled_student_metric(b, "theta_error_ref_deg")
         deltas[f"{a}_vs_{b}"] = {
             "p95_improvement_frac": frac_improve(float(pb["p95"]), float(pa["p95"])),
-            "fail_rate_improvement_frac": frac_improve(float(pb["fail_rate_gt5deg"]), float(pa["fail_rate_gt5deg"])),
+            "fail_rate_improvement_frac": frac_improve(float(pb["fail_rate_gt4deg"]), float(pa["fail_rate_gt4deg"])),
         }
 
     summary = {
         "generated": datetime.now().isoformat(),
-        "near_fail_precondition": {"baseline_fail_rate_gt5deg": base_fail, "near_fail_ge_0p40": near_fail},
+        "thresholds": {
+            "theta_fail_deg": float(THETA_FAIL_DEG),
+            "tau_err_fail_ms": float(TAU_ERR_FAIL_MS),
+            "psr_good_db": float(PSR_GOOD_DB),
+            "shift_clamp_ms": float(SHIFT_CLAMP_MS),
+        },
+        "theta_error_max_possible_deg": {"per_speaker": max_err_by_speaker, "min": float(min_max_err)},
+        "near_fail_precondition": {
+            "baseline_fail_rate_theta_gt4deg": float(base_fail_theta),
+            "baseline_frac_psr_gt3db": float(base_frac_psr_good),
+            "criteria": "fail_rate_theta_gt4deg>=0.40 AND frac_psr_gt3db<=0.10",
+            "near_fail": bool(near_fail),
+        },
         "obs_modes": OBS_MODES,
         "deltas": deltas,
     }
@@ -422,17 +558,51 @@ def main() -> None:
     lines.append(f"- tau_ref_gate_enable: {bool(tau_ref_gate_enable)} (ratio_min={tau_ref_gate_ratio_min:.2f})\n\n")
     lines.append("## Teacher identity checks\n\n")
     lines.append("- actions/noise centers/forbidden mask identical across obs modes: PASS\n\n")
+    lines.append("## Metric reachability (guided window)\n\n")
+    lines.append(f"- guided_radius_ms: {guided_radius_ms:.3f}\n")
+    lines.append(f"- quadratic_shift_clamp_ms: {SHIFT_CLAMP_MS:.6f}\n")
+    lines.append(f"- theta_fail_deg: {THETA_FAIL_DEG:.2f}\n\n")
+    lines.append("| speaker | max_theta_error_possible_deg |\n")
+    lines.append("| --- | ---: |\n")
+    for spk in sorted(max_err_by_speaker.keys()):
+        lines.append(f"| {spk} | {max_err_by_speaker[spk]:.3f} |\n")
+    lines.append("\n")
+
     lines.append("## Near-fail precondition (baseline MIC–MIC)\n\n")
-    lines.append(f"- baseline fail_rate_ref(>5°): {base_fail:.3f} (>= 0.40 required) => {'PASS' if near_fail else 'FAIL'}\n\n")
+    lines.append("- Criteria: fail_rate_theta_gt4deg>=0.40 AND frac_psr_gt3db<=0.10 (pooled test windows)\n")
+    lines.append(f"- baseline fail_rate_theta_gt4deg: {base_fail_theta:.3f}\n")
+    lines.append(f"- baseline frac_psr_gt3db: {base_frac_psr_good:.3f}\n")
+    lines.append(f"- near-fail => {'PASS' if near_fail else 'FAIL'}\n\n")
 
     lines.append("## Pooled test metrics (vs chirp reference)\n\n")
-    lines.append("| obs_mode | baseline p95 | baseline fail | student p95 | student fail |\n")
+    lines.append("### Theta error\n\n")
+    lines.append("| obs_mode | baseline p95 | baseline fail(>4°) | student p95 | student fail(>4°) |\n")
     lines.append("| --- | ---: | ---: | ---: | ---: |\n")
     for obs_mode in OBS_MODES:
-        b = pooled_baseline(obs_mode)
-        s = pooled_student(obs_mode)
+        b = pooled_baseline_metric(obs_mode, "theta_error_ref_deg")
+        s = pooled_student_metric(obs_mode, "theta_error_ref_deg")
         lines.append(
-            f"| {obs_mode} | {b['p95']:.3f} | {b['fail_rate_gt5deg']:.3f} | {s['p95']:.3f} | {s['fail_rate_gt5deg']:.3f} |\n"
+            f"| {obs_mode} | {b['p95']:.3f} | {b['fail_rate_gt4deg']:.3f} | {s['p95']:.3f} | {s['fail_rate_gt4deg']:.3f} |\n"
+        )
+
+    lines.append("\n### Tau error (vs tau_ref)\n\n")
+    lines.append("| obs_mode | baseline p95 (ms) | baseline fail(>0.25ms) | student p95 (ms) | student fail(>0.25ms) |\n")
+    lines.append("| --- | ---: | ---: | ---: | ---: |\n")
+    for obs_mode in OBS_MODES:
+        b = pooled_baseline_metric(obs_mode, "tau_error_ref_ms")
+        s = pooled_student_metric(obs_mode, "tau_error_ref_ms")
+        lines.append(
+            f"| {obs_mode} | {b['p95']:.3f} | {b['fail_rate_gt0p25ms']:.3f} | {s['p95']:.3f} | {s['fail_rate_gt0p25ms']:.3f} |\n"
+        )
+
+    lines.append("\n### PSR (guided peak)\n\n")
+    lines.append("| obs_mode | baseline median (dB) | baseline frac(>3dB) | student median (dB) | student frac(>3dB) |\n")
+    lines.append("| --- | ---: | ---: | ---: | ---: |\n")
+    for obs_mode in OBS_MODES:
+        b = pooled_baseline_metric(obs_mode, "psr_db")
+        s = pooled_student_metric(obs_mode, "psr_db")
+        lines.append(
+            f"| {obs_mode} | {b['median']:.3f} | {b['frac_gt3db']:.3f} | {s['median']:.3f} | {s['frac_gt3db']:.3f} |\n"
         )
 
     lines.append("\n## Key deltas (student vs student)\n\n")
@@ -453,10 +623,10 @@ def main() -> None:
     per_mic = metrics["variants"]["mic_only_control"]["metrics"]["per_speaker"]
     nt_rows: list[tuple[str, float, float, float, float]] = []
     for spk in sorted(per.keys()):
-        p95_ldv = float(per[spk]["student"]["p95"])
-        fail_ldv = float(per[spk]["student"]["fail_rate_gt5deg"])
-        p95_mic = float(per_mic[spk]["student"]["p95"])
-        fail_mic = float(per_mic[spk]["student"]["fail_rate_gt5deg"])
+        p95_ldv = float(per[spk]["student"]["theta_error_ref_deg"]["p95"])
+        fail_ldv = float(per[spk]["student"]["theta_error_ref_deg"]["fail_rate_gt4deg"])
+        p95_mic = float(per_mic[spk]["student"]["theta_error_ref_deg"]["p95"])
+        fail_mic = float(per_mic[spk]["student"]["theta_error_ref_deg"]["fail_rate_gt4deg"])
         nt_rows.append((spk, p95_ldv, p95_mic, fail_ldv, fail_mic))
         if (p95_ldv > float(nt_threshold["p95_ratio"]) * p95_mic) or (fail_ldv > fail_mic + float(nt_threshold["fail_abs"])):
             flagged.append(spk)
@@ -464,7 +634,7 @@ def main() -> None:
     lines.append("\n## Negative transfer check (per speaker)\n\n")
     lines.append("- Comparison: `ldv_mic` student vs `mic_only_control` student (test windows only)\n")
     lines.append(f"- Flag if: p95_ldv > {nt_threshold['p95_ratio']:.2f} * p95_mic OR fail_ldv > fail_mic + {nt_threshold['fail_abs']:.2f}\n\n")
-    lines.append("| speaker | p95_ldv | p95_mic | Δp95 | fail_ldv | fail_mic | Δfail | flagged |\n")
+    lines.append("| speaker | p95_ldv | p95_mic | Δp95 | fail_ldv(>4°) | fail_mic(>4°) | Δfail | flagged |\n")
     lines.append("| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |\n")
     for spk, p95_ldv, p95_mic, fail_ldv, fail_mic in nt_rows:
         dp95 = p95_ldv - p95_mic

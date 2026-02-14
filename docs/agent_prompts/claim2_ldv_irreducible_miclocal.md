@@ -37,8 +37,8 @@ python -u scripts/run_claim2_ldv_irreducible_miclocal_sweep.py \
 ## Acceptance (Claim 2 supported)
 We declare Claim 2 supported if **at least one** severity in `{0, -5, -10} dB` satisfies:
 
-1) **Near-fail baseline**: baseline MIC–MIC `fail_rate_ref(theta_error_ref_deg > 5°) >= 0.40`
-2) **LDV feasibility**: LDV+MIC student `fail_rate_ref(>5°) <= 0.10`
+1) **Near-fail baseline**: baseline MIC–MIC `fail_rate_ref(theta_error_ref_deg > 4°) >= 0.40`
+2) **LDV feasibility**: LDV+MIC student `fail_rate_ref(>4°) <= 0.10`
 3) **Irreducibility ablation**: LDV+MIC student beats MIC-only student:
    - p95 improvement ≥ 10% and fail-rate improvement ≥ 20% (relative)
 
