@@ -1,0 +1,281 @@
+{
+  "generated": "2026-02-14T04:13:14.305386",
+  "run_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_occlusion_20260214_005000",
+  "rows": [
+    {
+      "snr_db": 0.0,
+      "occlusion": {
+        "name": "lp800_micr",
+        "occlusion_enable": 1,
+        "occlusion_target": "micr",
+        "occlusion_kind": "lowpass",
+        "occlusion_lowpass_hz": 800.0,
+        "occlusion_tilt_k": 2.0,
+        "occlusion_tilt_pivot_hz": 800.0
+      },
+      "tag": "snr_p0_occ_lp800_micr",
+      "baseline_fail_rate_ref_gt5deg": 0.4528301886792453,
+      "ldv_mic_student_fail_rate_ref_gt5deg": 0.03459119496855346,
+      "compare_acceptance": {
+        "p95_ldv_mic_better_by_ge_10pct": false,
+        "fail_rate_ldv_mic_better_by_ge_20pct": true,
+        "overall_pass": false,
+        "computed": {
+          "p95_improvement_frac": 0.08758376016515317,
+          "fail_rate_improvement_frac": 0.5
+        }
+      },
+      "claim2_checks": {
+        "near_fail": true,
+        "ldv_feasible": true,
+        "ldv_beats_mic_only": false
+      },
+      "claim2_pass": false
+    },
+    {
+      "snr_db": -5.0,
+      "occlusion": {
+        "name": "lp800_micr",
+        "occlusion_enable": 1,
+        "occlusion_target": "micr",
+        "occlusion_kind": "lowpass",
+        "occlusion_lowpass_hz": 800.0,
+        "occlusion_tilt_k": 2.0,
+        "occlusion_tilt_pivot_hz": 800.0
+      },
+      "tag": "snr_m5_occ_lp800_micr",
+      "baseline_fail_rate_ref_gt5deg": 0.3553459119496855,
+      "ldv_mic_student_fail_rate_ref_gt5deg": 0.059748427672955975,
+      "compare_acceptance": {
+        "p95_ldv_mic_better_by_ge_10pct": false,
+        "fail_rate_ldv_mic_better_by_ge_20pct": false,
+        "overall_pass": false,
+        "computed": {
+          "p95_improvement_frac": 0.007595312459162181,
+          "fail_rate_improvement_frac": 0.09523809523809522
+        }
+      },
+      "claim2_checks": {
+        "near_fail": false,
+        "ldv_feasible": true,
+        "ldv_beats_mic_only": false
+      },
+      "claim2_pass": false
+    },
+    {
+      "snr_db": -10.0,
+      "occlusion": {
+        "name": "lp800_micr",
+        "occlusion_enable": 1,
+        "occlusion_target": "micr",
+        "occlusion_kind": "lowpass",
+        "occlusion_lowpass_hz": 800.0,
+        "occlusion_tilt_k": 2.0,
+        "occlusion_tilt_pivot_hz": 800.0
+      },
+      "tag": "snr_m10_occ_lp800_micr",
+      "baseline_fail_rate_ref_gt5deg": 0.22012578616352202,
+      "ldv_mic_student_fail_rate_ref_gt5deg": 0.07232704402515723,
+      "compare_acceptance": {
+        "p95_ldv_mic_better_by_ge_10pct": false,
+        "fail_rate_ldv_mic_better_by_ge_20pct": false,
+        "overall_pass": false,
+        "computed": {
+          "p95_improvement_frac": 0.034459935486144094,
+          "fail_rate_improvement_frac": 0.0
+        }
+      },
+      "claim2_checks": {
+        "near_fail": false,
+        "ldv_feasible": true,
+        "ldv_beats_mic_only": false
+      },
+      "claim2_pass": false
+    },
+    {
+      "snr_db": 0.0,
+      "occlusion": {
+        "name": "lp600_micr",
+        "occlusion_enable": 1,
+        "occlusion_target": "micr",
+        "occlusion_kind": "lowpass",
+        "occlusion_lowpass_hz": 600.0,
+        "occlusion_tilt_k": 2.0,
+        "occlusion_tilt_pivot_hz": 800.0
+      },
+      "tag": "snr_p0_occ_lp600_micr",
+      "baseline_fail_rate_ref_gt5deg": 0.23270440251572327,
+      "ldv_mic_student_fail_rate_ref_gt5deg": 0.07547169811320754,
+      "compare_acceptance": {
+        "p95_ldv_mic_better_by_ge_10pct": false,
+        "fail_rate_ldv_mic_better_by_ge_20pct": false,
+        "overall_pass": false,
+        "computed": {
+          "p95_improvement_frac": -0.02714518453636891,
+          "fail_rate_improvement_frac": -0.04347826086956521
+        }
+      },
+      "claim2_checks": {
+        "near_fail": false,
+        "ldv_feasible": true,
+        "ldv_beats_mic_only": false
+      },
+      "claim2_pass": false
+    },
+    {
+      "snr_db": -5.0,
+      "occlusion": {
+        "name": "lp600_micr",
+        "occlusion_enable": 1,
+        "occlusion_target": "micr",
+        "occlusion_kind": "lowpass",
+        "occlusion_lowpass_hz": 600.0,
+        "occlusion_tilt_k": 2.0,
+        "occlusion_tilt_pivot_hz": 800.0
+      },
+      "tag": "snr_m5_occ_lp600_micr",
+      "baseline_fail_rate_ref_gt5deg": 0.1918238993710692,
+      "ldv_mic_student_fail_rate_ref_gt5deg": 0.06289308176100629,
+      "compare_acceptance": {
+        "p95_ldv_mic_better_by_ge_10pct": false,
+        "fail_rate_ldv_mic_better_by_ge_20pct": false,
+        "overall_pass": false,
+        "computed": {
+          "p95_improvement_frac": 0.02205127975691954,
+          "fail_rate_improvement_frac": -0.05263157894736841
+        }
+      },
+      "claim2_checks": {
+        "near_fail": false,
+        "ldv_feasible": true,
+        "ldv_beats_mic_only": false
+      },
+      "claim2_pass": false
+    },
+    {
+      "snr_db": -10.0,
+      "occlusion": {
+        "name": "lp600_micr",
+        "occlusion_enable": 1,
+        "occlusion_target": "micr",
+        "occlusion_kind": "lowpass",
+        "occlusion_lowpass_hz": 600.0,
+        "occlusion_tilt_k": 2.0,
+        "occlusion_tilt_pivot_hz": 800.0
+      },
+      "tag": "snr_m10_occ_lp600_micr",
+      "baseline_fail_rate_ref_gt5deg": 0.1792452830188679,
+      "ldv_mic_student_fail_rate_ref_gt5deg": 0.06918238993710692,
+      "compare_acceptance": {
+        "p95_ldv_mic_better_by_ge_10pct": false,
+        "fail_rate_ldv_mic_better_by_ge_20pct": false,
+        "overall_pass": false,
+        "computed": {
+          "p95_improvement_frac": -0.049283293642906324,
+          "fail_rate_improvement_frac": -0.04761904761904761
+        }
+      },
+      "claim2_checks": {
+        "near_fail": false,
+        "ldv_feasible": true,
+        "ldv_beats_mic_only": false
+      },
+      "claim2_pass": false
+    },
+    {
+      "snr_db": 0.0,
+      "occlusion": {
+        "name": "tilt2_micr",
+        "occlusion_enable": 1,
+        "occlusion_target": "micr",
+        "occlusion_kind": "tilt",
+        "occlusion_lowpass_hz": 800.0,
+        "occlusion_tilt_k": 2.0,
+        "occlusion_tilt_pivot_hz": 800.0
+      },
+      "tag": "snr_p0_occ_tilt2_micr",
+      "baseline_fail_rate_ref_gt5deg": 0.24842767295597484,
+      "ldv_mic_student_fail_rate_ref_gt5deg": 0.11635220125786164,
+      "compare_acceptance": {
+        "p95_ldv_mic_better_by_ge_10pct": false,
+        "fail_rate_ldv_mic_better_by_ge_20pct": false,
+        "overall_pass": false,
+        "computed": {
+          "p95_improvement_frac": -0.05241326696795932,
+          "fail_rate_improvement_frac": -0.12121212121212117
+        }
+      },
+      "claim2_checks": {
+        "near_fail": false,
+        "ldv_feasible": false,
+        "ldv_beats_mic_only": false
+      },
+      "claim2_pass": false
+    },
+    {
+      "snr_db": -5.0,
+      "occlusion": {
+        "name": "tilt2_micr",
+        "occlusion_enable": 1,
+        "occlusion_target": "micr",
+        "occlusion_kind": "tilt",
+        "occlusion_lowpass_hz": 800.0,
+        "occlusion_tilt_k": 2.0,
+        "occlusion_tilt_pivot_hz": 800.0
+      },
+      "tag": "snr_m5_occ_tilt2_micr",
+      "baseline_fail_rate_ref_gt5deg": 0.2672955974842767,
+      "ldv_mic_student_fail_rate_ref_gt5deg": 0.10062893081761007,
+      "compare_acceptance": {
+        "p95_ldv_mic_better_by_ge_10pct": false,
+        "fail_rate_ldv_mic_better_by_ge_20pct": false,
+        "overall_pass": false,
+        "computed": {
+          "p95_improvement_frac": -0.018776982169967052,
+          "fail_rate_improvement_frac": -0.032258064516129024
+        }
+      },
+      "claim2_checks": {
+        "near_fail": false,
+        "ldv_feasible": false,
+        "ldv_beats_mic_only": false
+      },
+      "claim2_pass": false
+    },
+    {
+      "snr_db": -10.0,
+      "occlusion": {
+        "name": "tilt2_micr",
+        "occlusion_enable": 1,
+        "occlusion_target": "micr",
+        "occlusion_kind": "tilt",
+        "occlusion_lowpass_hz": 800.0,
+        "occlusion_tilt_k": 2.0,
+        "occlusion_tilt_pivot_hz": 800.0
+      },
+      "tag": "snr_m10_occ_tilt2_micr",
+      "baseline_fail_rate_ref_gt5deg": 0.19811320754716982,
+      "ldv_mic_student_fail_rate_ref_gt5deg": 0.0660377358490566,
+      "compare_acceptance": {
+        "p95_ldv_mic_better_by_ge_10pct": false,
+        "fail_rate_ldv_mic_better_by_ge_20pct": false,
+        "overall_pass": false,
+        "computed": {
+          "p95_improvement_frac": 0.014694272924610166,
+          "fail_rate_improvement_frac": 0.04545454545454545
+        }
+      },
+      "claim2_checks": {
+        "near_fail": false,
+        "ldv_feasible": true,
+        "ldv_beats_mic_only": false
+      },
+      "claim2_pass": false
+    }
+  ],
+  "final": {
+    "claim2_supported_any": false,
+    "near_fail_observed_any": true,
+    "note": "FAIL: near-fail occurred but LDV+MIC did not meet feasibility and/or did not beat MIC-only."
+  }
+}

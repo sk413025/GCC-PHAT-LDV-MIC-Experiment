@@ -59,6 +59,7 @@ try:
     from mic_corruption import (  # type: ignore
         MicCorruptionConfig,
         apply_mic_corruption,
+        apply_occlusion_fft,
         choose_noise_center,
         select_silence_centers,
     )
@@ -67,6 +68,7 @@ except ImportError:  # pragma: no cover
     from scripts.mic_corruption import (  # type: ignore
         MicCorruptionConfig,
         apply_mic_corruption,
+        apply_occlusion_fft,
         choose_noise_center,
         select_silence_centers,
     )
@@ -585,6 +587,30 @@ def main() -> None:
     parser.add_argument("--preclip_gain", type=float, default=100.0, help="Pre-clip gain for saturation proxy.")
     parser.add_argument("--clip_limit", type=float, default=0.99, help="Clip limit after preclip gain.")
     parser.add_argument(
+        "--occlusion_enable",
+        type=int,
+        default=0,
+        choices=[0, 1],
+        help="Enable mic-local occlusion spectral shaping on one mic (0/1). Default: 0.",
+    )
+    parser.add_argument(
+        "--occlusion_target",
+        type=str,
+        default="micr",
+        choices=["micl", "micr"],
+        help="Which mic is occluded. Default: micr.",
+    )
+    parser.add_argument(
+        "--occlusion_kind",
+        type=str,
+        default="lowpass",
+        choices=["lowpass", "tilt"],
+        help="Occlusion spectral shaping kind. Default: lowpass.",
+    )
+    parser.add_argument("--occlusion_lowpass_hz", type=float, default=800.0, help="Lowpass cutoff for occlusion.")
+    parser.add_argument("--occlusion_tilt_k", type=float, default=2.0, help="Spectral tilt exponent k (>=0).")
+    parser.add_argument("--occlusion_tilt_pivot_hz", type=float, default=800.0, help="Spectral tilt pivot frequency.")
+    parser.add_argument(
         "--center_start_sec",
         type=float,
         default=CENTER_START_SEC,
@@ -618,6 +644,12 @@ def main() -> None:
     corrupt_seed = int(args.corrupt_seed)
     preclip_gain = float(args.preclip_gain)
     clip_limit = float(args.clip_limit)
+    occlusion_enable = bool(int(args.occlusion_enable))
+    occlusion_target = str(args.occlusion_target)
+    occlusion_kind = str(args.occlusion_kind)
+    occlusion_lowpass_hz = float(args.occlusion_lowpass_hz)
+    occlusion_tilt_k = float(args.occlusion_tilt_k)
+    occlusion_tilt_pivot_hz = float(args.occlusion_tilt_pivot_hz)
 
     center_start_sec = float(args.center_start_sec)
     center_end_sec = float(args.center_end_sec)
@@ -663,6 +695,14 @@ def main() -> None:
             "clip_limit": float(clip_limit),
             "band_lo_hz": float(BAND_HZ[0]),
             "band_hi_hz": float(BAND_HZ[1]),
+            "occlusion": {
+                "enabled": bool(occlusion_enable),
+                "target": str(occlusion_target),
+                "kind": str(occlusion_kind),
+                "lowpass_hz": float(occlusion_lowpass_hz),
+                "tilt_k": float(occlusion_tilt_k),
+                "tilt_pivot_hz": float(occlusion_tilt_pivot_hz),
+            },
         },
     }
     write_json(out_dir / "run_config.json", run_config)
@@ -867,12 +907,56 @@ def main() -> None:
                     noise_center_R = choose_noise_center(rng, silence_centers)
                     noiseL = extract_centered_window(micl, fs=FS_EXPECTED, center_sec=noise_center_L, window_sec=WINDOW_SEC)
                     noiseR = extract_centered_window(micr, fs=FS_EXPECTED, center_sec=noise_center_R, window_sec=WINDOW_SEC)
-                    seg_micl, diagL = apply_mic_corruption(seg_micl_clean, noiseL, cfg=cfg, fs=FS_EXPECTED)
-                    seg_micr, diagR = apply_mic_corruption(seg_micr_clean, noiseR, cfg=cfg, fs=FS_EXPECTED)
+
+                    sigL_mix = seg_micl_clean
+                    sigR_mix = seg_micr_clean
+                    if occlusion_enable and occlusion_target == "micl":
+                        sigL_mix = apply_occlusion_fft(
+                            sigL_mix,
+                            fs=FS_EXPECTED,
+                            kind=occlusion_kind,
+                            lowpass_hz=occlusion_lowpass_hz,
+                            tilt_k=occlusion_tilt_k,
+                            tilt_pivot_hz=occlusion_tilt_pivot_hz,
+                        )
+                    if occlusion_enable and occlusion_target == "micr":
+                        sigR_mix = apply_occlusion_fft(
+                            sigR_mix,
+                            fs=FS_EXPECTED,
+                            kind=occlusion_kind,
+                            lowpass_hz=occlusion_lowpass_hz,
+                            tilt_k=occlusion_tilt_k,
+                            tilt_pivot_hz=occlusion_tilt_pivot_hz,
+                        )
+
+                    seg_micl, diagL = apply_mic_corruption(
+                        seg_micl_clean,
+                        noiseL,
+                        cfg=cfg,
+                        fs=FS_EXPECTED,
+                        signal_for_alpha=seg_micl_clean,
+                        signal_for_mix=sigL_mix,
+                    )
+                    seg_micr, diagR = apply_mic_corruption(
+                        seg_micr_clean,
+                        noiseR,
+                        cfg=cfg,
+                        fs=FS_EXPECTED,
+                        signal_for_alpha=seg_micr_clean,
+                        signal_for_mix=sigR_mix,
+                    )
                     corruption_record = {
                         "enabled": True,
                         "noise_center_sec_L": float(noise_center_L),
                         "noise_center_sec_R": float(noise_center_R),
+                        "occlusion": {
+                            "enabled": bool(occlusion_enable),
+                            "target": str(occlusion_target),
+                            "kind": str(occlusion_kind),
+                            "lowpass_hz": float(occlusion_lowpass_hz),
+                            "tilt_k": float(occlusion_tilt_k),
+                            "tilt_pivot_hz": float(occlusion_tilt_pivot_hz),
+                        },
                         "micl": diagL,
                         "micr": diagR,
                     }
@@ -1119,7 +1203,16 @@ def main() -> None:
             clip_limit=float(clip_limit),
             seed=int(corrupt_seed),
         )
-        corruption_config_json = json.dumps(cfg0.to_jsonable(), sort_keys=True)
+        payload = cfg0.to_jsonable()
+        payload["occlusion"] = {
+            "enabled": bool(occlusion_enable),
+            "target": str(occlusion_target),
+            "kind": str(occlusion_kind),
+            "lowpass_hz": float(occlusion_lowpass_hz),
+            "tilt_k": float(occlusion_tilt_k),
+            "tilt_pivot_hz": float(occlusion_tilt_pivot_hz),
+        }
+        corruption_config_json = json.dumps(payload, sort_keys=True)
 
     np.savez_compressed(
         out_dir / "teacher_trajectories.npz",

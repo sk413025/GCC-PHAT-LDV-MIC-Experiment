@@ -1,0 +1,57 @@
+{
+  "generated": "2026-02-14T02:57:26.592677",
+  "data_root": "/home/sbplab/jiawei/data",
+  "truth_ref_root": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/ldv_vs_mic_grid_20260211_093529/micl_micr_chirp_tau2_band500_2000",
+  "speakers": [
+    "18-0.1V",
+    "19-0.1V",
+    "20-0.1V",
+    "21-0.1V",
+    "22-0.1V"
+  ],
+  "snr_grid_db": [
+    0.0,
+    -5.0,
+    -10.0
+  ],
+  "occlusion_grid": [
+    {
+      "name": "lp800_micr",
+      "occlusion_enable": 1,
+      "occlusion_target": "micr",
+      "occlusion_kind": "lowpass",
+      "occlusion_lowpass_hz": 800.0,
+      "occlusion_tilt_k": 2.0,
+      "occlusion_tilt_pivot_hz": 800.0
+    },
+    {
+      "name": "lp600_micr",
+      "occlusion_enable": 1,
+      "occlusion_target": "micr",
+      "occlusion_kind": "lowpass",
+      "occlusion_lowpass_hz": 600.0,
+      "occlusion_tilt_k": 2.0,
+      "occlusion_tilt_pivot_hz": 800.0
+    },
+    {
+      "name": "tilt2_micr",
+      "occlusion_enable": 1,
+      "occlusion_target": "micr",
+      "occlusion_kind": "tilt",
+      "occlusion_lowpass_hz": 800.0,
+      "occlusion_tilt_k": 2.0,
+      "occlusion_tilt_pivot_hz": 800.0
+    }
+  ],
+  "corruption": {
+    "seed": 1337,
+    "preclip_gain": 100.0,
+    "clip_limit": 0.99,
+    "band_hz": [
+      500.0,
+      2000.0
+    ]
+  },
+  "coupling_mode": "mic_only",
+  "smoke": false
+}

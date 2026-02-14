@@ -1,0 +1,125 @@
+{
+  "generated": "2026-02-14T03:39:27.853102",
+  "run_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_occlusion_20260214_005000/snr_m5_occ_lp600_micr/compare",
+  "inputs": {
+    "run_a": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_occlusion_20260214_005000/snr_m5_occ_lp600_micr/student_ldv_mic",
+    "run_b": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_occlusion_20260214_005000/snr_m5_occ_lp600_micr/student_mic_only",
+    "sha256": {
+      "run_a/test_windows.jsonl": "529a0a73525f5e34e25cde00484e83d5f3f72d517ab82d300bb24d991938e2b2",
+      "run_b/test_windows.jsonl": "42efd545b7ecd6da41d58a55ddd1e7b06b5d7c08fe68380d5fb8c0b6afff163c"
+    }
+  },
+  "pooled": {
+    "run_a": {
+      "count": 318,
+      "median": 2.487430970992741,
+      "p90": 4.621731694962006,
+      "p95": 5.512027414938172,
+      "fail_rate_gt5deg": 0.06289308176100629
+    },
+    "run_b": {
+      "count": 318,
+      "median": 2.5969806255016197,
+      "p90": 4.614378295816657,
+      "p95": 5.636315382229953,
+      "fail_rate_gt5deg": 0.059748427672955975
+    }
+  },
+  "per_speaker": {
+    "18-0.1V": {
+      "run_a": {
+        "count": 78,
+        "median": 2.34082564098148,
+        "p90": 4.598442448173197,
+        "p95": 5.606641560742551,
+        "fail_rate_gt5deg": 0.0641025641025641
+      },
+      "run_b": {
+        "count": 78,
+        "median": 2.246938935266421,
+        "p90": 4.65870615602397,
+        "p95": 4.928305125498546,
+        "fail_rate_gt5deg": 0.038461538461538464
+      }
+    },
+    "19-0.1V": {
+      "run_a": {
+        "count": 53,
+        "median": 2.1675387097531775,
+        "p90": 4.238938609392398,
+        "p95": 4.7505017747075335,
+        "fail_rate_gt5deg": 0.03773584905660377
+      },
+      "run_b": {
+        "count": 53,
+        "median": 2.1675387097531775,
+        "p90": 4.491447967120159,
+        "p95": 5.031958256962655,
+        "fail_rate_gt5deg": 0.05660377358490566
+      }
+    },
+    "20-0.1V": {
+      "run_a": {
+        "count": 49,
+        "median": 2.775427090053224,
+        "p90": 4.453473697307137,
+        "p95": 4.609083874189777,
+        "fail_rate_gt5deg": 0.0
+      },
+      "run_b": {
+        "count": 49,
+        "median": 2.2581671725608183,
+        "p90": 4.2732664864264125,
+        "p95": 4.411402583282388,
+        "fail_rate_gt5deg": 0.0
+      }
+    },
+    "21-0.1V": {
+      "run_a": {
+        "count": 63,
+        "median": 1.734105118820212,
+        "p90": 4.023568718031989,
+        "p95": 4.518158348581407,
+        "fail_rate_gt5deg": 0.0
+      },
+      "run_b": {
+        "count": 63,
+        "median": 2.5845482990572295,
+        "p90": 4.122821575808845,
+        "p95": 4.519874270620162,
+        "fail_rate_gt5deg": 0.0
+      }
+    },
+    "22-0.1V": {
+      "run_a": {
+        "count": 75,
+        "median": 3.5312984382076547,
+        "p90": 5.727696176304059,
+        "p95": 5.7531653025055824,
+        "fail_rate_gt5deg": 0.17333333333333334
+      },
+      "run_b": {
+        "count": 75,
+        "median": 3.7381907885602086,
+        "p90": 5.728995834037439,
+        "p95": 5.793528237341309,
+        "fail_rate_gt5deg": 0.17333333333333334
+      }
+    }
+  },
+  "acceptance": {
+    "p95_ldv_mic_better_by_ge_10pct": false,
+    "fail_rate_ldv_mic_better_by_ge_20pct": false,
+    "overall_pass": false,
+    "computed": {
+      "p95_improvement_frac": 0.02205127975691954,
+      "fail_rate_improvement_frac": -0.05263157894736841
+    }
+  },
+  "teacher_actions_check": {
+    "teacher_a": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_occlusion_20260214_005000/snr_m5_occ_lp600_micr/teacher_ldv_mic/teacher_trajectories.npz",
+    "teacher_b": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_occlusion_20260214_005000/snr_m5_occ_lp600_micr/teacher_mic_only/teacher_trajectories.npz",
+    "actions_identical": true,
+    "diff_count": 0
+  }
+}

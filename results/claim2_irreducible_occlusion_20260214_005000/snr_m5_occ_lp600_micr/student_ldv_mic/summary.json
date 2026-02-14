@@ -1,0 +1,66 @@
+{
+  "generated": "2026-02-14T03:37:05.394373",
+  "run_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_occlusion_20260214_005000/snr_m5_occ_lp600_micr/student_ldv_mic",
+  "acceptance": {
+    "p95_improvement_frac_ge_0p15": true,
+    "fail_rate_improvement_frac_ge_0p20": true,
+    "median_not_worse_frac_le_0p05": true,
+    "overall_pass": true,
+    "computed": {
+      "p95_improvement_frac": 0.21397885386981938,
+      "fail_rate_improvement_frac": 0.6721311475374798,
+      "median_worsening_frac": -0.13825778355095691
+    }
+  },
+  "corruption": {
+    "use_traj_corruption": true,
+    "config": {
+      "snr_db": -5.0,
+      "band_lo_hz": 500.0,
+      "band_hi_hz": 2000.0,
+      "preclip_gain": 100.0,
+      "clip_limit": 0.99,
+      "seed": 1337
+    },
+    "snr_achieved_db_preclip_test": {
+      "micl_median": -4.99999999998362,
+      "micr_median": -19.346373385422954
+    },
+    "clip_frac_test": {
+      "micl_mean": 0.0017687631027253669,
+      "micr_mean": 0.0066374213836477985
+    }
+  },
+  "pooled": {
+    "baseline": {
+      "theta_error_ref_deg": {
+        "count": 318,
+        "median": 2.886513998632638,
+        "p90": 5.753165302505583,
+        "p95": 7.012568862906247
+      },
+      "theta_error_geo_deg": {
+        "count": 318,
+        "median": 2.9779157687355973,
+        "p90": 7.195193488531452,
+        "p95": 8.225372785323827
+      },
+      "fail_rate_ref_gt5deg": 0.1918238993710692
+    },
+    "student": {
+      "theta_error_ref_deg": {
+        "count": 318,
+        "median": 2.487430970992741,
+        "p90": 4.621731694962006,
+        "p95": 5.512027414938172
+      },
+      "theta_error_geo_deg": {
+        "count": 318,
+        "median": 2.758001975341016,
+        "p90": 6.184035192073236,
+        "p95": 6.822115629883846
+      },
+      "fail_rate_ref_gt5deg": 0.06289308176100629
+    }
+  }
+}

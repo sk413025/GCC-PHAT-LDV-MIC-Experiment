@@ -61,10 +61,10 @@ from scipy.io import wavfile
 
 try:
     # When executed as a script: `python scripts/train_dtmin_from_band_trajectories.py`
-    from mic_corruption import MicCorruptionConfig, apply_mic_corruption  # type: ignore
+    from mic_corruption import MicCorruptionConfig, apply_mic_corruption, apply_occlusion_fft  # type: ignore
 except ImportError:  # pragma: no cover
     # When imported from repo root: `import scripts.train_dtmin_from_band_trajectories`
-    from scripts.mic_corruption import MicCorruptionConfig, apply_mic_corruption  # type: ignore
+    from scripts.mic_corruption import MicCorruptionConfig, apply_mic_corruption, apply_occlusion_fft  # type: ignore
 
 logger = logging.getLogger(__name__)
 
@@ -426,6 +426,7 @@ def main() -> None:
     noise_center_sec_L = None
     noise_center_sec_R = None
     corruption_cfg = None
+    occlusion_cfg = None
     if use_traj_corruption:
         required = ["noise_center_sec_L", "noise_center_sec_R", "corruption_config_json"]
         missing = [k for k in required if k not in payload]
@@ -447,6 +448,7 @@ def main() -> None:
                 clip_limit=float(cfg_payload["clip_limit"]),
                 seed=int(cfg_payload["seed"]),
             )
+            occlusion_cfg = cfg_payload.get("occlusion", None)
 
     if observations.ndim != 3:
         raise ValueError(f"Expected observations (N,K,B), got shape={observations.shape}")
@@ -559,12 +561,56 @@ def main() -> None:
                 noise_r = extract_centered_window(micr, fs=FS_EXPECTED, center_sec=ncr, window_sec=WINDOW_SEC).astype(
                     np.float64, copy=False
                 )
-                seg_l, diag_l = apply_mic_corruption(seg_l, noise_l, cfg=corruption_cfg, fs=FS_EXPECTED)
-                seg_r, diag_r = apply_mic_corruption(seg_r, noise_r, cfg=corruption_cfg, fs=FS_EXPECTED)
+                sig_l_mix = seg_l
+                sig_r_mix = seg_r
+                if isinstance(occlusion_cfg, dict) and bool(occlusion_cfg.get("enabled", False)):
+                    target = str(occlusion_cfg.get("target", "micr"))
+                    kind = str(occlusion_cfg.get("kind", "lowpass"))
+                    lowpass_hz = float(occlusion_cfg.get("lowpass_hz", 800.0))
+                    tilt_k = float(occlusion_cfg.get("tilt_k", 2.0))
+                    tilt_pivot_hz = float(occlusion_cfg.get("tilt_pivot_hz", 800.0))
+                    if target == "micl":
+                        sig_l_mix = apply_occlusion_fft(
+                            sig_l_mix,
+                            fs=FS_EXPECTED,
+                            kind=kind,
+                            lowpass_hz=lowpass_hz,
+                            tilt_k=tilt_k,
+                            tilt_pivot_hz=tilt_pivot_hz,
+                        )
+                    elif target == "micr":
+                        sig_r_mix = apply_occlusion_fft(
+                            sig_r_mix,
+                            fs=FS_EXPECTED,
+                            kind=kind,
+                            lowpass_hz=lowpass_hz,
+                            tilt_k=tilt_k,
+                            tilt_pivot_hz=tilt_pivot_hz,
+                        )
+                    else:
+                        raise ValueError(f"Unknown occlusion target: {target}")
+
+                seg_l, diag_l = apply_mic_corruption(
+                    seg_l,
+                    noise_l,
+                    cfg=corruption_cfg,
+                    fs=FS_EXPECTED,
+                    signal_for_alpha=seg_l,
+                    signal_for_mix=sig_l_mix,
+                )
+                seg_r, diag_r = apply_mic_corruption(
+                    seg_r,
+                    noise_r,
+                    cfg=corruption_cfg,
+                    fs=FS_EXPECTED,
+                    signal_for_alpha=seg_r,
+                    signal_for_mix=sig_r_mix,
+                )
                 corruption_record = {
                     "enabled": True,
                     "noise_center_sec_L": ncl,
                     "noise_center_sec_R": ncr,
+                    "occlusion": occlusion_cfg,
                     "micl": diag_l,
                     "micr": diag_r,
                 }

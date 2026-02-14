@@ -1,0 +1,14 @@
+{
+  "generated": "2026-02-14T03:34:43.177835",
+  "run_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_occlusion_20260214_005000/snr_m5_occ_lp600_micr/teacher_mic_only",
+  "n_samples": 1255,
+  "k_horizon": 6,
+  "n_bands": 64,
+  "valid_len": {
+    "mean": 2.853386454183267,
+    "median": 2.0,
+    "p10": 1.0,
+    "p90": 6.0,
+    "frac_zero": 0.0
+  }
+}
