@@ -1,0 +1,18 @@
+2026-02-14 10:37:45,296 - INFO - ======================================================================
+2026-02-14 10:37:45,297 - INFO - Stage 4: LDV-vs-Mic DoA (GCC-PHAT)
+2026-02-14 10:37:45,297 - INFO - ======================================================================
+2026-02-14 10:37:45,297 - INFO - Speaker: 21-0.1V
+2026-02-14 10:37:45,297 - INFO - Signal pair: ldv_micl
+2026-02-14 10:37:45,297 - INFO - Alignment mode: omp
+2026-02-14 10:37:45,298 - INFO - Geometry truth: tau=-0.759 ms, theta=-10.71 deg
+2026-02-14 10:37:45,298 - INFO - Reference(geometry): tau=-0.759 ms, theta=-10.71 deg
+2026-02-14 10:37:45,298 - INFO - Pass mode: omp_vs_raw
+2026-02-14 10:37:46,686 - INFO - Duration: 1043.97 s
+2026-02-14 10:37:46,686 - INFO - GCC method=fft, welch(nperseg=4096, noverlap=3072, nfft=6144), coherence_mask_min=None, narrowband_fusion=False, dual_baseline_fusion=False, pass_require_ldv_better_than_mic=True
+2026-02-14 10:38:21,427 - INFO - Evaluating 5 segments
+2026-02-14 10:38:21,427 - INFO - Segment 1/5: center_t=208.00s
+2026-02-14 10:38:23,690 - INFO - Segment 2/5: center_t=595.00s
+2026-02-14 10:38:25,994 - INFO - Segment 3/5: center_t=520.00s
+2026-02-14 10:38:28,288 - INFO - Segment 4/5: center_t=255.00s
+2026-02-14 10:38:30,604 - INFO - Segment 5/5: center_t=194.00s
+2026-02-14 10:38:32,883 - INFO - Results saved to: results\stage4_untried_ai_with_mic_gate_20260214_1035\baseline_fft_band200_4000\21-0.1V\summary.json

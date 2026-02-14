@@ -1,0 +1,18 @@
+2026-02-14 10:47:44,214 - INFO - ======================================================================
+2026-02-14 10:47:44,215 - INFO - Stage 4: LDV-vs-Mic DoA (GCC-PHAT)
+2026-02-14 10:47:44,215 - INFO - ======================================================================
+2026-02-14 10:47:44,215 - INFO - Speaker: 18-0.1V
+2026-02-14 10:47:44,215 - INFO - Signal pair: ldv_micl
+2026-02-14 10:47:44,215 - INFO - Alignment mode: omp
+2026-02-14 10:47:44,215 - INFO - Geometry truth: tau=1.450 ms, theta=20.82 deg
+2026-02-14 10:47:44,215 - INFO - Reference(geometry): tau=1.450 ms, theta=20.82 deg
+2026-02-14 10:47:44,215 - INFO - Pass mode: omp_vs_raw
+2026-02-14 10:47:45,659 - INFO - Duration: 1043.97 s
+2026-02-14 10:47:45,659 - INFO - GCC method=welch_coherence_weighted, welch(nperseg=4096, noverlap=3072, nfft=6144), coherence_mask_min=None, narrowband_fusion=False, dual_baseline_fusion=False, pass_require_ldv_better_than_mic=True
+2026-02-14 10:49:04,367 - INFO - Evaluating 5 segments
+2026-02-14 10:49:04,367 - INFO - Segment 1/5: center_t=333.00s
+2026-02-14 10:49:07,025 - INFO - Segment 2/5: center_t=507.00s
+2026-02-14 10:49:09,692 - INFO - Segment 3/5: center_t=211.00s
+2026-02-14 10:49:12,366 - INFO - Segment 4/5: center_t=491.00s
+2026-02-14 10:49:15,011 - INFO - Segment 5/5: center_t=264.00s
+2026-02-14 10:49:17,632 - INFO - Results saved to: results\stage4_untried_ai_with_mic_gate_20260214_1035\A_welch_coherence_weighted_band200_4000\18-0.1V\summary.json

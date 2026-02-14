@@ -1,0 +1,19 @@
+2026-02-14 10:55:53,890 - INFO - ======================================================================
+2026-02-14 10:55:53,890 - INFO - Stage 4: LDV-vs-Mic DoA (GCC-PHAT)
+2026-02-14 10:55:53,890 - INFO - ======================================================================
+2026-02-14 10:55:53,890 - INFO - Speaker: 18-0.1V
+2026-02-14 10:55:53,890 - INFO - Signal pair: ldv_micl
+2026-02-14 10:55:53,890 - INFO - Alignment mode: omp
+2026-02-14 10:55:53,890 - INFO - Geometry truth: tau=1.450 ms, theta=20.82 deg
+2026-02-14 10:55:53,890 - INFO - Reference(geometry): tau=1.450 ms, theta=20.82 deg
+2026-02-14 10:55:53,890 - INFO - Pass mode: omp_vs_raw
+2026-02-14 10:56:00,828 - INFO - Applied LDV velocity compensation: eps_hz=20.000
+2026-02-14 10:56:00,834 - INFO - Duration: 1043.97 s
+2026-02-14 10:56:00,834 - INFO - GCC method=welch_phat, welch(nperseg=4096, noverlap=3072, nfft=6144), coherence_mask_min=None, narrowband_fusion=False, dual_baseline_fusion=False, pass_require_ldv_better_than_mic=True
+2026-02-14 10:57:18,313 - INFO - Evaluating 5 segments
+2026-02-14 10:57:18,313 - INFO - Segment 1/5: center_t=200.00s
+2026-02-14 10:57:20,920 - INFO - Segment 2/5: center_t=467.00s
+2026-02-14 10:57:23,505 - INFO - Segment 3/5: center_t=335.00s
+2026-02-14 10:57:26,158 - INFO - Segment 4/5: center_t=586.00s
+2026-02-14 10:57:28,810 - INFO - Segment 5/5: center_t=311.00s
+2026-02-14 10:57:31,434 - INFO - Results saved to: results\stage4_untried_ai_with_mic_gate_20260214_1035\D_plus_F_welch_phat_ldv_comp\18-0.1V\summary.json
