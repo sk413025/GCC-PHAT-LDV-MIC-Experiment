@@ -172,6 +172,26 @@ def main() -> None:
         default=["18-0.1V", "19-0.1V", "20-0.1V", "21-0.1V", "22-0.1V"],
     )
     ap.add_argument("--smoke", type=int, default=0, choices=[0, 1])
+    ap.add_argument(
+        "--coupling_hard_forbid_enable",
+        type=int,
+        default=1,
+        choices=[0, 1],
+        help="If 0, do not hard-forbid any band based on silence coupling (keep coupling as a soft penalty only). Default: 1.",
+    )
+    ap.add_argument(
+        "--dynamic_coh_gate_enable",
+        type=int,
+        default=0,
+        choices=[0, 1],
+        help="If 1, apply a per-window mic coherence gate (teacher forbidden mask includes coherence floor). Default: 0.",
+    )
+    ap.add_argument(
+        "--dynamic_coh_min",
+        type=float,
+        default=0.05,
+        help="Dynamic mic coherence floor for per-window gating. Default: 0.05.",
+    )
     args = ap.parse_args()
 
     repo_root = Path(__file__).resolve().parents[1]
@@ -190,6 +210,10 @@ def main() -> None:
         teacher_center_overrides = ["--center_start_sec", "100", "--center_end_sec", "110", "--center_step_sec", "1"]
         student_split_overrides = ["--train_max_center_sec", "105"]
 
+    coupling_hard_forbid_enable = int(args.coupling_hard_forbid_enable)
+    dynamic_coh_gate_enable = int(args.dynamic_coh_gate_enable)
+    dynamic_coh_min = float(args.dynamic_coh_min)
+
     run_cfg = {
         "generated": datetime.now().isoformat(),
         "data_root": str(data_root),
@@ -204,6 +228,9 @@ def main() -> None:
             "max_lag_ms": 10.0,
         },
         "coupling_mode": COUPLING_MODE,
+        "coupling_hard_forbid_enable": bool(coupling_hard_forbid_enable),
+        "dynamic_coh_gate_enable": bool(dynamic_coh_gate_enable),
+        "dynamic_coh_min": float(dynamic_coh_min),
         "corruption": {
             "corrupt_enable": 1,
             "corrupt_snr_db": float(SNR_DB),
@@ -237,6 +264,12 @@ def main() -> None:
             obs_mode,
             "--coupling_mode",
             COUPLING_MODE,
+            "--coupling_hard_forbid_enable",
+            str(int(coupling_hard_forbid_enable)),
+            "--dynamic_coh_gate_enable",
+            str(int(dynamic_coh_gate_enable)),
+            "--dynamic_coh_min",
+            str(float(dynamic_coh_min)),
             "--corrupt_enable",
             "1",
             "--corrupt_snr_db",
@@ -388,10 +421,37 @@ def main() -> None:
     lines.append("- PSD materially helps beyond coherence if psd_only closes >=50% of the p95 gap between coh_only and control.\n")
     lines.append("- LDV adds marginal info beyond strong mic-only if ldv_mic improves vs mic_only_control by >=10% p95 and >=20% fail-rate (relative).\n")
 
+    # Negative transfer check (per speaker): ldv_mic vs mic_only_control
+    nt_threshold = {"p95_ratio": 1.05, "fail_abs": 0.02}
+    flagged: list[str] = []
+    per = metrics["variants"]["ldv_mic"]["metrics"]["per_speaker"]
+    per_mic = metrics["variants"]["mic_only_control"]["metrics"]["per_speaker"]
+    nt_rows: list[tuple[str, float, float, float, float]] = []
+    for spk in sorted(per.keys()):
+        p95_ldv = float(per[spk]["student"]["p95"])
+        fail_ldv = float(per[spk]["student"]["fail_rate_gt5deg"])
+        p95_mic = float(per_mic[spk]["student"]["p95"])
+        fail_mic = float(per_mic[spk]["student"]["fail_rate_gt5deg"])
+        nt_rows.append((spk, p95_ldv, p95_mic, fail_ldv, fail_mic))
+        if (p95_ldv > float(nt_threshold["p95_ratio"]) * p95_mic) or (fail_ldv > fail_mic + float(nt_threshold["fail_abs"])):
+            flagged.append(spk)
+
+    lines.append("\n## Negative transfer check (per speaker)\n\n")
+    lines.append("- Comparison: `ldv_mic` student vs `mic_only_control` student (test windows only)\n")
+    lines.append(f"- Flag if: p95_ldv > {nt_threshold['p95_ratio']:.2f} * p95_mic OR fail_ldv > fail_mic + {nt_threshold['fail_abs']:.2f}\n\n")
+    lines.append("| speaker | p95_ldv | p95_mic | Δp95 | fail_ldv | fail_mic | Δfail | flagged |\n")
+    lines.append("| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |\n")
+    for spk, p95_ldv, p95_mic, fail_ldv, fail_mic in nt_rows:
+        dp95 = p95_ldv - p95_mic
+        dfail = fail_ldv - fail_mic
+        is_flag = "YES" if spk in flagged else ""
+        lines.append(f"| {spk} | {p95_ldv:.3f} | {p95_mic:.3f} | {dp95:+.3f} | {fail_ldv:.3f} | {fail_mic:.3f} | {dfail:+.3f} | {is_flag} |\n")
+    lines.append("\n")
+    lines.append(f"- Flagged speakers: `{flagged}`\n")
+
     (out_dir / "report.md").write_text("".join(lines), encoding="utf-8")
     logger.info("Wrote report: %s", (out_dir / "report.md").as_posix())
 
 
 if __name__ == "__main__":
     main()
-

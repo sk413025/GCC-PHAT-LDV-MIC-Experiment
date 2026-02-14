@@ -1,0 +1,451 @@
+{
+  "summary": {
+    "generated": "2026-02-14T14:58:05.969072",
+    "near_fail_precondition": {
+      "baseline_fail_rate_gt5deg": 0.4528301886792453,
+      "near_fail_ge_0p40": true
+    },
+    "obs_modes": [
+      "ldv_mic",
+      "mic_only_control",
+      "mic_only_coh_only",
+      "mic_only_psd_only"
+    ],
+    "deltas": {
+      "ldv_mic_vs_mic_only_control": {
+        "p95_improvement_frac": -0.09387766224290997,
+        "fail_rate_improvement_frac": 0.08823529411764704
+      },
+      "mic_only_control_vs_mic_only_coh_only": {
+        "p95_improvement_frac": -0.009341081006861774,
+        "fail_rate_improvement_frac": -0.1147540983606557
+      },
+      "mic_only_control_vs_mic_only_psd_only": {
+        "p95_improvement_frac": 0.0502899893318171,
+        "fail_rate_improvement_frac": 0.08108108108108106
+      }
+    }
+  },
+  "metrics": {
+    "generated": "2026-02-14T14:58:05.952444",
+    "out_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_micobs_ablation_fix_20260214_144138",
+    "variants": {
+      "ldv_mic": {
+        "student_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_micobs_ablation_fix_20260214_144138/student/ldv_mic",
+        "sha256_test_windows": "0aed23ee26f0234f35c2ffbff4c46144d8f5222827d4abf7be4a69ed47fe7472",
+        "metrics": {
+          "pooled": {
+            "baseline": {
+              "count": 318,
+              "median": 4.834958856419766,
+              "p90": 6.919111942689123,
+              "p95": 10.606212431335203,
+              "fail_rate_gt5deg": 0.4528301886792453
+            },
+            "student": {
+              "count": 318,
+              "median": 3.0460107620786827,
+              "p90": 5.911102250583851,
+              "p95": 7.387104726509038,
+              "fail_rate_gt5deg": 0.1949685534591195
+            }
+          },
+          "per_speaker": {
+            "18-0.1V": {
+              "baseline": {
+                "count": 78,
+                "median": 3.9886138048185433,
+                "p90": 6.423206109986578,
+                "p95": 8.282762406076275,
+                "fail_rate_gt5deg": 0.34615384615384615
+              },
+              "student": {
+                "count": 78,
+                "median": 1.0091370164769273,
+                "p90": 4.8866056526496395,
+                "p95": 5.645098330294799,
+                "fail_rate_gt5deg": 0.08974358974358974
+              }
+            },
+            "19-0.1V": {
+              "baseline": {
+                "count": 53,
+                "median": 4.41093982625474,
+                "p90": 10.876597774522955,
+                "p95": 11.572961951584427,
+                "fail_rate_gt5deg": 0.33962264150943394
+              },
+              "student": {
+                "count": 53,
+                "median": 1.5299920777577327,
+                "p90": 6.5463186259267365,
+                "p95": 8.126665107495816,
+                "fail_rate_gt5deg": 0.1509433962264151
+              }
+            },
+            "20-0.1V": {
+              "baseline": {
+                "count": 49,
+                "median": 5.459199561866015,
+                "p90": 11.551945325608237,
+                "p95": 24.349039784004727,
+                "fail_rate_gt5deg": 0.6530612244897959
+              },
+              "student": {
+                "count": 49,
+                "median": 3.6385595162440585,
+                "p90": 9.974591807901156,
+                "p95": 13.831911694429179,
+                "fail_rate_gt5deg": 0.40816326530612246
+              }
+            },
+            "21-0.1V": {
+              "baseline": {
+                "count": 63,
+                "median": 5.02132869668141,
+                "p90": 6.538024383404275,
+                "p95": 7.466932939388148,
+                "fail_rate_gt5deg": 0.5396825396825397
+              },
+              "student": {
+                "count": 63,
+                "median": 3.7870981724975916,
+                "p90": 5.212393278295451,
+                "p95": 5.794848357713512,
+                "fail_rate_gt5deg": 0.2222222222222222
+              }
+            },
+            "22-0.1V": {
+              "baseline": {
+                "count": 75,
+                "median": 4.8180773852278005,
+                "p90": 5.928077117786621,
+                "p95": 6.637447252257637,
+                "fail_rate_gt5deg": 0.44
+              },
+              "student": {
+                "count": 75,
+                "median": 4.182903809828076,
+                "p90": 5.441469538106208,
+                "p95": 5.6553949930968415,
+                "fail_rate_gt5deg": 0.17333333333333334
+              }
+            }
+          }
+        }
+      },
+      "mic_only_control": {
+        "student_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_micobs_ablation_fix_20260214_144138/student/mic_only_control",
+        "sha256_test_windows": "feb357013218f0999eacfa0aebc240360e29c6bed8863c9cd63bebc3f3111f4c",
+        "metrics": {
+          "pooled": {
+            "baseline": {
+              "count": 318,
+              "median": 4.834958856419766,
+              "p90": 6.919111942689123,
+              "p95": 10.606212431335203,
+              "fail_rate_gt5deg": 0.4528301886792453
+            },
+            "student": {
+              "count": 318,
+              "median": 3.0460107620786827,
+              "p90": 5.7892853820962475,
+              "p95": 6.753136096921809,
+              "fail_rate_gt5deg": 0.2138364779874214
+            }
+          },
+          "per_speaker": {
+            "18-0.1V": {
+              "baseline": {
+                "count": 78,
+                "median": 3.9886138048185433,
+                "p90": 6.423206109986578,
+                "p95": 8.282762406076275,
+                "fail_rate_gt5deg": 0.34615384615384615
+              },
+              "student": {
+                "count": 78,
+                "median": 1.064180904712833,
+                "p90": 5.02893638750622,
+                "p95": 6.405042419129813,
+                "fail_rate_gt5deg": 0.11538461538461539
+              }
+            },
+            "19-0.1V": {
+              "baseline": {
+                "count": 53,
+                "median": 4.41093982625474,
+                "p90": 10.876597774522955,
+                "p95": 11.572961951584427,
+                "fail_rate_gt5deg": 0.33962264150943394
+              },
+              "student": {
+                "count": 53,
+                "median": 1.5299920777577327,
+                "p90": 6.668190861705887,
+                "p95": 8.688159982135481,
+                "fail_rate_gt5deg": 0.18867924528301888
+              }
+            },
+            "20-0.1V": {
+              "baseline": {
+                "count": 49,
+                "median": 5.459199561866015,
+                "p90": 11.551945325608237,
+                "p95": 24.349039784004727,
+                "fail_rate_gt5deg": 0.6530612244897959
+              },
+              "student": {
+                "count": 49,
+                "median": 3.8419709190579523,
+                "p90": 7.234416061733479,
+                "p95": 9.03690439917047,
+                "fail_rate_gt5deg": 0.32653061224489793
+              }
+            },
+            "21-0.1V": {
+              "baseline": {
+                "count": 63,
+                "median": 5.02132869668141,
+                "p90": 6.538024383404275,
+                "p95": 7.466932939388148,
+                "fail_rate_gt5deg": 0.5396825396825397
+              },
+              "student": {
+                "count": 63,
+                "median": 3.9592459643622906,
+                "p90": 5.316603196521941,
+                "p95": 5.80446823887429,
+                "fail_rate_gt5deg": 0.23809523809523808
+              }
+            },
+            "22-0.1V": {
+              "baseline": {
+                "count": 75,
+                "median": 4.8180773852278005,
+                "p90": 5.928077117786621,
+                "p95": 6.637447252257637,
+                "fail_rate_gt5deg": 0.44
+              },
+              "student": {
+                "count": 75,
+                "median": 4.225339246972387,
+                "p90": 5.475473384164427,
+                "p95": 5.6553949930968415,
+                "fail_rate_gt5deg": 0.24
+              }
+            }
+          }
+        }
+      },
+      "mic_only_coh_only": {
+        "student_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_micobs_ablation_fix_20260214_144138/student/mic_only_coh_only",
+        "sha256_test_windows": "c3b479c314f635e8c0f9b72d40f795a027b48535b06e40c0de11d6bbfb12bfa6",
+        "metrics": {
+          "pooled": {
+            "baseline": {
+              "count": 318,
+              "median": 4.834958856419766,
+              "p90": 6.919111942689123,
+              "p95": 10.606212431335203,
+              "fail_rate_gt5deg": 0.4528301886792453
+            },
+            "student": {
+              "count": 318,
+              "median": 2.94776114810712,
+              "p90": 5.493622400275139,
+              "p95": 6.690638302550076,
+              "fail_rate_gt5deg": 0.1918238993710692
+            }
+          },
+          "per_speaker": {
+            "18-0.1V": {
+              "baseline": {
+                "count": 78,
+                "median": 3.9886138048185433,
+                "p90": 6.423206109986578,
+                "p95": 8.282762406076275,
+                "fail_rate_gt5deg": 0.34615384615384615
+              },
+              "student": {
+                "count": 78,
+                "median": 1.1180341274779089,
+                "p90": 5.124885760400134,
+                "p95": 6.076790470961936,
+                "fail_rate_gt5deg": 0.1282051282051282
+              }
+            },
+            "19-0.1V": {
+              "baseline": {
+                "count": 53,
+                "median": 4.41093982625474,
+                "p90": 10.876597774522955,
+                "p95": 11.572961951584427,
+                "fail_rate_gt5deg": 0.33962264150943394
+              },
+              "student": {
+                "count": 53,
+                "median": 1.089625397678022,
+                "p90": 5.608756291128712,
+                "p95": 6.73500497023134,
+                "fail_rate_gt5deg": 0.1320754716981132
+              }
+            },
+            "20-0.1V": {
+              "baseline": {
+                "count": 49,
+                "median": 5.459199561866015,
+                "p90": 11.551945325608237,
+                "p95": 24.349039784004727,
+                "fail_rate_gt5deg": 0.6530612244897959
+              },
+              "student": {
+                "count": 49,
+                "median": 2.952461151469931,
+                "p90": 7.119830425595208,
+                "p95": 12.861701548132404,
+                "fail_rate_gt5deg": 0.2653061224489796
+              }
+            },
+            "21-0.1V": {
+              "baseline": {
+                "count": 63,
+                "median": 5.02132869668141,
+                "p90": 6.538024383404275,
+                "p95": 7.466932939388148,
+                "fail_rate_gt5deg": 0.5396825396825397
+              },
+              "student": {
+                "count": 63,
+                "median": 3.972014432342368,
+                "p90": 5.154406170521264,
+                "p95": 5.4652800163193085,
+                "fail_rate_gt5deg": 0.19047619047619047
+              }
+            },
+            "22-0.1V": {
+              "baseline": {
+                "count": 75,
+                "median": 4.8180773852278005,
+                "p90": 5.928077117786621,
+                "p95": 6.637447252257637,
+                "fail_rate_gt5deg": 0.44
+              },
+              "student": {
+                "count": 75,
+                "median": 4.294968957719908,
+                "p90": 5.476348189374747,
+                "p95": 5.669772010465701,
+                "fail_rate_gt5deg": 0.25333333333333335
+              }
+            }
+          }
+        }
+      },
+      "mic_only_psd_only": {
+        "student_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_micobs_ablation_fix_20260214_144138/student/mic_only_psd_only",
+        "sha256_test_windows": "c410a1ea5c59e398154c04c6dbda06c9c7410315cfe03ba320f9031748a4022e",
+        "metrics": {
+          "pooled": {
+            "baseline": {
+              "count": 318,
+              "median": 4.834958856419766,
+              "p90": 6.919111942689123,
+              "p95": 10.606212431335203,
+              "fail_rate_gt5deg": 0.4528301886792453
+            },
+            "student": {
+              "count": 318,
+              "median": 2.4238519061949013,
+              "p90": 5.867697719336903,
+              "p95": 7.110734878081929,
+              "fail_rate_gt5deg": 0.23270440251572327
+            }
+          },
+          "per_speaker": {
+            "18-0.1V": {
+              "baseline": {
+                "count": 78,
+                "median": 3.9886138048185433,
+                "p90": 6.423206109986578,
+                "p95": 8.282762406076275,
+                "fail_rate_gt5deg": 0.34615384615384615
+              },
+              "student": {
+                "count": 78,
+                "median": 0.3486524313444228,
+                "p90": 1.2734552769972565,
+                "p95": 1.9443818161362132,
+                "fail_rate_gt5deg": 0.01282051282051282
+              }
+            },
+            "19-0.1V": {
+              "baseline": {
+                "count": 53,
+                "median": 4.41093982625474,
+                "p90": 10.876597774522955,
+                "p95": 11.572961951584427,
+                "fail_rate_gt5deg": 0.33962264150943394
+              },
+              "student": {
+                "count": 53,
+                "median": 1.089625397678022,
+                "p90": 4.8415441107741,
+                "p95": 6.185887372761126,
+                "fail_rate_gt5deg": 0.09433962264150944
+              }
+            },
+            "20-0.1V": {
+              "baseline": {
+                "count": 49,
+                "median": 5.459199561866015,
+                "p90": 11.551945325608237,
+                "p95": 24.349039784004727,
+                "fail_rate_gt5deg": 0.6530612244897959
+              },
+              "student": {
+                "count": 49,
+                "median": 2.6270338639873514,
+                "p90": 10.979759711210347,
+                "p95": 24.349039784004727,
+                "fail_rate_gt5deg": 0.32653061224489793
+              }
+            },
+            "21-0.1V": {
+              "baseline": {
+                "count": 63,
+                "median": 5.02132869668141,
+                "p90": 6.538024383404275,
+                "p95": 7.466932939388148,
+                "fail_rate_gt5deg": 0.5396825396825397
+              },
+              "student": {
+                "count": 63,
+                "median": 5.111920944251342,
+                "p90": 7.394020325519045,
+                "p95": 9.46344377064034,
+                "fail_rate_gt5deg": 0.6031746031746031
+              }
+            },
+            "22-0.1V": {
+              "baseline": {
+                "count": 75,
+                "median": 4.8180773852278005,
+                "p90": 5.928077117786621,
+                "p95": 6.637447252257637,
+                "fail_rate_gt5deg": 0.44
+              },
+              "student": {
+                "count": 75,
+                "median": 3.849991899275702,
+                "p90": 5.418681820174144,
+                "p95": 5.762268298454818,
+                "fail_rate_gt5deg": 0.18666666666666668
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

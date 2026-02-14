@@ -438,7 +438,7 @@ def compute_obs_vector(
     cpl_band_for_obs: np.ndarray,
     fs: int,
     obs_mode: str,
-) -> np.ndarray:
+) -> tuple[np.ndarray, np.ndarray]:
     f, P_ldv = welch_psd(ldv, fs=fs)
     _f2, P_l = welch_psd(micl, fs=fs)
     _f3, P_r = welch_psd(micr, fs=fs)
@@ -467,7 +467,7 @@ def compute_obs_vector(
         raise ValueError(f"Unknown obs_mode: {obs_mode}")
 
     obs = obs - 2.0 * zscore_inband(cpl_band_for_obs)
-    return obs.astype(np.float64, copy=False)
+    return obs.astype(np.float64, copy=False), coh_band.astype(np.float64, copy=False)
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -584,6 +584,26 @@ def main() -> None:
         help="How to compute silence coupling mask. Default: max_pairs (backward compatible).",
     )
     parser.add_argument(
+        "--coupling_hard_forbid_enable",
+        type=int,
+        default=1,
+        choices=[0, 1],
+        help="If 0, do not hard-forbid any band based on silence coupling (keep coupling as a soft penalty only). Default: 1.",
+    )
+    parser.add_argument(
+        "--dynamic_coh_gate_enable",
+        type=int,
+        default=0,
+        choices=[0, 1],
+        help="If 1, apply a per-window mic coherence gate: forbid bands with coherence below --dynamic_coh_min. Default: 0.",
+    )
+    parser.add_argument(
+        "--dynamic_coh_min",
+        type=float,
+        default=0.05,
+        help="Dynamic coherence floor for per-window gating. Bands with mic coherence below this value are forbidden. Default: 0.05.",
+    )
+    parser.add_argument(
         "--corrupt_enable",
         type=int,
         default=0,
@@ -652,6 +672,9 @@ def main() -> None:
     speakers = list(args.speakers)
     obs_mode = str(args.obs_mode)
     coupling_mode = str(args.coupling_mode)
+    coupling_hard_forbid_enable = bool(int(args.coupling_hard_forbid_enable))
+    dynamic_coh_gate_enable = bool(int(args.dynamic_coh_gate_enable))
+    dynamic_coh_min = float(args.dynamic_coh_min)
     corrupt_enable = bool(int(args.corrupt_enable))
     corrupt_snr_db = args.corrupt_snr_db
     corrupt_seed = int(args.corrupt_seed)
@@ -694,6 +717,9 @@ def main() -> None:
             "silence_percent": float(SILENCE_PERCENT),
             "speech_rms_percentile": float(SPEECH_RMS_PERCENTILE),
             "forbid_gamma2": float(COUPLING_FORBID_GAMMA2),
+            "coupling_hard_forbid_enable": bool(coupling_hard_forbid_enable),
+            "dynamic_coh_gate_enable": bool(dynamic_coh_gate_enable),
+            "dynamic_coh_min": float(dynamic_coh_min),
         },
         "gcc": {
             "max_lag_ms": float(GCC_MAX_LAG_MS),
@@ -817,19 +843,24 @@ def main() -> None:
         cpl_band_mic_only = compute_silence_coupling_mask_mic_only(
             silence_windows=silence_windows, edges_hz=edges_hz, fs=FS_EXPECTED
         )
+        forbidden_static_raw: np.ndarray
+        forbidden_static_effective: np.ndarray
         if coupling_mode == "max_pairs":
-            cpl_band_max, forbidden_raw, forbidden = compute_silence_coupling_mask(
+            cpl_band_max, forbidden_static_raw, forbidden_static_effective = compute_silence_coupling_mask(
                 silence_windows=silence_windows, edges_hz=edges_hz, fs=FS_EXPECTED
             )
         elif coupling_mode == "mic_only":
             cpl_band_max = cpl_band_mic_only
-            forbidden_raw = (cpl_band_max >= float(COUPLING_FORBID_GAMMA2)).astype(bool)
-            if int(np.sum(forbidden_raw)) >= int(len(forbidden_raw)):
-                forbidden = np.zeros_like(forbidden_raw, dtype=bool)
+            forbidden_static_raw = (cpl_band_max >= float(COUPLING_FORBID_GAMMA2)).astype(bool)
+            if int(np.sum(forbidden_static_raw)) >= int(len(forbidden_static_raw)):
+                forbidden_static_effective = np.zeros_like(forbidden_static_raw, dtype=bool)
             else:
-                forbidden = forbidden_raw.copy()
+                forbidden_static_effective = forbidden_static_raw.copy()
         else:
             raise ValueError(f"Unknown coupling_mode: {coupling_mode}")
+
+        if not coupling_hard_forbid_enable:
+            forbidden_static_effective = np.zeros_like(forbidden_static_effective, dtype=bool)
 
         if obs_mode == "mic_only_strict":
             cpl_band_for_obs = cpl_band_mic_only
@@ -838,9 +869,9 @@ def main() -> None:
 
         if cpl_band_for_obs.shape != (N_BANDS,):
             raise ValueError(f"cpl_band_for_obs wrong shape: {cpl_band_for_obs.shape}")
-        forbidden_raw_idx = np.where(forbidden_raw)[0].tolist()
-        forbidden_idx = np.where(forbidden)[0].tolist()
-        forbid_degenerate = int(np.sum(forbidden_raw)) >= int(N_BANDS)
+        forbidden_static_raw_idx = np.where(forbidden_static_raw)[0].tolist()
+        forbidden_static_effective_idx = np.where(forbidden_static_effective)[0].tolist()
+        forbid_degenerate = int(np.sum(forbidden_static_raw)) >= int(N_BANDS)
         logger.info(
             "%s: %d candidate windows, %d speech-active (RMS>=%.3e), %d silence windows; forbidden bands raw=%d effective=%d",
             speaker,
@@ -848,8 +879,8 @@ def main() -> None:
             len(speech_windows),
             speech_thresh,
             len(silence_windows),
-            int(np.sum(forbidden_raw)),
-            int(np.sum(forbidden)),
+            int(np.sum(forbidden_static_raw)),
+            int(np.sum(forbidden_static_effective)),
         )
 
         spk_out = per_speaker_dir / speaker
@@ -864,13 +895,16 @@ def main() -> None:
                 "band_edges_hz": edges_hz.tolist(),
                 "silence_percent": float(SILENCE_PERCENT),
                 "forbid_gamma2": float(COUPLING_FORBID_GAMMA2),
+                "coupling_hard_forbid_enable": bool(coupling_hard_forbid_enable),
+                "dynamic_coh_gate_enable": bool(dynamic_coh_gate_enable),
+                "dynamic_coh_min": float(dynamic_coh_min),
                 "obs_mode": obs_mode,
                 "coupling_mode": coupling_mode,
                 "cpl_band_max": cpl_band_max.tolist(),
                 "cpl_band_mic_only": None if cpl_band_mic_only is None else cpl_band_mic_only.tolist(),
                 "cpl_band_for_obs": cpl_band_for_obs.tolist(),
-                "forbidden_bands_raw": forbidden_raw_idx,
-                "forbidden_bands_effective": forbidden_idx,
+                "forbidden_bands_raw": forbidden_static_raw_idx,
+                "forbidden_bands_effective": forbidden_static_effective_idx,
                 "forbid_rule_degenerated": bool(forbid_degenerate),
             },
         )
@@ -903,6 +937,8 @@ def main() -> None:
                 seed=int(corrupt_seed),
             )
             rng = np.random.default_rng(int(corrupt_seed + spk_int))
+
+        dyn_forbidden_counts: list[int] = []
 
         windows_path = spk_out / "windows.jsonl"
         with windows_path.open("w", encoding="utf-8") as f_jsonl:
@@ -977,7 +1013,7 @@ def main() -> None:
                     seg_micl = seg_micl_clean
                     seg_micr = seg_micr_clean
 
-                obs_vec = compute_obs_vector(
+                obs_vec, mic_coh_speech_band = compute_obs_vector(
                     ldv=seg_ldv,
                     micl=seg_micl,
                     micr=seg_micr,
@@ -986,6 +1022,21 @@ def main() -> None:
                     fs=FS_EXPECTED,
                     obs_mode=obs_mode,
                 )
+
+                mic_coh_summary = {
+                    "min": float(np.min(mic_coh_speech_band)),
+                    "median": float(np.median(mic_coh_speech_band)),
+                    "p90": float(np.percentile(mic_coh_speech_band, 90)),
+                    "max": float(np.max(mic_coh_speech_band)),
+                }
+
+                forbidden_dyn = np.zeros((N_BANDS,), dtype=bool)
+                if dynamic_coh_gate_enable:
+                    forbidden_dyn = (mic_coh_speech_band < float(dynamic_coh_min)).astype(bool, copy=False)
+                forbidden_eff = (forbidden_static_effective | forbidden_dyn).astype(bool, copy=False)
+                forbidden_dyn_idx = np.where(forbidden_dyn)[0].tolist()
+                forbidden_eff_idx = np.where(forbidden_eff)[0].tolist()
+                dyn_forbidden_counts.append(int(np.sum(forbidden_dyn)))
 
                 X = np.fft.rfft(seg_micl, n_fft)
                 Y = np.fft.rfft(seg_micr, n_fft)
@@ -1010,7 +1061,7 @@ def main() -> None:
                 # Teacher: precompute per-band cc windows for allowed bands only.
                 cc_band: list[np.ndarray] = []
                 for b in range(N_BANDS):
-                    if bool(forbidden[b]):
+                    if bool(forbidden_eff[b]):
                         cc_band.append(np.full((2 * max_shift + 1,), np.nan, dtype=np.float64))
                         continue
                     R_b = R_phat * band_masks_fft[b]
@@ -1023,7 +1074,7 @@ def main() -> None:
                 current_score = -1e30
                 current_cc = None
 
-                allowed_bands = [int(b) for b in range(N_BANDS) if not bool(forbidden[b])]
+                allowed_bands = [int(b) for b in range(N_BANDS) if not bool(forbidden_eff[b])]
                 for step in range(K_HORIZON):
                     best_b = None
                     best_score = None
@@ -1104,7 +1155,7 @@ def main() -> None:
                 traj_len.append(valid_len)
                 traj_spk.append(str(speaker))
                 traj_center.append(center_sec)
-                traj_forbidden.append(forbidden.astype(bool, copy=False))
+                traj_forbidden.append(forbidden_eff.astype(bool, copy=False))
                 if corrupt_enable:
                     assert corruption_record is not None
                     traj_noise_center_L.append(float(corruption_record["noise_center_sec_L"]))
@@ -1130,7 +1181,11 @@ def main() -> None:
                     "corruption": corruption_record,
                     "truth_reference": truth_ref,
                     "geometry_truth": geom,
-                    "forbidden_bands": forbidden_idx,
+                    "forbidden_bands": forbidden_eff_idx,
+                    "forbidden_static_bands": forbidden_static_effective_idx,
+                    "forbidden_dyn_bands": forbidden_dyn_idx,
+                    "forbidden_dyn_count": int(np.sum(forbidden_dyn)),
+                    "mic_coh_speech_band_summary": mic_coh_summary,
                     "baseline": {
                         "tau_ms": base_tau_ms,
                         "psr_db": float(base_tp.psr_db),
@@ -1176,7 +1231,21 @@ def main() -> None:
                 "n_silence_windows": int(len(silence_windows)),
             },
             "rms_thresholds": {"speech_rms_micl_p50": float(speech_thresh)},
-            "coupling": {"forbidden_band_count": int(np.sum(forbidden))},
+            "coupling": {
+                "coupling_mode": str(coupling_mode),
+                "coupling_hard_forbid_enable": bool(coupling_hard_forbid_enable),
+                "forbidden_band_count_static_effective": int(np.sum(forbidden_static_effective)),
+                "dynamic_coh_gate_enable": bool(dynamic_coh_gate_enable),
+                "dynamic_coh_min": float(dynamic_coh_min),
+                "forbidden_dyn_count_speech_windows": {
+                    "min": int(np.min(np.asarray(dyn_forbidden_counts, dtype=np.int32))) if dyn_forbidden_counts else 0,
+                    "median": float(np.median(np.asarray(dyn_forbidden_counts, dtype=np.int32))) if dyn_forbidden_counts else 0.0,
+                    "p90": float(np.percentile(np.asarray(dyn_forbidden_counts, dtype=np.int32), 90))
+                    if dyn_forbidden_counts
+                    else 0.0,
+                    "max": int(np.max(np.asarray(dyn_forbidden_counts, dtype=np.int32))) if dyn_forbidden_counts else 0,
+                },
+            },
             "method": {
                 "baseline": {
                     "theta_error_ref_deg": summarize(speaker_err_ref_base),

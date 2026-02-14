@@ -1,0 +1,7 @@
+{
+  "script_path": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/scripts/teacher_band_omp_micmic.py",
+  "script_sha256": "1f9f4b6bf5635a6fd0ae12578c5a5f353d1231f66a59b3dbce8447121f6c2e43",
+  "git_head": "578fe7a87f4024110aebb76a7b73f2989e877970",
+  "dirty": true,
+  "timestamp": "2026-02-14T14:43:26.540367"
+}
