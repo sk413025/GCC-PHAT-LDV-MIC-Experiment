@@ -1,0 +1,56 @@
+{
+  "generated": "2026-02-13T23:54:28.431553",
+  "speaker_id": "21-0.1V",
+  "truth_reference": {
+    "tau_ref_ms": -0.6354575282303851,
+    "theta_ref_deg": -8.956647639640721,
+    "label": "chirp 24 mic truth-ref (5s)"
+  },
+  "geometry_truth": {
+    "tau_true_ms": -0.7585061238687961,
+    "theta_true_deg": -10.709760310799183
+  },
+  "counts": {
+    "n_candidate_windows": 501,
+    "n_speech_windows": 251,
+    "n_silence_windows": 6
+  },
+  "rms_thresholds": {
+    "speech_rms_micl_p50": 0.0017280344740161358
+  },
+  "coupling": {
+    "forbidden_band_count": 44
+  },
+  "method": {
+    "baseline": {
+      "theta_error_ref_deg": {
+        "count": 251,
+        "median": 1.1363167019029765,
+        "p90": 1.745165857230834,
+        "p95": 2.0308246152661376
+      },
+      "theta_error_geo_deg": {
+        "count": 251,
+        "median": 2.8881794940531433,
+        "p90": 3.4812503805354202,
+        "p95": 3.6981464053866997
+      },
+      "fail_rate_ref_gt5deg": 0.027888446215139442
+    },
+    "teacher": {
+      "theta_error_ref_deg": {
+        "count": 251,
+        "median": 0.29717774097831473,
+        "p90": 0.9096172242796907,
+        "p95": 1.22582862018873
+      },
+      "theta_error_geo_deg": {
+        "count": 251,
+        "median": 1.689649173113418,
+        "p90": 2.345303191424179,
+        "p95": 2.58410522282713
+      },
+      "fail_rate_ref_gt5deg": 0.0
+    }
+  }
+}

@@ -1,0 +1,5 @@
+2026-02-13 23:50:45,888 - INFO - Dataset: N=1255, horizon=6, bands=64
+2026-02-13 23:50:45,888 - INFO - Train: 937 samples, Test: 318 samples
+2026-02-13 23:50:45,891 - INFO - Saved model: /home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_miclocal_20260213_232300/snr_p0/student_mic_only/model_dtmin_band_policy_k6.npz
+2026-02-13 23:53:06,115 - INFO - Done. Results: /home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_miclocal_20260213_232300/snr_p0/student_mic_only
+2026-02-13 23:53:06,116 - INFO - Acceptance overall_pass=False

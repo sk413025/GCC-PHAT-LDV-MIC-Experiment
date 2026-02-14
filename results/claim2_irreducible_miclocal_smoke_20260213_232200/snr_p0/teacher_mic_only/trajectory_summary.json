@@ -1,0 +1,14 @@
+{
+  "generated": "2026-02-13T23:20:43.143598",
+  "run_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_miclocal_smoke_20260213_232200/snr_p0/teacher_mic_only",
+  "n_samples": 6,
+  "k_horizon": 6,
+  "n_bands": 64,
+  "valid_len": {
+    "mean": 2.8333333333333335,
+    "median": 1.5,
+    "p10": 1.0,
+    "p90": 6.0,
+    "frac_zero": 0.0
+  }
+}

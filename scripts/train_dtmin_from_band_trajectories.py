@@ -59,6 +59,13 @@ from typing import Any
 import numpy as np
 from scipy.io import wavfile
 
+try:
+    # When executed as a script: `python scripts/train_dtmin_from_band_trajectories.py`
+    from mic_corruption import MicCorruptionConfig, apply_mic_corruption  # type: ignore
+except ImportError:  # pragma: no cover
+    # When imported from repo root: `import scripts.train_dtmin_from_band_trajectories`
+    from scripts.mic_corruption import MicCorruptionConfig, apply_mic_corruption  # type: ignore
+
 logger = logging.getLogger(__name__)
 
 
@@ -385,9 +392,24 @@ def main() -> None:
     parser.add_argument("--data_root", type=str, required=True)
     parser.add_argument("--truth_ref_root", type=str, required=True)
     parser.add_argument("--out_dir", type=str, required=True)
+    parser.add_argument(
+        "--train_max_center_sec",
+        type=float,
+        default=float(TRAIN_MAX_CENTER_SEC),
+        help="Time split threshold per speaker (train: <=, test: >). Default: 450.",
+    )
+    parser.add_argument(
+        "--use_traj_corruption",
+        type=int,
+        default=1,
+        choices=[0, 1],
+        help="If 1, apply mic corruption as specified by the trajectory NPZ (Claim-2). Default: 1.",
+    )
     args = parser.parse_args()
 
     out_dir = Path(args.out_dir)
+    use_traj_corruption = bool(int(args.use_traj_corruption))
+    train_max_center_sec = float(args.train_max_center_sec)
     configure_logging(out_dir)
     write_code_state(out_dir, Path(__file__))
 
@@ -400,6 +422,31 @@ def main() -> None:
     center_sec = payload["center_sec"].astype(np.float64, copy=False)
     forbidden_mask = payload["forbidden_mask"].astype(bool, copy=False)  # (N, B)
     edges_hz = payload["band_edges_hz"].astype(np.float64, copy=False)
+
+    noise_center_sec_L = None
+    noise_center_sec_R = None
+    corruption_cfg = None
+    if use_traj_corruption:
+        required = ["noise_center_sec_L", "noise_center_sec_R", "corruption_config_json"]
+        missing = [k for k in required if k not in payload]
+        if missing:
+            raise ValueError(
+                f"Trajectory NPZ missing corruption keys: {missing}. "
+                f"Re-run teacher with corruption enabled or pass --use_traj_corruption=0."
+            )
+        noise_center_sec_L = payload["noise_center_sec_L"].astype(np.float64, copy=False)
+        noise_center_sec_R = payload["noise_center_sec_R"].astype(np.float64, copy=False)
+        cfg_json = str(payload["corruption_config_json"].item())
+        if cfg_json.strip():
+            cfg_payload = json.loads(cfg_json)
+            corruption_cfg = MicCorruptionConfig(
+                snr_db=float(cfg_payload["snr_db"]),
+                band_lo_hz=float(cfg_payload["band_lo_hz"]),
+                band_hi_hz=float(cfg_payload["band_hi_hz"]),
+                preclip_gain=float(cfg_payload["preclip_gain"]),
+                clip_limit=float(cfg_payload["clip_limit"]),
+                seed=int(cfg_payload["seed"]),
+            )
 
     if observations.ndim != 3:
         raise ValueError(f"Expected observations (N,K,B), got shape={observations.shape}")
@@ -414,7 +461,7 @@ def main() -> None:
     logger.info("Dataset: N=%d, horizon=%d, bands=%d", N, K, B)
 
     # Train/test split (per speaker, time-based)
-    train_mask = center_sec <= float(TRAIN_MAX_CENTER_SEC)
+    train_mask = center_sec <= float(train_max_center_sec)
     test_mask = ~train_mask
     if int(np.sum(train_mask)) == 0 or int(np.sum(test_mask)) == 0:
         raise RuntimeError("Empty train/test split; check center_sec values")
@@ -432,6 +479,7 @@ def main() -> None:
         "horizon": int(K),
         "n_actions": int(B),
         "model_type": "nearest_centroid_stepwise",
+        "train_max_center_sec": float(train_max_center_sec),
     }
     np.savez_compressed(
         model_path,
@@ -470,6 +518,11 @@ def main() -> None:
     base_err_geo: list[float] = []
     stud_err_geo: list[float] = []
 
+    snr_ach_test_L: list[float] = []
+    snr_ach_test_R: list[float] = []
+    clip_frac_test_L: list[float] = []
+    clip_frac_test_R: list[float] = []
+
     test_windows_path = out_dir / "test_windows.jsonl"
     with test_windows_path.open("w", encoding="utf-8") as f_jsonl:
         for i in np.where(test_mask)[0].tolist():
@@ -493,6 +546,32 @@ def main() -> None:
             seg_r = extract_centered_window(micr, fs=FS_EXPECTED, center_sec=center, window_sec=WINDOW_SEC).astype(
                 np.float64, copy=False
             )
+
+            corruption_record: dict[str, Any] | None = None
+            if use_traj_corruption and corruption_cfg is not None:
+                assert noise_center_sec_L is not None
+                assert noise_center_sec_R is not None
+                ncl = float(noise_center_sec_L[i])
+                ncr = float(noise_center_sec_R[i])
+                noise_l = extract_centered_window(micl, fs=FS_EXPECTED, center_sec=ncl, window_sec=WINDOW_SEC).astype(
+                    np.float64, copy=False
+                )
+                noise_r = extract_centered_window(micr, fs=FS_EXPECTED, center_sec=ncr, window_sec=WINDOW_SEC).astype(
+                    np.float64, copy=False
+                )
+                seg_l, diag_l = apply_mic_corruption(seg_l, noise_l, cfg=corruption_cfg, fs=FS_EXPECTED)
+                seg_r, diag_r = apply_mic_corruption(seg_r, noise_r, cfg=corruption_cfg, fs=FS_EXPECTED)
+                corruption_record = {
+                    "enabled": True,
+                    "noise_center_sec_L": ncl,
+                    "noise_center_sec_R": ncr,
+                    "micl": diag_l,
+                    "micr": diag_r,
+                }
+                snr_ach_test_L.append(float(diag_l["snr_achieved_db_preclip"]))
+                snr_ach_test_R.append(float(diag_r["snr_achieved_db_preclip"]))
+                clip_frac_test_L.append(float(diag_l["clip_frac"]))
+                clip_frac_test_R.append(float(diag_r["clip_frac"]))
 
             guided_tau_sec = float(truth_ref["tau_ref_ms"]) / 1000.0
 
@@ -551,6 +630,7 @@ def main() -> None:
             record = {
                 "speaker_id": spk,
                 "center_sec": center,
+                "corruption": corruption_record,
                 "truth_reference": truth_ref,
                 "geometry_truth": geom,
                 "baseline": {
@@ -607,6 +687,27 @@ def main() -> None:
         "generated": datetime.now().isoformat(),
         "run_dir": str(out_dir),
         "acceptance": win,
+        "corruption": {
+            "use_traj_corruption": bool(use_traj_corruption),
+            "config": None
+            if corruption_cfg is None
+            else {
+                "snr_db": float(corruption_cfg.snr_db),
+                "band_lo_hz": float(corruption_cfg.band_lo_hz),
+                "band_hi_hz": float(corruption_cfg.band_hi_hz),
+                "preclip_gain": float(corruption_cfg.preclip_gain),
+                "clip_limit": float(corruption_cfg.clip_limit),
+                "seed": int(corruption_cfg.seed),
+            },
+            "snr_achieved_db_preclip_test": {
+                "micl_median": float(np.median(np.asarray(snr_ach_test_L, dtype=np.float64))) if snr_ach_test_L else None,
+                "micr_median": float(np.median(np.asarray(snr_ach_test_R, dtype=np.float64))) if snr_ach_test_R else None,
+            },
+            "clip_frac_test": {
+                "micl_mean": float(np.mean(np.asarray(clip_frac_test_L, dtype=np.float64))) if clip_frac_test_L else None,
+                "micr_mean": float(np.mean(np.asarray(clip_frac_test_R, dtype=np.float64))) if clip_frac_test_R else None,
+            },
+        },
         "pooled": {
             "baseline": {
                 "theta_error_ref_deg": summarize_errors(base_ref),
@@ -657,4 +758,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

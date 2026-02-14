@@ -1,0 +1,22 @@
+{
+  "generated": "2026-02-13T23:20:41.025925",
+  "data_root": "/home/sbplab/jiawei/data",
+  "speakers": [
+    "20-0.1V"
+  ],
+  "files": [
+    {
+      "rel_path": "20-0.1V/0128-LDV-20-boy-320.wav",
+      "sha256": "97b4f6236e74dc352f1e6c5ca6eac763b03fa6e0cacb005b512b06678ff88f15"
+    },
+    {
+      "rel_path": "20-0.1V/0128-LEFT-MIC-20-boy-320.wav",
+      "sha256": "a2c8df61d4d4f23e4133f811b9ab71e5b5d0682f172fd07106497a04cca958bf"
+    },
+    {
+      "rel_path": "20-0.1V/0128-RIGHT-MIC-20-boy-320.wav",
+      "sha256": "7e4c8e593945b8d8e15cdd4d5601b88fda38bddc28702372c3e667ccfd2f2829"
+    }
+  ],
+  "dataset_fingerprint_sha256": "b7d53bb256443eced72a044f0a03a46e57738582178b26cf3bdc3a600add9f95"
+}

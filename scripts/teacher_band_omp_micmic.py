@@ -26,13 +26,15 @@ python -u scripts/teacher_band_omp_micmic.py \\
 Observation mode (for mic-only / LDV-only ablations)
 ----------------------------------------------------
 --obs_mode ldv_mic (default): z(ldv_psd)+z(mic_psd)+z(mic_coh)-2*z(cpl_band)
+--obs_mode mic_only_control : z(mic_psd)+z(mic_coh)-2*z(cpl_band)
 --obs_mode mic_only_strict  : z(mic_psd)+z(mic_coh)-2*z(cpl_band_mic_only)
 --obs_mode ldv_only         : z(ldv_psd)-2*z(cpl_band)
 
 Notes:
 - Teacher actions are computed from MIC-MIC GCC score only (truth-guided) and do not
-  depend on obs_mode. Forbidden bands are always derived from the max-silence coherence
-  across the 3 pairs, so the action space is comparable across obs_mode runs.
+  depend on obs_mode. Forbidden bands are derived from a silence coupling mask that is
+  independent of obs_mode (see --coupling_mode), so the action space is comparable across
+  obs_mode runs within a given coupling_mode.
 """
 
 from __future__ import annotations
@@ -51,6 +53,23 @@ from typing import Any
 import numpy as np
 from scipy.io import wavfile
 from scipy.signal import csd, welch
+
+try:
+    # When executed as a script: `python scripts/teacher_band_omp_micmic.py`
+    from mic_corruption import (  # type: ignore
+        MicCorruptionConfig,
+        apply_mic_corruption,
+        choose_noise_center,
+        select_silence_centers,
+    )
+except ImportError:  # pragma: no cover
+    # When imported from repo root: `import scripts.teacher_band_omp_micmic`
+    from scripts.mic_corruption import (  # type: ignore
+        MicCorruptionConfig,
+        apply_mic_corruption,
+        choose_noise_center,
+        select_silence_centers,
+    )
 
 logger = logging.getLogger(__name__)
 
@@ -430,6 +449,8 @@ def compute_obs_vector(
 
     if obs_mode == "ldv_mic":
         obs = zscore_inband(ldv_band) + zscore_inband(mic_band) + zscore_inband(coh_band)
+    elif obs_mode == "mic_only_control":
+        obs = zscore_inband(mic_band) + zscore_inband(coh_band)
     elif obs_mode == "mic_only_strict":
         obs = zscore_inband(mic_band) + zscore_inband(coh_band)
     elif obs_mode == "ldv_only":
@@ -537,8 +558,49 @@ def main() -> None:
         "--obs_mode",
         type=str,
         default="ldv_mic",
-        choices=["ldv_mic", "mic_only_strict", "ldv_only"],
+        choices=["ldv_mic", "mic_only_control", "mic_only_strict", "ldv_only"],
         help="Observation vector mode (for ablations). Default: ldv_mic.",
+    )
+    parser.add_argument(
+        "--coupling_mode",
+        type=str,
+        default="max_pairs",
+        choices=["max_pairs", "mic_only"],
+        help="How to compute silence coupling mask. Default: max_pairs (backward compatible).",
+    )
+    parser.add_argument(
+        "--corrupt_enable",
+        type=int,
+        default=0,
+        choices=[0, 1],
+        help="Enable mic-local corruption (0/1). Default: 0.",
+    )
+    parser.add_argument(
+        "--corrupt_snr_db",
+        type=float,
+        default=None,
+        help="Target in-band SNR in dB for mic corruption (required if --corrupt_enable=1).",
+    )
+    parser.add_argument("--corrupt_seed", type=int, default=1337, help="RNG seed for deterministic noise selection.")
+    parser.add_argument("--preclip_gain", type=float, default=100.0, help="Pre-clip gain for saturation proxy.")
+    parser.add_argument("--clip_limit", type=float, default=0.99, help="Clip limit after preclip gain.")
+    parser.add_argument(
+        "--center_start_sec",
+        type=float,
+        default=CENTER_START_SEC,
+        help="Override center start (default plan-locked 100). Use only for smoke tests.",
+    )
+    parser.add_argument(
+        "--center_end_sec",
+        type=float,
+        default=CENTER_END_SEC,
+        help="Override center end (default plan-locked 600). Use only for smoke tests.",
+    )
+    parser.add_argument(
+        "--center_step_sec",
+        type=float,
+        default=CENTER_STEP_SEC,
+        help="Override center step (default plan-locked 1). Use only for smoke tests.",
     )
     args = parser.parse_args()
 
@@ -550,6 +612,19 @@ def main() -> None:
     truth_ref_root = Path(args.truth_ref_root)
     speakers = list(args.speakers)
     obs_mode = str(args.obs_mode)
+    coupling_mode = str(args.coupling_mode)
+    corrupt_enable = bool(int(args.corrupt_enable))
+    corrupt_snr_db = args.corrupt_snr_db
+    corrupt_seed = int(args.corrupt_seed)
+    preclip_gain = float(args.preclip_gain)
+    clip_limit = float(args.clip_limit)
+
+    center_start_sec = float(args.center_start_sec)
+    center_end_sec = float(args.center_end_sec)
+    center_step_sec = float(args.center_step_sec)
+
+    if corrupt_enable and corrupt_snr_db is None:
+        raise ValueError("--corrupt_snr_db is required when --corrupt_enable=1")
 
     run_config = {
         "generated": datetime.now().isoformat(),
@@ -557,9 +632,10 @@ def main() -> None:
         "truth_ref_root": str(truth_ref_root),
         "speakers": speakers,
         "obs_mode": obs_mode,
+        "coupling_mode": coupling_mode,
         "fs_expected": int(FS_EXPECTED),
         "window_sec": float(WINDOW_SEC),
-        "center_grid": [float(CENTER_START_SEC), float(CENTER_END_SEC), float(CENTER_STEP_SEC)],
+        "center_grid": [float(center_start_sec), float(center_end_sec), float(center_step_sec)],
         "band_hz": [float(BAND_HZ[0]), float(BAND_HZ[1])],
         "n_bands": int(N_BANDS),
         "teacher": {
@@ -578,6 +654,15 @@ def main() -> None:
             "max_lag_ms": float(GCC_MAX_LAG_MS),
             "guided_radius_ms": float(GCC_GUIDED_RADIUS_MS),
             "psr_exclude_samples": int(PSR_EXCLUDE_SAMPLES),
+        },
+        "corruption": {
+            "enabled": bool(corrupt_enable),
+            "snr_db": None if corrupt_snr_db is None else float(corrupt_snr_db),
+            "seed": int(corrupt_seed),
+            "preclip_gain": float(preclip_gain),
+            "clip_limit": float(clip_limit),
+            "band_lo_hz": float(BAND_HZ[0]),
+            "band_hi_hz": float(BAND_HZ[1]),
         },
     }
     write_json(out_dir / "run_config.json", run_config)
@@ -598,8 +683,15 @@ def main() -> None:
     traj_spk: list[str] = []
     traj_center: list[float] = []
     traj_forbidden: list[np.ndarray] = []
+    traj_noise_center_L: list[float] = []
+    traj_noise_center_R: list[float] = []
+    traj_snr_target: list[float] = []
+    traj_snr_ach_L: list[float] = []
+    traj_snr_ach_R: list[float] = []
+    traj_clip_frac_L: list[float] = []
+    traj_clip_frac_R: list[float] = []
 
-    centers_grid = np.arange(CENTER_START_SEC, CENTER_END_SEC + 1e-9, CENTER_STEP_SEC, dtype=np.float64)
+    centers_grid = np.arange(center_start_sec, center_end_sec + 1e-9, center_step_sec, dtype=np.float64)
     win_samples = int(round(WINDOW_SEC * FS_EXPECTED))
     n_fft = int(win_samples * 2)
     f_fft = fft_freqs(FS_EXPECTED, n_fft)
@@ -651,18 +743,42 @@ def main() -> None:
         if not speech_windows:
             raise RuntimeError(f"No speech windows after RMS filter for speaker {speaker}")
 
-        n_silence = max(3, int(round(len(candidates) * (SILENCE_PERCENT / 100.0))))
-        silence_windows = sorted(candidates, key=lambda d: float(d["rms_micl"]))[:n_silence]
+        # Silence windows are selected from the plan-locked center grid using clean MicL RMS.
+        silence_centers = select_silence_centers(
+            micl.astype(np.float64, copy=False),
+            fs=FS_EXPECTED,
+            centers_grid=centers_grid,
+            window_sec=WINDOW_SEC,
+            silence_percent=float(SILENCE_PERCENT),
+            min_windows=3,
+        )
+        cand_by_center = {float(c["center_sec"]): c for c in candidates}
+        silence_windows = []
+        for csec in silence_centers:
+            w = cand_by_center.get(float(csec), None)
+            if w is None:
+                raise RuntimeError(f"Silence center not found in candidates: {csec}")
+            silence_windows.append(w)
 
-        cpl_band_max, forbidden_raw, forbidden = compute_silence_coupling_mask(
+        # Coupling bands are derived from clean silence windows (plan-locked).
+        cpl_band_mic_only = compute_silence_coupling_mask_mic_only(
             silence_windows=silence_windows, edges_hz=edges_hz, fs=FS_EXPECTED
         )
-
-        cpl_band_mic_only = None
-        if obs_mode == "mic_only_strict":
-            cpl_band_mic_only = compute_silence_coupling_mask_mic_only(
+        if coupling_mode == "max_pairs":
+            cpl_band_max, forbidden_raw, forbidden = compute_silence_coupling_mask(
                 silence_windows=silence_windows, edges_hz=edges_hz, fs=FS_EXPECTED
             )
+        elif coupling_mode == "mic_only":
+            cpl_band_max = cpl_band_mic_only
+            forbidden_raw = (cpl_band_max >= float(COUPLING_FORBID_GAMMA2)).astype(bool)
+            if int(np.sum(forbidden_raw)) >= int(len(forbidden_raw)):
+                forbidden = np.zeros_like(forbidden_raw, dtype=bool)
+            else:
+                forbidden = forbidden_raw.copy()
+        else:
+            raise ValueError(f"Unknown coupling_mode: {coupling_mode}")
+
+        if obs_mode == "mic_only_strict":
             cpl_band_for_obs = cpl_band_mic_only
         else:
             cpl_band_for_obs = cpl_band_max
@@ -696,6 +812,7 @@ def main() -> None:
                 "silence_percent": float(SILENCE_PERCENT),
                 "forbid_gamma2": float(COUPLING_FORBID_GAMMA2),
                 "obs_mode": obs_mode,
+                "coupling_mode": coupling_mode,
                 "cpl_band_max": cpl_band_max.tolist(),
                 "cpl_band_mic_only": None if cpl_band_mic_only is None else cpl_band_mic_only.tolist(),
                 "cpl_band_for_obs": cpl_band_for_obs.tolist(),
@@ -716,13 +833,52 @@ def main() -> None:
         speaker_fail_ref_base: list[bool] = []
         speaker_fail_ref_teacher: list[bool] = []
 
+        cfg = None
+        rng = None
+        if corrupt_enable:
+            spk_key = speaker.split("-")[0]
+            try:
+                spk_int = int(spk_key)
+            except Exception as e:
+                raise ValueError(f"Failed to parse speaker id for corruption seeding: {speaker}") from e
+            cfg = MicCorruptionConfig(
+                snr_db=float(corrupt_snr_db),
+                band_lo_hz=float(BAND_HZ[0]),
+                band_hi_hz=float(BAND_HZ[1]),
+                preclip_gain=float(preclip_gain),
+                clip_limit=float(clip_limit),
+                seed=int(corrupt_seed),
+            )
+            rng = np.random.default_rng(int(corrupt_seed + spk_int))
+
         windows_path = spk_out / "windows.jsonl"
         with windows_path.open("w", encoding="utf-8") as f_jsonl:
             for w in speech_windows:
                 center_sec = float(w["center_sec"])
-                seg_micl = w["micl"]
-                seg_micr = w["micr"]
+                seg_micl_clean = w["micl"]
+                seg_micr_clean = w["micr"]
                 seg_ldv = w["ldv"]
+
+                corruption_record: dict[str, Any] | None = None
+                if corrupt_enable:
+                    assert cfg is not None
+                    assert rng is not None
+                    noise_center_L = choose_noise_center(rng, silence_centers)
+                    noise_center_R = choose_noise_center(rng, silence_centers)
+                    noiseL = extract_centered_window(micl, fs=FS_EXPECTED, center_sec=noise_center_L, window_sec=WINDOW_SEC)
+                    noiseR = extract_centered_window(micr, fs=FS_EXPECTED, center_sec=noise_center_R, window_sec=WINDOW_SEC)
+                    seg_micl, diagL = apply_mic_corruption(seg_micl_clean, noiseL, cfg=cfg, fs=FS_EXPECTED)
+                    seg_micr, diagR = apply_mic_corruption(seg_micr_clean, noiseR, cfg=cfg, fs=FS_EXPECTED)
+                    corruption_record = {
+                        "enabled": True,
+                        "noise_center_sec_L": float(noise_center_L),
+                        "noise_center_sec_R": float(noise_center_R),
+                        "micl": diagL,
+                        "micr": diagR,
+                    }
+                else:
+                    seg_micl = seg_micl_clean
+                    seg_micr = seg_micr_clean
 
                 obs_vec = compute_obs_vector(
                     ldv=seg_ldv,
@@ -852,11 +1008,29 @@ def main() -> None:
                 traj_spk.append(str(speaker))
                 traj_center.append(center_sec)
                 traj_forbidden.append(forbidden.astype(bool, copy=False))
+                if corrupt_enable:
+                    assert corruption_record is not None
+                    traj_noise_center_L.append(float(corruption_record["noise_center_sec_L"]))
+                    traj_noise_center_R.append(float(corruption_record["noise_center_sec_R"]))
+                    traj_snr_target.append(float(cfg.snr_db))
+                    traj_snr_ach_L.append(float(corruption_record["micl"]["snr_achieved_db_preclip"]))
+                    traj_snr_ach_R.append(float(corruption_record["micr"]["snr_achieved_db_preclip"]))
+                    traj_clip_frac_L.append(float(corruption_record["micl"]["clip_frac"]))
+                    traj_clip_frac_R.append(float(corruption_record["micr"]["clip_frac"]))
+                else:
+                    traj_noise_center_L.append(float("nan"))
+                    traj_noise_center_R.append(float("nan"))
+                    traj_snr_target.append(float("nan"))
+                    traj_snr_ach_L.append(float("nan"))
+                    traj_snr_ach_R.append(float("nan"))
+                    traj_clip_frac_L.append(float("nan"))
+                    traj_clip_frac_R.append(float("nan"))
 
                 record = {
                     "speaker_id": speaker,
                     "center_sec": center_sec,
                     "rms_micl": float(w["rms_micl"]),
+                    "corruption": corruption_record,
                     "truth_reference": truth_ref,
                     "geometry_truth": geom,
                     "forbidden_bands": forbidden_idx,
@@ -935,6 +1109,18 @@ def main() -> None:
     if not traj_obs:
         raise RuntimeError("No trajectories collected")
 
+    corruption_config_json = ""
+    if corrupt_enable:
+        cfg0 = MicCorruptionConfig(
+            snr_db=float(corrupt_snr_db),
+            band_lo_hz=float(BAND_HZ[0]),
+            band_hi_hz=float(BAND_HZ[1]),
+            preclip_gain=float(preclip_gain),
+            clip_limit=float(clip_limit),
+            seed=int(corrupt_seed),
+        )
+        corruption_config_json = json.dumps(cfg0.to_jsonable(), sort_keys=True)
+
     np.savez_compressed(
         out_dir / "teacher_trajectories.npz",
         observations=np.stack(traj_obs, axis=0).astype(np.float32, copy=False),
@@ -944,6 +1130,14 @@ def main() -> None:
         center_sec=np.asarray(traj_center, dtype=np.float64),
         forbidden_mask=np.stack(traj_forbidden, axis=0).astype(bool, copy=False),
         band_edges_hz=edges_hz.astype(np.float64, copy=False),
+        noise_center_sec_L=np.asarray(traj_noise_center_L, dtype=np.float64),
+        noise_center_sec_R=np.asarray(traj_noise_center_R, dtype=np.float64),
+        snr_target_db=np.asarray(traj_snr_target, dtype=np.float64),
+        snr_achieved_db_L=np.asarray(traj_snr_ach_L, dtype=np.float64),
+        snr_achieved_db_R=np.asarray(traj_snr_ach_R, dtype=np.float64),
+        clip_frac_L=np.asarray(traj_clip_frac_L, dtype=np.float64),
+        clip_frac_R=np.asarray(traj_clip_frac_R, dtype=np.float64),
+        corruption_config_json=np.asarray(corruption_config_json, dtype=np.str_),
     )
 
     valid_len_arr = np.asarray(traj_len, dtype=np.int32)

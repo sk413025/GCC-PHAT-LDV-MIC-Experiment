@@ -1,0 +1,38 @@
+{
+  "generated": "2026-02-13T23:20:47.157597",
+  "run_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_miclocal_smoke_20260213_232200",
+  "snr_rows": [
+    {
+      "snr_db": 0.0,
+      "paths": {
+        "teacher_ldv_mic": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_miclocal_smoke_20260213_232200/snr_p0/teacher_ldv_mic",
+        "teacher_mic_only": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_miclocal_smoke_20260213_232200/snr_p0/teacher_mic_only",
+        "student_ldv_mic": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_miclocal_smoke_20260213_232200/snr_p0/student_ldv_mic",
+        "student_mic_only": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_miclocal_smoke_20260213_232200/snr_p0/student_mic_only",
+        "compare": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_miclocal_smoke_20260213_232200/snr_p0/compare"
+      },
+      "baseline_fail_rate_ref_gt5deg": 0.0,
+      "ldv_mic_student_fail_rate_ref_gt5deg": 0.0,
+      "compare_acceptance": {
+        "p95_ldv_mic_better_by_ge_10pct": false,
+        "fail_rate_ldv_mic_better_by_ge_20pct": false,
+        "overall_pass": false,
+        "computed": {
+          "p95_improvement_frac": 0.0,
+          "fail_rate_improvement_frac": NaN
+        }
+      },
+      "claim2_checks": {
+        "near_fail": false,
+        "ldv_feasible": true,
+        "ldv_beats_mic_only": false
+      },
+      "claim2_pass": false
+    }
+  ],
+  "final": {
+    "claim2_supported_on_{0,-5,-10}": false,
+    "near_fail_observed_on_{0,-5,-10}": false,
+    "note": "FAIL: baseline never reached near-fail on {0,-5,-10} (dataset not extreme enough under this proxy)."
+  }
+}

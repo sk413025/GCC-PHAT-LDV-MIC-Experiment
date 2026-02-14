@@ -1,0 +1,125 @@
+{
+  "generated": "2026-02-14T00:09:14.002131",
+  "run_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_miclocal_20260213_232300/snr_m10/compare",
+  "inputs": {
+    "run_a": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_miclocal_20260213_232300/snr_m10/student_ldv_mic",
+    "run_b": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_miclocal_20260213_232300/snr_m10/student_mic_only",
+    "sha256": {
+      "run_a/test_windows.jsonl": "82e9bd1963749307e46bf05004b364b506eea87c8068424239bdb33991076604",
+      "run_b/test_windows.jsonl": "6c81a48321a846a05489dab1c548d6b64919b566482a03fbd3cc75ff39f78689"
+    }
+  },
+  "pooled": {
+    "run_a": {
+      "count": 318,
+      "median": 2.4244061755509563,
+      "p90": 4.8922596670563765,
+      "p95": 5.657324468016658,
+      "fail_rate_gt5deg": 0.09119496855345911
+    },
+    "run_b": {
+      "count": 318,
+      "median": 2.485557206472903,
+      "p90": 4.65385186367493,
+      "p95": 5.419382978738874,
+      "fail_rate_gt5deg": 0.07232704402515723
+    }
+  },
+  "per_speaker": {
+    "18-0.1V": {
+      "run_a": {
+        "count": 78,
+        "median": 2.822130680485529,
+        "p90": 4.99623722881043,
+        "p95": 5.476686840862451,
+        "fail_rate_gt5deg": 0.10256410256410256
+      },
+      "run_b": {
+        "count": 78,
+        "median": 2.8046899104383964,
+        "p90": 4.604654320251339,
+        "p95": 4.964375235647208,
+        "fail_rate_gt5deg": 0.05128205128205128
+      }
+    },
+    "19-0.1V": {
+      "run_a": {
+        "count": 53,
+        "median": 1.8750245510980577,
+        "p90": 4.643096035322408,
+        "p95": 4.910388351944225,
+        "fail_rate_gt5deg": 0.03773584905660377
+      },
+      "run_b": {
+        "count": 53,
+        "median": 1.8900373569346005,
+        "p90": 4.485234490224304,
+        "p95": 4.680831754227545,
+        "fail_rate_gt5deg": 0.018867924528301886
+      }
+    },
+    "20-0.1V": {
+      "run_a": {
+        "count": 49,
+        "median": 2.7108732505429347,
+        "p90": 4.292490456479659,
+        "p95": 4.575924488899137,
+        "fail_rate_gt5deg": 0.04081632653061224
+      },
+      "run_b": {
+        "count": 49,
+        "median": 2.784504343096806,
+        "p90": 4.53924700137649,
+        "p95": 4.670722194898019,
+        "fail_rate_gt5deg": 0.04081632653061224
+      }
+    },
+    "21-0.1V": {
+      "run_a": {
+        "count": 63,
+        "median": 2.082188624116222,
+        "p90": 4.148982328765714,
+        "p95": 4.65915640863764,
+        "fail_rate_gt5deg": 0.047619047619047616
+      },
+      "run_b": {
+        "count": 63,
+        "median": 2.6650775960635196,
+        "p90": 4.314107201769038,
+        "p95": 4.856422520224087,
+        "fail_rate_gt5deg": 0.047619047619047616
+      }
+    },
+    "22-0.1V": {
+      "run_a": {
+        "count": 75,
+        "median": 2.5055010067086165,
+        "p90": 5.757298095393007,
+        "p95": 5.8788307533346265,
+        "fail_rate_gt5deg": 0.18666666666666668
+      },
+      "run_b": {
+        "count": 75,
+        "median": 2.5055010067086165,
+        "p90": 5.757298095393007,
+        "p95": 5.8788307533346265,
+        "fail_rate_gt5deg": 0.17333333333333334
+      }
+    }
+  },
+  "acceptance": {
+    "p95_ldv_mic_better_by_ge_10pct": false,
+    "fail_rate_ldv_mic_better_by_ge_20pct": false,
+    "overall_pass": false,
+    "computed": {
+      "p95_improvement_frac": -0.04390564206502255,
+      "fail_rate_improvement_frac": -0.26086956521739124
+    }
+  },
+  "teacher_actions_check": {
+    "teacher_a": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_miclocal_20260213_232300/snr_m10/teacher_ldv_mic/teacher_trajectories.npz",
+    "teacher_b": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_miclocal_20260213_232300/snr_m10/teacher_mic_only/teacher_trajectories.npz",
+    "actions_identical": true,
+    "diff_count": 0
+  }
+}

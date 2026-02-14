@@ -1,0 +1,22 @@
+{
+  "generated": "2026-02-13T23:20:39.642178",
+  "data_root": "/home/sbplab/jiawei/data",
+  "truth_ref_root": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/ldv_vs_mic_grid_20260211_093529/micl_micr_chirp_tau2_band500_2000",
+  "speakers": [
+    "20-0.1V"
+  ],
+  "snr_grid_db": [
+    0.0
+  ],
+  "corruption": {
+    "seed": 1337,
+    "preclip_gain": 100.0,
+    "clip_limit": 0.99,
+    "band_hz": [
+      500.0,
+      2000.0
+    ]
+  },
+  "coupling_mode": "mic_only",
+  "smoke": true
+}

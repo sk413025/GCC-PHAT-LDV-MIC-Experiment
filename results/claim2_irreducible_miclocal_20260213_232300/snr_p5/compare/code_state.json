@@ -1,0 +1,7 @@
+{
+  "script_path": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/scripts/compare_ablation_runs.py",
+  "script_sha256": "1de300c9ae27245f385fb5ef597bd0a21e284f66a4b8e9a480a87dad2646f5ee",
+  "git_head": "3e2243df8d04b737d88eac0d326618c77f661800",
+  "dirty": true,
+  "timestamp": "2026-02-13T23:45:03.570514"
+}
