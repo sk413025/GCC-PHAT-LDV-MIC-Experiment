@@ -59,7 +59,9 @@ from scipy.signal import csd, welch
 try:
     # When executed as a script: `python scripts/teacher_band_omp_micmic.py`
     from mic_corruption import (  # type: ignore
+        CommonModeInterferenceConfig,
         MicCorruptionConfig,
+        add_common_mode_interference,
         apply_mic_corruption,
         apply_occlusion_fft,
         choose_noise_center,
@@ -68,7 +70,9 @@ try:
 except ImportError:  # pragma: no cover
     # When imported from repo root: `import scripts.teacher_band_omp_micmic`
     from scripts.mic_corruption import (  # type: ignore
+        CommonModeInterferenceConfig,
         MicCorruptionConfig,
+        add_common_mode_interference,
         apply_mic_corruption,
         apply_occlusion_fft,
         choose_noise_center,
@@ -666,6 +670,25 @@ def main() -> None:
     parser.add_argument("--preclip_gain", type=float, default=100.0, help="Pre-clip gain for saturation proxy.")
     parser.add_argument("--clip_limit", type=float, default=0.99, help="Clip limit after preclip gain.")
     parser.add_argument(
+        "--cm_interf_enable",
+        type=int,
+        default=0,
+        choices=[0, 1],
+        help="Enable common-mode coherent interference injected identically into MicL/MicR (mic-only). Default: 0.",
+    )
+    parser.add_argument(
+        "--cm_interf_snr_db",
+        type=float,
+        default=None,
+        help="Target in-band SNR (dB) for common-mode interference (required if --cm_interf_enable=1).",
+    )
+    parser.add_argument(
+        "--cm_interf_seed",
+        type=int,
+        default=1337,
+        help="Seed for deterministic common-mode interference noise selection. Default: 1337.",
+    )
+    parser.add_argument(
         "--occlusion_enable",
         type=int,
         default=0,
@@ -728,6 +751,9 @@ def main() -> None:
     corrupt_seed = int(args.corrupt_seed)
     preclip_gain = float(args.preclip_gain)
     clip_limit = float(args.clip_limit)
+    cm_interf_enable = bool(int(args.cm_interf_enable))
+    cm_interf_snr_db = args.cm_interf_snr_db
+    cm_interf_seed = int(args.cm_interf_seed)
     occlusion_enable = bool(int(args.occlusion_enable))
     occlusion_target = str(args.occlusion_target)
     occlusion_kind = str(args.occlusion_kind)
@@ -741,6 +767,8 @@ def main() -> None:
 
     if corrupt_enable and corrupt_snr_db is None:
         raise ValueError("--corrupt_snr_db is required when --corrupt_enable=1")
+    if cm_interf_enable and cm_interf_snr_db is None:
+        raise ValueError("--cm_interf_snr_db is required when --cm_interf_enable=1")
 
     run_config = {
         "generated": datetime.now().isoformat(),
@@ -784,6 +812,13 @@ def main() -> None:
             "clip_limit": float(clip_limit),
             "band_lo_hz": float(BAND_HZ[0]),
             "band_hi_hz": float(BAND_HZ[1]),
+            "common_mode_interference": {
+                "enabled": bool(cm_interf_enable),
+                "snr_db": None if cm_interf_snr_db is None else float(cm_interf_snr_db),
+                "seed": int(cm_interf_seed),
+                "band_lo_hz": float(BAND_HZ[0]),
+                "band_hi_hz": float(BAND_HZ[1]),
+            },
             "occlusion": {
                 "enabled": bool(occlusion_enable),
                 "target": str(occlusion_target),
@@ -819,6 +854,9 @@ def main() -> None:
     traj_snr_ach_R: list[float] = []
     traj_clip_frac_L: list[float] = []
     traj_clip_frac_R: list[float] = []
+    traj_cm_noise_center: list[float] = []
+    traj_cm_snr_target: list[float] = []
+    traj_cm_snr_ach: list[float] = []
 
     centers_grid = np.arange(center_start_sec, center_end_sec + 1e-9, center_step_sec, dtype=np.float64)
     win_samples = int(round(WINDOW_SEC * FS_EXPECTED))
@@ -990,6 +1028,22 @@ def main() -> None:
             )
             rng = np.random.default_rng(int(corrupt_seed + spk_int))
 
+        cfg_cm = None
+        rng_cm = None
+        if cm_interf_enable:
+            spk_key = speaker.split("-")[0]
+            try:
+                spk_int = int(spk_key)
+            except Exception as e:
+                raise ValueError(f"Failed to parse speaker id for cm interference seeding: {speaker}") from e
+            cfg_cm = CommonModeInterferenceConfig(
+                snr_db=float(cm_interf_snr_db),
+                band_lo_hz=float(BAND_HZ[0]),
+                band_hi_hz=float(BAND_HZ[1]),
+                seed=int(cm_interf_seed),
+            )
+            rng_cm = np.random.default_rng(int(cm_interf_seed + spk_int))
+
         dyn_forbidden_counts: list[int] = []
         tau_forbidden_counts: list[int] = []
 
@@ -1001,6 +1055,53 @@ def main() -> None:
                 seg_micr_clean = w["micr"]
                 seg_ldv = w["ldv"]
 
+                # Build mic mix (occlusion + optional common-mode interference), then apply optional independent corruption.
+                sigL_mix = seg_micl_clean
+                sigR_mix = seg_micr_clean
+                if occlusion_enable and occlusion_target == "micl":
+                    sigL_mix = apply_occlusion_fft(
+                        sigL_mix,
+                        fs=FS_EXPECTED,
+                        kind=occlusion_kind,
+                        lowpass_hz=occlusion_lowpass_hz,
+                        tilt_k=occlusion_tilt_k,
+                        tilt_pivot_hz=occlusion_tilt_pivot_hz,
+                    )
+                if occlusion_enable and occlusion_target == "micr":
+                    sigR_mix = apply_occlusion_fft(
+                        sigR_mix,
+                        fs=FS_EXPECTED,
+                        kind=occlusion_kind,
+                        lowpass_hz=occlusion_lowpass_hz,
+                        tilt_k=occlusion_tilt_k,
+                        tilt_pivot_hz=occlusion_tilt_pivot_hz,
+                    )
+
+                cm_record: dict[str, Any] | None = None
+                if cm_interf_enable:
+                    assert cfg_cm is not None
+                    assert rng_cm is not None
+                    noise_center_cm = choose_noise_center(rng_cm, silence_centers)
+                    noise_cm = extract_centered_window(
+                        micl, fs=FS_EXPECTED, center_sec=noise_center_cm, window_sec=WINDOW_SEC
+                    )
+                    (sigL_mix, sigR_mix), diag_cm = add_common_mode_interference(
+                        sigL_mix,
+                        sigR_mix,
+                        noise_cm,
+                        cfg=cfg_cm,
+                        fs=FS_EXPECTED,
+                        signal_for_alpha=seg_micl_clean,
+                    )
+                    cm_record = {
+                        "enabled": True,
+                        "noise_center_sec": float(noise_center_cm),
+                        "snr_target_db": float(cfg_cm.snr_db),
+                        "diag": diag_cm,
+                    }
+                else:
+                    noise_center_cm = float("nan")
+
                 corruption_record: dict[str, Any] | None = None
                 if corrupt_enable:
                     assert cfg is not None
@@ -1009,27 +1110,6 @@ def main() -> None:
                     noise_center_R = choose_noise_center(rng, silence_centers)
                     noiseL = extract_centered_window(micl, fs=FS_EXPECTED, center_sec=noise_center_L, window_sec=WINDOW_SEC)
                     noiseR = extract_centered_window(micr, fs=FS_EXPECTED, center_sec=noise_center_R, window_sec=WINDOW_SEC)
-
-                    sigL_mix = seg_micl_clean
-                    sigR_mix = seg_micr_clean
-                    if occlusion_enable and occlusion_target == "micl":
-                        sigL_mix = apply_occlusion_fft(
-                            sigL_mix,
-                            fs=FS_EXPECTED,
-                            kind=occlusion_kind,
-                            lowpass_hz=occlusion_lowpass_hz,
-                            tilt_k=occlusion_tilt_k,
-                            tilt_pivot_hz=occlusion_tilt_pivot_hz,
-                        )
-                    if occlusion_enable and occlusion_target == "micr":
-                        sigR_mix = apply_occlusion_fft(
-                            sigR_mix,
-                            fs=FS_EXPECTED,
-                            kind=occlusion_kind,
-                            lowpass_hz=occlusion_lowpass_hz,
-                            tilt_k=occlusion_tilt_k,
-                            tilt_pivot_hz=occlusion_tilt_pivot_hz,
-                        )
 
                     seg_micl, diagL = apply_mic_corruption(
                         seg_micl_clean,
@@ -1051,6 +1131,7 @@ def main() -> None:
                         "enabled": True,
                         "noise_center_sec_L": float(noise_center_L),
                         "noise_center_sec_R": float(noise_center_R),
+                        "common_mode_interference": cm_record,
                         "occlusion": {
                             "enabled": bool(occlusion_enable),
                             "target": str(occlusion_target),
@@ -1063,8 +1144,20 @@ def main() -> None:
                         "micr": diagR,
                     }
                 else:
-                    seg_micl = seg_micl_clean
-                    seg_micr = seg_micr_clean
+                    seg_micl = sigL_mix
+                    seg_micr = sigR_mix
+                    corruption_record = {
+                        "enabled": False,
+                        "common_mode_interference": cm_record,
+                        "occlusion": {
+                            "enabled": bool(occlusion_enable),
+                            "target": str(occlusion_target),
+                            "kind": str(occlusion_kind),
+                            "lowpass_hz": float(occlusion_lowpass_hz),
+                            "tilt_k": float(occlusion_tilt_k),
+                            "tilt_pivot_hz": float(occlusion_tilt_pivot_hz),
+                        },
+                    }
 
                 obs_vec, mic_coh_speech_band = compute_obs_vector(
                     ldv=seg_ldv,
@@ -1249,6 +1342,17 @@ def main() -> None:
                     traj_clip_frac_L.append(float("nan"))
                     traj_clip_frac_R.append(float("nan"))
 
+                cm_block = (corruption_record or {}).get("common_mode_interference", None)
+                if cm_interf_enable and isinstance(cm_block, dict) and bool(cm_block.get("enabled", False)):
+                    traj_cm_noise_center.append(float(cm_block["noise_center_sec"]))
+                    traj_cm_snr_target.append(float(cm_block["snr_target_db"]))
+                    diag = cm_block.get("diag", None)
+                    traj_cm_snr_ach.append(float(diag.get("snr_achieved_db")) if isinstance(diag, dict) else float("nan"))
+                else:
+                    traj_cm_noise_center.append(float("nan"))
+                    traj_cm_snr_target.append(float("nan"))
+                    traj_cm_snr_ach.append(float("nan"))
+
                 record = {
                     "speaker_id": speaker,
                     "center_sec": center_sec,
@@ -1406,6 +1510,13 @@ def main() -> None:
             "tilt_k": float(occlusion_tilt_k),
             "tilt_pivot_hz": float(occlusion_tilt_pivot_hz),
         }
+        payload["common_mode_interference"] = {
+            "enabled": bool(cm_interf_enable),
+            "snr_db": None if cm_interf_snr_db is None else float(cm_interf_snr_db),
+            "seed": int(cm_interf_seed),
+            "band_lo_hz": float(BAND_HZ[0]),
+            "band_hi_hz": float(BAND_HZ[1]),
+        }
         corruption_config_json = json.dumps(payload, sort_keys=True)
 
     np.savez_compressed(
@@ -1424,6 +1535,9 @@ def main() -> None:
         snr_achieved_db_R=np.asarray(traj_snr_ach_R, dtype=np.float64),
         clip_frac_L=np.asarray(traj_clip_frac_L, dtype=np.float64),
         clip_frac_R=np.asarray(traj_clip_frac_R, dtype=np.float64),
+        cm_noise_center_sec=np.asarray(traj_cm_noise_center, dtype=np.float64),
+        cm_snr_target_db=np.asarray(traj_cm_snr_target, dtype=np.float64),
+        cm_snr_achieved_db=np.asarray(traj_cm_snr_ach, dtype=np.float64),
         corruption_config_json=np.asarray(corruption_config_json, dtype=np.str_),
     )
 

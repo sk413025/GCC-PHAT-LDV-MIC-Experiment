@@ -1,0 +1,5 @@
+2026-02-14 19:01:53,235 - INFO - Dataset: N=6, horizon=6, bands=64
+2026-02-14 19:01:53,235 - INFO - Train: 2 samples, Test: 4 samples
+2026-02-14 19:01:53,236 - INFO - Saved model: /home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_coherence_trap_ablation_smoke_20260214_190130/student/mic_only_coh_only/model_dtmin_band_policy_k6.npz
+2026-02-14 19:01:55,170 - INFO - Done. Results: /home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_coherence_trap_ablation_smoke_20260214_190130/student/mic_only_coh_only
+2026-02-14 19:01:55,170 - INFO - Acceptance overall_pass=False

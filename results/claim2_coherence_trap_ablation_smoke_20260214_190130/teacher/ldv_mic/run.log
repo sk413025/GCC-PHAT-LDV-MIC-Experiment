@@ -1,0 +1,4 @@
+2026-02-14 19:01:40,158 - INFO - Speaker 20-0.1V duration: 1044.65 s
+2026-02-14 19:01:40,231 - INFO - 20-0.1V: 11 candidate windows, 6 speech-active (RMS>=1.782e-03), 3 silence windows; forbidden bands raw=41 effective=0
+2026-02-14 19:01:41,763 - INFO - Done. Results: /home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_coherence_trap_ablation_smoke_20260214_190130/teacher/ldv_mic
+2026-02-14 19:01:41,764 - INFO - Teacher sanity gate pass=True

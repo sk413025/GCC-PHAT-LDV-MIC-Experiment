@@ -303,6 +303,25 @@ def main() -> None:
         default=0.60,
         help="Minimum guided-peak ratio to keep a band when --tau_ref_gate_enable=1. Default: 0.60.",
     )
+    ap.add_argument(
+        "--cm_interf_enable",
+        type=int,
+        default=0,
+        choices=[0, 1],
+        help="Enable common-mode coherent interference injected identically into MicL/MicR (mic-only). Default: 0.",
+    )
+    ap.add_argument(
+        "--cm_interf_snr_db",
+        type=float,
+        default=None,
+        help="Target in-band SNR (dB) for common-mode interference (required if --cm_interf_enable=1).",
+    )
+    ap.add_argument(
+        "--cm_interf_seed",
+        type=int,
+        default=1337,
+        help="Seed for deterministic common-mode interference noise selection. Default: 1337.",
+    )
     args = ap.parse_args()
 
     repo_root = Path(__file__).resolve().parents[1]
@@ -326,6 +345,12 @@ def main() -> None:
     dynamic_coh_min = float(args.dynamic_coh_min)
     tau_ref_gate_enable = int(args.tau_ref_gate_enable)
     tau_ref_gate_ratio_min = float(args.tau_ref_gate_ratio_min)
+    cm_interf_enable = int(args.cm_interf_enable)
+    cm_interf_snr_db = args.cm_interf_snr_db
+    cm_interf_seed = int(args.cm_interf_seed)
+
+    if bool(cm_interf_enable) and cm_interf_snr_db is None:
+        raise ValueError("--cm_interf_snr_db is required when --cm_interf_enable=1")
 
     run_cfg = {
         "generated": datetime.now().isoformat(),
@@ -346,6 +371,12 @@ def main() -> None:
         "dynamic_coh_min": float(dynamic_coh_min),
         "tau_ref_gate_enable": bool(tau_ref_gate_enable),
         "tau_ref_gate_ratio_min": float(tau_ref_gate_ratio_min),
+        "common_mode_interference": {
+            "enabled": bool(cm_interf_enable),
+            "snr_db": None if cm_interf_snr_db is None else float(cm_interf_snr_db),
+            "seed": int(cm_interf_seed),
+            "band_hz": [500.0, 2000.0],
+        },
         "corruption": {
             "corrupt_enable": 1,
             "corrupt_snr_db": float(SNR_DB),
@@ -389,6 +420,12 @@ def main() -> None:
             str(int(tau_ref_gate_enable)),
             "--tau_ref_gate_ratio_min",
             str(float(tau_ref_gate_ratio_min)),
+            "--cm_interf_enable",
+            str(int(cm_interf_enable)),
+            "--cm_interf_snr_db",
+            str(float(cm_interf_snr_db)) if cm_interf_snr_db is not None else "0.0",
+            "--cm_interf_seed",
+            str(int(cm_interf_seed)),
             "--corrupt_enable",
             "1",
             "--corrupt_snr_db",
@@ -423,6 +460,7 @@ def main() -> None:
     ref_actions = ref["actions"]
     ref_ncl = ref["noise_center_sec_L"]
     ref_ncr = ref["noise_center_sec_R"]
+    ref_cm = ref["cm_noise_center_sec"] if "cm_noise_center_sec" in ref else None
     ref_forbid = ref["forbidden_mask"]
 
     teacher_identity: dict[str, Any] = {
@@ -435,6 +473,8 @@ def main() -> None:
         assert_np_equal(ref_actions, d["actions"], name=f"actions ({obs_mode})")
         assert_np_equal(ref_ncl, d["noise_center_sec_L"], name=f"noise_center_sec_L ({obs_mode})")
         assert_np_equal(ref_ncr, d["noise_center_sec_R"], name=f"noise_center_sec_R ({obs_mode})")
+        if ref_cm is not None:
+            assert_np_equal(ref_cm, d["cm_noise_center_sec"], name=f"cm_noise_center_sec ({obs_mode})")
         assert_np_equal(ref_forbid, d["forbidden_mask"], name=f"forbidden_mask ({obs_mode})")
         teacher_identity["checks"][obs_mode] = {"ok": True, "npz": str(npz)}
     write_json(out_dir / "teacher_identity.json", teacher_identity)
@@ -551,6 +591,9 @@ def main() -> None:
     lines.append(f"- corruption: SNR={SNR_DB:.1f} dB in-band (500–2000), seed={CORRUPT_SEED}, preclip_gain={PRECLIP_GAIN}, clip_limit={CLIP_LIMIT}\n")
     lines.append(
         f"- occlusion: target={OCCLUSION['occlusion_target']}, kind={OCCLUSION['occlusion_kind']}, lowpass_hz={OCCLUSION['occlusion_lowpass_hz']}\n\n"
+    )
+    lines.append(
+        f"- common-mode interference: enabled={bool(cm_interf_enable)}, snr_db={float(cm_interf_snr_db) if cm_interf_snr_db is not None else None}, seed={int(cm_interf_seed)}\n\n"
     )
     lines.append("## Policy gates (teacher forbidden mask)\n\n")
     lines.append(f"- coupling_hard_forbid_enable: {bool(coupling_hard_forbid_enable)}\n")

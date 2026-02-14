@@ -1,0 +1,14 @@
+{
+  "generated": "2026-02-14T18:44:20.084588",
+  "run_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_coherence_trap_sweep_20260214_183626/cm_snr_+5db/teacher_mic_only_control",
+  "n_samples": 1255,
+  "k_horizon": 6,
+  "n_bands": 64,
+  "valid_len": {
+    "mean": 3.9824701195219125,
+    "median": 4.0,
+    "p10": 1.0,
+    "p90": 6.0,
+    "frac_zero": 0.0
+  }
+}

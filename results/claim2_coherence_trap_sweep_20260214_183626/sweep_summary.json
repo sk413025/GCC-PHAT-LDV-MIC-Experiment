@@ -1,0 +1,161 @@
+{
+  "generated": "2026-02-14T18:59:49.737647",
+  "out_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_coherence_trap_sweep_20260214_183626",
+  "grid": [
+    {
+      "cm_snr_db": 20.0,
+      "teacher_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_coherence_trap_sweep_20260214_183626/cm_snr_+20db/teacher_mic_only_control",
+      "n_test_windows": 318,
+      "theta_error_ref_deg": {
+        "p95": 4.625099483103288,
+        "fail_rate_gt4deg": 0.6823899371069182,
+        "median": 4.289654729310151
+      },
+      "psr_db": {
+        "median": -4.260819710389608,
+        "frac_gt3db": 0.0880503144654088,
+        "p95": 3.929746481281565
+      },
+      "mic_coh_band_median": {
+        "median": 0.02129946317710671,
+        "p10": 0.018224596302095653,
+        "p90": 0.1761927416206251
+      },
+      "near_fail_pass": true,
+      "coherence_trap_pass": false
+    },
+    {
+      "cm_snr_db": 10.0,
+      "teacher_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_coherence_trap_sweep_20260214_183626/cm_snr_+10db/teacher_mic_only_control",
+      "n_test_windows": 318,
+      "theta_error_ref_deg": {
+        "p95": 4.625099483103288,
+        "fail_rate_gt4deg": 0.559748427672956,
+        "median": 4.140589226274792
+      },
+      "psr_db": {
+        "median": -5.3513603839771715,
+        "frac_gt3db": 0.1540880503144654,
+        "p95": 7.903247091995578
+      },
+      "mic_coh_band_median": {
+        "median": 0.03633418027179218,
+        "p10": 0.029220103727812086,
+        "p90": 0.17112970375032527
+      },
+      "near_fail_pass": false,
+      "coherence_trap_pass": false
+    },
+    {
+      "cm_snr_db": 5.0,
+      "teacher_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_coherence_trap_sweep_20260214_183626/cm_snr_+5db/teacher_mic_only_control",
+      "n_test_windows": 318,
+      "theta_error_ref_deg": {
+        "p95": 4.625099483103288,
+        "fail_rate_gt4deg": 0.5408805031446541,
+        "median": 4.0758141737558296
+      },
+      "psr_db": {
+        "median": -6.2436413976412855,
+        "frac_gt3db": 0.25157232704402516,
+        "p95": 12.579570420004478
+      },
+      "mic_coh_band_median": {
+        "median": 0.09519548578345614,
+        "p10": 0.08003523652932255,
+        "p90": 0.34168428799599565
+      },
+      "near_fail_pass": false,
+      "coherence_trap_pass": false
+    },
+    {
+      "cm_snr_db": 0.0,
+      "teacher_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_coherence_trap_sweep_20260214_183626/cm_snr_+0db/teacher_mic_only_control",
+      "n_test_windows": 318,
+      "theta_error_ref_deg": {
+        "p95": 4.625099483103288,
+        "fail_rate_gt4deg": 0.48427672955974843,
+        "median": 3.1805884972239613
+      },
+      "psr_db": {
+        "median": -8.058076127378069,
+        "frac_gt3db": 0.3522012578616352,
+        "p95": 15.721707495482152
+      },
+      "mic_coh_band_median": {
+        "median": 0.2727027796954149,
+        "p10": 0.24943454568949575,
+        "p90": 0.5849879527456564
+      },
+      "near_fail_pass": false,
+      "coherence_trap_pass": true
+    },
+    {
+      "cm_snr_db": -5.0,
+      "teacher_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_coherence_trap_sweep_20260214_183626/cm_snr_-5db/teacher_mic_only_control",
+      "n_test_windows": 318,
+      "theta_error_ref_deg": {
+        "p95": 4.625099483103288,
+        "fail_rate_gt4deg": 0.389937106918239,
+        "median": 3.117029134698945
+      },
+      "psr_db": {
+        "median": -9.151175186450377,
+        "frac_gt3db": 0.3522012578616352,
+        "p95": 16.94105407975662
+      },
+      "mic_coh_band_median": {
+        "median": 0.5644021243178202,
+        "p10": 0.5425065442337428,
+        "p90": 0.7906794552374513
+      },
+      "near_fail_pass": false,
+      "coherence_trap_pass": true
+    },
+    {
+      "cm_snr_db": -10.0,
+      "teacher_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_coherence_trap_sweep_20260214_183626/cm_snr_-10db/teacher_mic_only_control",
+      "n_test_windows": 318,
+      "theta_error_ref_deg": {
+        "p95": 4.625099483103288,
+        "fail_rate_gt4deg": 0.34591194968553457,
+        "median": 2.803302817374295
+      },
+      "psr_db": {
+        "median": -9.719211346147862,
+        "frac_gt3db": 0.3522012578616352,
+        "p95": 17.42105461112691
+      },
+      "mic_coh_band_median": {
+        "median": 0.8059634306842502,
+        "p10": 0.7957745550657679,
+        "p90": 0.9070507627867834
+      },
+      "near_fail_pass": false,
+      "coherence_trap_pass": true
+    },
+    {
+      "cm_snr_db": -15.0,
+      "teacher_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_coherence_trap_sweep_20260214_183626/cm_snr_-15db/teacher_mic_only_control",
+      "n_test_windows": 318,
+      "theta_error_ref_deg": {
+        "p95": 4.58134677037469,
+        "fail_rate_gt4deg": 0.29245283018867924,
+        "median": 2.496066811776794
+      },
+      "psr_db": {
+        "median": -9.89819835355717,
+        "frac_gt3db": 0.3522012578616352,
+        "p95": 17.461145204566698
+      },
+      "mic_coh_band_median": {
+        "median": 0.9184103508938287,
+        "p10": 0.911965927977099,
+        "p90": 0.9515570466250541
+      },
+      "near_fail_pass": false,
+      "coherence_trap_pass": true
+    }
+  ],
+  "chosen": null
+}

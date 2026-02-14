@@ -31,6 +31,24 @@ class MicCorruptionConfig:
         return asdict(self)
 
 
+@dataclass(frozen=True)
+class CommonModeInterferenceConfig:
+    """
+    Common-mode coherent interference injected identically into MicL and MicR.
+
+    This models electrical/common-path interference or crosstalk-like contamination
+    that is coherent across microphones but not present in LDV.
+    """
+
+    snr_db: float
+    band_lo_hz: float
+    band_hi_hz: float
+    seed: int
+
+    def to_jsonable(self) -> dict[str, Any]:
+        return asdict(self)
+
+
 def bandpass_fft(x: np.ndarray, *, fs: int, lo_hz: float, hi_hz: float) -> np.ndarray:
     """
     Deterministic frequency-domain hard-mask bandpass.
@@ -113,6 +131,66 @@ def compute_inband_power(x: np.ndarray, *, fs: int, lo_hz: float, hi_hz: float) 
     if not np.isfinite(p):
         raise ValueError("Non-finite in-band power")
     return p
+
+
+def add_common_mode_interference(
+    micl_mix: np.ndarray,
+    micr_mix: np.ndarray,
+    noise_window: np.ndarray,
+    *,
+    cfg: CommonModeInterferenceConfig,
+    fs: int,
+    signal_for_alpha: np.ndarray,
+    eps: float = 1e-18,
+) -> tuple[tuple[np.ndarray, np.ndarray], dict[str, float]]:
+    """
+    Add the same band-limited interference waveform to both MicL and MicR.
+
+    The interference is scaled to achieve a target SNR in-band relative to
+    `signal_for_alpha` (typically the clean MicL window).
+
+    Returns ((micl_out, micr_out), diag).
+    """
+    micl_mix = np.asarray(micl_mix, dtype=np.float64)
+    micr_mix = np.asarray(micr_mix, dtype=np.float64)
+    noise_window = np.asarray(noise_window, dtype=np.float64)
+    signal_for_alpha = np.asarray(signal_for_alpha, dtype=np.float64)
+    if micl_mix.shape != micr_mix.shape or micl_mix.shape != noise_window.shape or micl_mix.shape != signal_for_alpha.shape:
+        raise ValueError("Shape mismatch in add_common_mode_interference")
+
+    lo = float(cfg.band_lo_hz)
+    hi = float(cfg.band_hi_hz)
+    snr_db = float(cfg.snr_db)
+
+    s_bp = bandpass_fft(signal_for_alpha, fs=fs, lo_hz=lo, hi_hz=hi)
+    n_bp = bandpass_fft(noise_window, fs=fs, lo_hz=lo, hi_hz=hi)
+    P_s = float(np.mean(s_bp * s_bp))
+    P_n = float(np.mean(n_bp * n_bp))
+    if not (np.isfinite(P_s) and np.isfinite(P_n)):
+        raise ValueError("Non-finite powers in common-mode interference")
+    if P_s <= 0.0:
+        raise ValueError("Zero in-band signal power for common-mode interference")
+    if P_n <= eps:
+        raise ValueError("Noise in-band power too small for common-mode interference")
+
+    alpha = float(np.sqrt(P_s / (P_n * (10.0 ** (snr_db / 10.0)) + eps)))
+    i_bp = (alpha * n_bp).astype(np.float64, copy=False)
+
+    micl_out = (micl_mix + i_bp).astype(np.float64, copy=False)
+    micr_out = (micr_mix + i_bp).astype(np.float64, copy=False)
+
+    P_i = float((alpha * alpha) * P_n)
+    snr_achieved_db = 10.0 * float(np.log10(P_s / (P_i + eps)))
+    diag = {
+        "snr_target_db": snr_db,
+        "snr_achieved_db": float(snr_achieved_db),
+        "alpha": float(alpha),
+        "P_s_ref": float(P_s),
+        "P_i": float(P_i),
+        "band_lo_hz": lo,
+        "band_hi_hz": hi,
+    }
+    return (micl_out, micr_out), diag
 
 
 def select_silence_centers(

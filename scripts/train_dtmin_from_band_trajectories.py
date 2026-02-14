@@ -61,10 +61,22 @@ from scipy.io import wavfile
 
 try:
     # When executed as a script: `python scripts/train_dtmin_from_band_trajectories.py`
-    from mic_corruption import MicCorruptionConfig, apply_mic_corruption, apply_occlusion_fft  # type: ignore
+    from mic_corruption import (  # type: ignore
+        CommonModeInterferenceConfig,
+        MicCorruptionConfig,
+        add_common_mode_interference,
+        apply_mic_corruption,
+        apply_occlusion_fft,
+    )
 except ImportError:  # pragma: no cover
     # When imported from repo root: `import scripts.train_dtmin_from_band_trajectories`
-    from scripts.mic_corruption import MicCorruptionConfig, apply_mic_corruption, apply_occlusion_fft  # type: ignore
+    from scripts.mic_corruption import (  # type: ignore
+        CommonModeInterferenceConfig,
+        MicCorruptionConfig,
+        add_common_mode_interference,
+        apply_mic_corruption,
+        apply_occlusion_fft,
+    )
 
 logger = logging.getLogger(__name__)
 
@@ -428,8 +440,10 @@ def main() -> None:
 
     noise_center_sec_L = None
     noise_center_sec_R = None
+    cm_noise_center_sec = None
     corruption_cfg = None
     occlusion_cfg = None
+    cm_interf_cfg = None
     if use_traj_corruption:
         required = ["noise_center_sec_L", "noise_center_sec_R", "corruption_config_json"]
         missing = [k for k in required if k not in payload]
@@ -437,9 +451,11 @@ def main() -> None:
             raise ValueError(
                 f"Trajectory NPZ missing corruption keys: {missing}. "
                 f"Re-run teacher with corruption enabled or pass --use_traj_corruption=0."
-            )
+        )
         noise_center_sec_L = payload["noise_center_sec_L"].astype(np.float64, copy=False)
         noise_center_sec_R = payload["noise_center_sec_R"].astype(np.float64, copy=False)
+        if "cm_noise_center_sec" in payload:
+            cm_noise_center_sec = payload["cm_noise_center_sec"].astype(np.float64, copy=False)
         cfg_json = str(payload["corruption_config_json"].item())
         if cfg_json.strip():
             cfg_payload = json.loads(cfg_json)
@@ -452,6 +468,18 @@ def main() -> None:
                 seed=int(cfg_payload["seed"]),
             )
             occlusion_cfg = cfg_payload.get("occlusion", None)
+            cm_payload = cfg_payload.get("common_mode_interference", None)
+            if isinstance(cm_payload, dict) and bool(cm_payload.get("enabled", False)):
+                if cm_noise_center_sec is None:
+                    raise ValueError("Trajectory NPZ missing cm_noise_center_sec for enabled common-mode interference")
+                if cm_payload.get("snr_db", None) is None:
+                    raise ValueError("common_mode_interference.snr_db is required when enabled")
+                cm_interf_cfg = CommonModeInterferenceConfig(
+                    snr_db=float(cm_payload["snr_db"]),
+                    band_lo_hz=float(cm_payload.get("band_lo_hz", BAND_HZ[0])),
+                    band_hi_hz=float(cm_payload.get("band_hi_hz", BAND_HZ[1])),
+                    seed=int(cm_payload.get("seed", 0)),
+                )
 
     if observations.ndim != 3:
         raise ValueError(f"Expected observations (N,K,B), got shape={observations.shape}")
@@ -593,6 +621,30 @@ def main() -> None:
                     else:
                         raise ValueError(f"Unknown occlusion target: {target}")
 
+                cm_record = None
+                if cm_interf_cfg is not None:
+                    assert cm_noise_center_sec is not None
+                    nccm = float(cm_noise_center_sec[i])
+                    if not np.isfinite(nccm):
+                        raise ValueError("Non-finite cm_noise_center_sec for enabled common-mode interference")
+                    noise_cm = extract_centered_window(micl, fs=FS_EXPECTED, center_sec=nccm, window_sec=WINDOW_SEC).astype(
+                        np.float64, copy=False
+                    )
+                    (sig_l_mix, sig_r_mix), diag_cm = add_common_mode_interference(
+                        sig_l_mix,
+                        sig_r_mix,
+                        noise_cm,
+                        cfg=cm_interf_cfg,
+                        fs=FS_EXPECTED,
+                        signal_for_alpha=seg_l,
+                    )
+                    cm_record = {
+                        "enabled": True,
+                        "noise_center_sec": float(nccm),
+                        "snr_target_db": float(cm_interf_cfg.snr_db),
+                        "diag": diag_cm,
+                    }
+
                 seg_l, diag_l = apply_mic_corruption(
                     seg_l,
                     noise_l,
@@ -614,6 +666,7 @@ def main() -> None:
                     "noise_center_sec_L": ncl,
                     "noise_center_sec_R": ncr,
                     "occlusion": occlusion_cfg,
+                    "common_mode_interference": cm_record,
                     "micl": diag_l,
                     "micr": diag_r,
                 }
