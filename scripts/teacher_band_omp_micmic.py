@@ -527,6 +527,9 @@ def estimate_tau_psr_from_ccwin(
         denom = y0 - 2.0 * y1 + y2
         if abs(float(denom)) > 1e-12:
             shift = float(0.5 * (y0 - y2) / denom)
+            # Quadratic interpolation can extrapolate far outside the guided window when the
+            # argmax hits the window boundary. Clamp to a local sub-sample refinement only.
+            shift = float(np.clip(shift, -0.5, 0.5))
 
     tau_sec = ((peak_idx - max_shift) + shift) / float(fs)
 
@@ -539,6 +542,36 @@ def estimate_tau_psr_from_ccwin(
     peak_val = float(abs_cc[peak_idx])
     psr_db = 20.0 * float(np.log10(peak_val / (sidelobe_max + 1e-10)))
     return TauPsr(tau_sec=float(tau_sec), psr_db=float(psr_db))
+
+
+def guided_peak_ratio(
+    cc_win: np.ndarray,
+    *,
+    fs: int,
+    max_shift: int,
+    guided_tau_sec: float,
+    guided_radius_sec: float,
+) -> float:
+    """
+    Truth-guided inlier test for per-band MIC–MIC GCC-PHAT.
+
+    ratio = max_{tau in guided window} |cc(tau)| / max_{tau in full window} |cc(tau)|
+
+    A band dominated by a coherent-but-wrong path tends to have its global peak far from
+    tau_ref, producing a small ratio even if the band is coherent.
+    """
+    abs_cc = np.abs(cc_win)
+    peak_global = float(np.max(abs_cc))
+    if not np.isfinite(peak_global) or peak_global <= 0.0:
+        return 0.0
+    guided_center = int(round(float(guided_tau_sec) * float(fs))) + int(max_shift)
+    guided_radius = int(round(float(guided_radius_sec) * float(fs)))
+    lo = max(0, guided_center - guided_radius)
+    hi = min(len(abs_cc) - 1, guided_center + guided_radius)
+    if lo > hi:
+        raise ValueError("Invalid guided window")
+    peak_guided = float(np.max(abs_cc[lo : hi + 1]))
+    return float(peak_guided / (peak_global + 1e-30))
 
 
 def teacher_score(*, tau_ms: float, tau_ref_ms: float, psr_db: float) -> float:
@@ -602,6 +635,19 @@ def main() -> None:
         type=float,
         default=0.05,
         help="Dynamic coherence floor for per-window gating. Bands with mic coherence below this value are forbidden. Default: 0.05.",
+    )
+    parser.add_argument(
+        "--tau_ref_gate_enable",
+        type=int,
+        default=0,
+        choices=[0, 1],
+        help="If 1, forbid bands whose per-band GCC peak is not supported near tau_ref (guided-peak ratio below --tau_ref_gate_ratio_min). Default: 0.",
+    )
+    parser.add_argument(
+        "--tau_ref_gate_ratio_min",
+        type=float,
+        default=0.60,
+        help="Minimum guided-peak ratio to keep a band when --tau_ref_gate_enable=1. Default: 0.60.",
     )
     parser.add_argument(
         "--corrupt_enable",
@@ -675,6 +721,8 @@ def main() -> None:
     coupling_hard_forbid_enable = bool(int(args.coupling_hard_forbid_enable))
     dynamic_coh_gate_enable = bool(int(args.dynamic_coh_gate_enable))
     dynamic_coh_min = float(args.dynamic_coh_min)
+    tau_ref_gate_enable = bool(int(args.tau_ref_gate_enable))
+    tau_ref_gate_ratio_min = float(args.tau_ref_gate_ratio_min)
     corrupt_enable = bool(int(args.corrupt_enable))
     corrupt_snr_db = args.corrupt_snr_db
     corrupt_seed = int(args.corrupt_seed)
@@ -720,6 +768,8 @@ def main() -> None:
             "coupling_hard_forbid_enable": bool(coupling_hard_forbid_enable),
             "dynamic_coh_gate_enable": bool(dynamic_coh_gate_enable),
             "dynamic_coh_min": float(dynamic_coh_min),
+            "tau_ref_gate_enable": bool(tau_ref_gate_enable),
+            "tau_ref_gate_ratio_min": float(tau_ref_gate_ratio_min),
         },
         "gcc": {
             "max_lag_ms": float(GCC_MAX_LAG_MS),
@@ -898,6 +948,8 @@ def main() -> None:
                 "coupling_hard_forbid_enable": bool(coupling_hard_forbid_enable),
                 "dynamic_coh_gate_enable": bool(dynamic_coh_gate_enable),
                 "dynamic_coh_min": float(dynamic_coh_min),
+                "tau_ref_gate_enable": bool(tau_ref_gate_enable),
+                "tau_ref_gate_ratio_min": float(tau_ref_gate_ratio_min),
                 "obs_mode": obs_mode,
                 "coupling_mode": coupling_mode,
                 "cpl_band_max": cpl_band_max.tolist(),
@@ -939,6 +991,7 @@ def main() -> None:
             rng = np.random.default_rng(int(corrupt_seed + spk_int))
 
         dyn_forbidden_counts: list[int] = []
+        tau_forbidden_counts: list[int] = []
 
         windows_path = spk_out / "windows.jsonl"
         with windows_path.open("w", encoding="utf-8") as f_jsonl:
@@ -1035,7 +1088,6 @@ def main() -> None:
                     forbidden_dyn = (mic_coh_speech_band < float(dynamic_coh_min)).astype(bool, copy=False)
                 forbidden_eff = (forbidden_static_effective | forbidden_dyn).astype(bool, copy=False)
                 forbidden_dyn_idx = np.where(forbidden_dyn)[0].tolist()
-                forbidden_eff_idx = np.where(forbidden_eff)[0].tolist()
                 dyn_forbidden_counts.append(int(np.sum(forbidden_dyn)))
 
                 X = np.fft.rfft(seg_micl, n_fft)
@@ -1067,6 +1119,29 @@ def main() -> None:
                     R_b = R_phat * band_masks_fft[b]
                     cc_b = ccwin_from_spectrum(R_b.astype(np.complex128, copy=False), n_fft=n_fft, max_shift=max_shift)
                     cc_band.append(cc_b)
+
+                forbidden_tau = np.zeros((N_BANDS,), dtype=bool)
+                guided_ratio_band = np.full((N_BANDS,), np.nan, dtype=np.float64)
+                if tau_ref_gate_enable:
+                    for b in range(N_BANDS):
+                        cc_b = cc_band[b]
+                        if not np.all(np.isfinite(cc_b)):
+                            continue
+                        guided_ratio_band[b] = guided_peak_ratio(
+                            cc_b,
+                            fs=FS_EXPECTED,
+                            max_shift=max_shift,
+                            guided_tau_sec=guided_tau_sec,
+                            guided_radius_sec=guided_radius_sec,
+                        )
+                    forbidden_tau = (
+                        np.isfinite(guided_ratio_band) & (guided_ratio_band < float(tau_ref_gate_ratio_min))
+                    ).astype(bool, copy=False)
+                    forbidden_eff = (forbidden_eff | forbidden_tau).astype(bool, copy=False)
+
+                forbidden_tau_idx = np.where(forbidden_tau)[0].tolist()
+                forbidden_eff_idx = np.where(forbidden_eff)[0].tolist()
+                tau_forbidden_counts.append(int(np.sum(forbidden_tau)))
 
                 # Greedy selection
                 selected: list[int] = []
@@ -1185,7 +1260,34 @@ def main() -> None:
                     "forbidden_static_bands": forbidden_static_effective_idx,
                     "forbidden_dyn_bands": forbidden_dyn_idx,
                     "forbidden_dyn_count": int(np.sum(forbidden_dyn)),
+                    "forbidden_tau_ref_bands": forbidden_tau_idx,
+                    "forbidden_tau_ref_count": int(np.sum(forbidden_tau)),
                     "mic_coh_speech_band_summary": mic_coh_summary,
+                    "tau_ref_gate": None
+                    if not tau_ref_gate_enable
+                    else {
+                        "enabled": True,
+                        "ratio_min": float(tau_ref_gate_ratio_min),
+                        "guided_ratio_band_summary": (
+                            {
+                                "count_finite": int(np.sum(np.isfinite(guided_ratio_band))),
+                                "min": float(np.nanmin(guided_ratio_band)),
+                                "median": float(np.nanmedian(guided_ratio_band)),
+                                "p10": float(np.nanpercentile(guided_ratio_band, 10)),
+                                "p90": float(np.nanpercentile(guided_ratio_band, 90)),
+                                "max": float(np.nanmax(guided_ratio_band)),
+                            }
+                            if int(np.sum(np.isfinite(guided_ratio_band))) > 0
+                            else {
+                                "count_finite": 0,
+                                "min": float("nan"),
+                                "median": float("nan"),
+                                "p10": float("nan"),
+                                "p90": float("nan"),
+                                "max": float("nan"),
+                            }
+                        ),
+                    },
                     "baseline": {
                         "tau_ms": base_tau_ms,
                         "psr_db": float(base_tp.psr_db),
@@ -1237,6 +1339,8 @@ def main() -> None:
                 "forbidden_band_count_static_effective": int(np.sum(forbidden_static_effective)),
                 "dynamic_coh_gate_enable": bool(dynamic_coh_gate_enable),
                 "dynamic_coh_min": float(dynamic_coh_min),
+                "tau_ref_gate_enable": bool(tau_ref_gate_enable),
+                "tau_ref_gate_ratio_min": float(tau_ref_gate_ratio_min),
                 "forbidden_dyn_count_speech_windows": {
                     "min": int(np.min(np.asarray(dyn_forbidden_counts, dtype=np.int32))) if dyn_forbidden_counts else 0,
                     "median": float(np.median(np.asarray(dyn_forbidden_counts, dtype=np.int32))) if dyn_forbidden_counts else 0.0,
@@ -1244,6 +1348,14 @@ def main() -> None:
                     if dyn_forbidden_counts
                     else 0.0,
                     "max": int(np.max(np.asarray(dyn_forbidden_counts, dtype=np.int32))) if dyn_forbidden_counts else 0,
+                },
+                "forbidden_tau_ref_count_speech_windows": {
+                    "min": int(np.min(np.asarray(tau_forbidden_counts, dtype=np.int32))) if tau_forbidden_counts else 0,
+                    "median": float(np.median(np.asarray(tau_forbidden_counts, dtype=np.int32))) if tau_forbidden_counts else 0.0,
+                    "p90": float(np.percentile(np.asarray(tau_forbidden_counts, dtype=np.int32), 90))
+                    if tau_forbidden_counts
+                    else 0.0,
+                    "max": int(np.max(np.asarray(tau_forbidden_counts, dtype=np.int32))) if tau_forbidden_counts else 0,
                 },
             },
             "method": {

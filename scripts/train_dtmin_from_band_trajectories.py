@@ -285,6 +285,9 @@ def estimate_tau_psr_from_ccwin(
         denom = y0 - 2.0 * y1 + y2
         if abs(float(denom)) > 1e-12:
             shift = float(0.5 * (y0 - y2) / denom)
+            # Quadratic interpolation can extrapolate far outside the guided window when the
+            # argmax hits the window boundary. Clamp to a local sub-sample refinement only.
+            shift = float(np.clip(shift, -0.5, 0.5))
 
     tau_sec = ((peak_idx - max_shift) + shift) / float(fs)
 

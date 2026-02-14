@@ -192,6 +192,19 @@ def main() -> None:
         default=0.05,
         help="Dynamic mic coherence floor for per-window gating. Default: 0.05.",
     )
+    ap.add_argument(
+        "--tau_ref_gate_enable",
+        type=int,
+        default=0,
+        choices=[0, 1],
+        help="If 1, enable a tau_ref-support gate in the teacher forbidden mask (per-band guided-peak ratio). Default: 0.",
+    )
+    ap.add_argument(
+        "--tau_ref_gate_ratio_min",
+        type=float,
+        default=0.60,
+        help="Minimum guided-peak ratio to keep a band when --tau_ref_gate_enable=1. Default: 0.60.",
+    )
     args = ap.parse_args()
 
     repo_root = Path(__file__).resolve().parents[1]
@@ -213,6 +226,8 @@ def main() -> None:
     coupling_hard_forbid_enable = int(args.coupling_hard_forbid_enable)
     dynamic_coh_gate_enable = int(args.dynamic_coh_gate_enable)
     dynamic_coh_min = float(args.dynamic_coh_min)
+    tau_ref_gate_enable = int(args.tau_ref_gate_enable)
+    tau_ref_gate_ratio_min = float(args.tau_ref_gate_ratio_min)
 
     run_cfg = {
         "generated": datetime.now().isoformat(),
@@ -231,6 +246,8 @@ def main() -> None:
         "coupling_hard_forbid_enable": bool(coupling_hard_forbid_enable),
         "dynamic_coh_gate_enable": bool(dynamic_coh_gate_enable),
         "dynamic_coh_min": float(dynamic_coh_min),
+        "tau_ref_gate_enable": bool(tau_ref_gate_enable),
+        "tau_ref_gate_ratio_min": float(tau_ref_gate_ratio_min),
         "corruption": {
             "corrupt_enable": 1,
             "corrupt_snr_db": float(SNR_DB),
@@ -270,6 +287,10 @@ def main() -> None:
             str(int(dynamic_coh_gate_enable)),
             "--dynamic_coh_min",
             str(float(dynamic_coh_min)),
+            "--tau_ref_gate_enable",
+            str(int(tau_ref_gate_enable)),
+            "--tau_ref_gate_ratio_min",
+            str(float(tau_ref_gate_ratio_min)),
             "--corrupt_enable",
             "1",
             "--corrupt_snr_db",
@@ -395,6 +416,10 @@ def main() -> None:
     lines.append(
         f"- occlusion: target={OCCLUSION['occlusion_target']}, kind={OCCLUSION['occlusion_kind']}, lowpass_hz={OCCLUSION['occlusion_lowpass_hz']}\n\n"
     )
+    lines.append("## Policy gates (teacher forbidden mask)\n\n")
+    lines.append(f"- coupling_hard_forbid_enable: {bool(coupling_hard_forbid_enable)}\n")
+    lines.append(f"- dynamic_coh_gate_enable: {bool(dynamic_coh_gate_enable)} (coh_min={dynamic_coh_min:.3f})\n")
+    lines.append(f"- tau_ref_gate_enable: {bool(tau_ref_gate_enable)} (ratio_min={tau_ref_gate_ratio_min:.2f})\n\n")
     lines.append("## Teacher identity checks\n\n")
     lines.append("- actions/noise centers/forbidden mask identical across obs modes: PASS\n\n")
     lines.append("## Near-fail precondition (baseline MIC–MIC)\n\n")

@@ -1,0 +1,5 @@
+2026-02-14 16:52:51,104 - INFO - Dataset: N=1255, horizon=6, bands=64
+2026-02-14 16:52:51,104 - INFO - Train: 937 samples, Test: 318 samples
+2026-02-14 16:52:51,108 - INFO - Saved model: /home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_micobs_ablation_tau_ref_gate_20260214_163851/student/mic_only_psd_only/model_dtmin_band_policy_k6.npz
+2026-02-14 16:55:12,696 - INFO - Done. Results: /home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_micobs_ablation_tau_ref_gate_20260214_163851/student/mic_only_psd_only
+2026-02-14 16:55:12,696 - INFO - Acceptance overall_pass=False
