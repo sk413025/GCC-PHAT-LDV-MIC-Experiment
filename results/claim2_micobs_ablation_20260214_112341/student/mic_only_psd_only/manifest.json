@@ -1,0 +1,47 @@
+{
+  "generated": "2026-02-14T11:40:26.205926",
+  "data_root": "/home/sbplab/jiawei/data",
+  "files": [
+    {
+      "rel_path": "18-0.1V/0128-LEFT-MIC-18-boy-320.wav",
+      "sha256": "b4a8e3f1b4671722ca6f785c67b2a665f784a80bd63408e90473022daa1d51bb"
+    },
+    {
+      "rel_path": "18-0.1V/0128-RIGHT-MIC-18-boy-320.wav",
+      "sha256": "d8f0758755bdb71d4611a8e187dd9df7262a8c47c67e9c9175bbb5d1199ade1a"
+    },
+    {
+      "rel_path": "19-0.1V/0128-LEFT-MIC-19-boy-320.wav",
+      "sha256": "017fc42c2f2b90945d176a64e80f2bdf2c8eeed0c9d2597196ab049ea2d71af3"
+    },
+    {
+      "rel_path": "19-0.1V/0128-RIGHT-MIC-19-boy-320.wav",
+      "sha256": "cf821af0650fffb9b342b0f1ad2502beff5eaf61f522b17131a23fead892b209"
+    },
+    {
+      "rel_path": "20-0.1V/0128-LEFT-MIC-20-boy-320.wav",
+      "sha256": "a2c8df61d4d4f23e4133f811b9ab71e5b5d0682f172fd07106497a04cca958bf"
+    },
+    {
+      "rel_path": "20-0.1V/0128-RIGHT-MIC-20-boy-320.wav",
+      "sha256": "7e4c8e593945b8d8e15cdd4d5601b88fda38bddc28702372c3e667ccfd2f2829"
+    },
+    {
+      "rel_path": "21-0.1V/0128-LEFT-MIC-21-boy-320.wav",
+      "sha256": "751e019d20fc6c35aa27943f07d472016b48ff2263fd93094db5cf6a1fa6797a"
+    },
+    {
+      "rel_path": "21-0.1V/0128-RIGHT-MIC-21-boy-320.wav",
+      "sha256": "c34860f6be43d8d0564bc274617efeb1c5ce2c79b6fb2c05f36ac4f7d571c54d"
+    },
+    {
+      "rel_path": "22-0.1V/0128-LEFT-MIC-22-boy-320.wav",
+      "sha256": "df248994a37c5f272bdbb44c3c162b22ce482b3141130b923a89f86196a5bd73"
+    },
+    {
+      "rel_path": "22-0.1V/0128-RIGHT-MIC-22-boy-320.wav",
+      "sha256": "24003b7d892e3750fd0b1e338b2aaa9eeb9bb0c9382fbdf7236dd7f913e67dee"
+    }
+  ],
+  "traj_path": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_micobs_ablation_20260214_112341/teacher/mic_only_psd_only/teacher_trajectories.npz"
+}

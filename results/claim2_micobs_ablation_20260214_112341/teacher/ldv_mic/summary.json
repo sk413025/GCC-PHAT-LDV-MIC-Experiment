@@ -1,0 +1,42 @@
+{
+  "generated": "2026-02-14T11:25:31.638959",
+  "run_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_micobs_ablation_20260214_112341/teacher/ldv_mic",
+  "pooled": {
+    "baseline": {
+      "theta_error_ref_deg": {
+        "count": 1255,
+        "median": 4.793261902757424,
+        "p90": 7.52640784249782,
+        "p95": 10.538083192089097
+      },
+      "theta_error_geo_deg": {
+        "count": 1255,
+        "median": 3.7783514460329144,
+        "p90": 7.889836594231573,
+        "p95": 9.695746158626905
+      },
+      "fail_rate_ref_gt5deg": 0.43824701195219123
+    },
+    "teacher": {
+      "theta_error_ref_deg": {
+        "count": 1255,
+        "median": 0.34256981413463805,
+        "p90": 1.025717521819102,
+        "p95": 1.3538230111806808
+      },
+      "theta_error_geo_deg": {
+        "count": 1255,
+        "median": 2.1962462990736977,
+        "p90": 3.307604051577428,
+        "p95": 3.6222249028914644
+      },
+      "fail_rate_ref_gt5deg": 0.0
+    }
+  },
+  "teacher_sanity_gate": {
+    "median_not_worse_frac_le_0p05": true,
+    "computed": {
+      "median_worsening_frac": -0.9285309626126425
+    }
+  }
+}

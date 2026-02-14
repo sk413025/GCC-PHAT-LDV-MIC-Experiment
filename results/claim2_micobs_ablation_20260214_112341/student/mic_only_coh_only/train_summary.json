@@ -1,0 +1,18 @@
+{
+  "generated": "2026-02-14T11:35:42.389800",
+  "traj_path": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_micobs_ablation_20260214_112341/teacher/mic_only_coh_only/teacher_trajectories.npz",
+  "n_samples": 1255,
+  "horizon": 6,
+  "n_actions": 64,
+  "model_type": "nearest_centroid_stepwise",
+  "train_max_center_sec": 450.0,
+  "non_empty_actions_per_step": [
+    26,
+    26,
+    26,
+    26,
+    24,
+    24
+  ],
+  "model_path": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_micobs_ablation_20260214_112341/student/mic_only_coh_only/model_dtmin_band_policy_k6.npz"
+}

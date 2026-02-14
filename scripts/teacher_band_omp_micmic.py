@@ -27,6 +27,8 @@ Observation mode (for mic-only / LDV-only ablations)
 ----------------------------------------------------
 --obs_mode ldv_mic (default): z(ldv_psd)+z(mic_psd)+z(mic_coh)-2*z(cpl_band)
 --obs_mode mic_only_control : z(mic_psd)+z(mic_coh)-2*z(cpl_band)
+--obs_mode mic_only_coh_only: z(mic_coh)-2*z(cpl_band)
+--obs_mode mic_only_psd_only: z(mic_psd)-2*z(cpl_band)
 --obs_mode mic_only_strict  : z(mic_psd)+z(mic_coh)-2*z(cpl_band_mic_only)
 --obs_mode ldv_only         : z(ldv_psd)-2*z(cpl_band)
 
@@ -453,6 +455,10 @@ def compute_obs_vector(
         obs = zscore_inband(ldv_band) + zscore_inband(mic_band) + zscore_inband(coh_band)
     elif obs_mode == "mic_only_control":
         obs = zscore_inband(mic_band) + zscore_inband(coh_band)
+    elif obs_mode == "mic_only_coh_only":
+        obs = zscore_inband(coh_band)
+    elif obs_mode == "mic_only_psd_only":
+        obs = zscore_inband(mic_band)
     elif obs_mode == "mic_only_strict":
         obs = zscore_inband(mic_band) + zscore_inband(coh_band)
     elif obs_mode == "ldv_only":
@@ -560,7 +566,14 @@ def main() -> None:
         "--obs_mode",
         type=str,
         default="ldv_mic",
-        choices=["ldv_mic", "mic_only_control", "mic_only_strict", "ldv_only"],
+        choices=[
+            "ldv_mic",
+            "mic_only_control",
+            "mic_only_coh_only",
+            "mic_only_psd_only",
+            "mic_only_strict",
+            "ldv_only",
+        ],
         help="Observation vector mode (for ablations). Default: ldv_mic.",
     )
     parser.add_argument(
