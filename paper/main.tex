@@ -20,8 +20,10 @@
 % ============================================================================
 \title{Physics-Informed Heterogeneous DNN for Through-Barrier Speech DoA \\ Using LDV-Microphone Fusion}
 
-\name{Anonymous}
-\address{Anonymous Institution}
+\author[affiliation={1}]{Anonymous}{Author}
+\address{
+    $^1$ Anonymous Institution
+}
 \email{anonymous@email.com}
 \keywords{direction of arrival, laser Doppler vibrometer, heterogeneous sensor fusion, physics-informed neural network, robust localization}
 
@@ -158,7 +160,7 @@ The profound spectral distortion introduced by the barrier transfer function $H_
 \subsection{Cross-Modal GCC Features}
 \label{sec:gcc_features}
 
-Our core design principle is to discard spectral magnitude information prior to the neural network and exclusively preserve phase relationships, acknowledging that laser reflections off unknown surfaces introduce arbitrary magnitude distortions \cite{yamada2023speech}. We compute the Generalized Cross-Correlation with Phase Transform (GCC-PHAT) \cite{knapp1976gcc} not between the two microphones (which is jammed), but between the clean LDV anchor and each individual microphone:
+Our core design principle is to discard spectral magnitude information prior to the neural network and exclusively preserve phase relationships, acknowledging that laser reflections off unknown surfaces introduce arbitrary magnitude distortions \cite{yamada2023speech}. Let $X_m(f)$ and $X_v(f)$ denote the Short-Time Fourier Transforms (STFTs) of $x_m(t)$ and $x_{\text{ldv}}(t)$, respectively. We compute the Generalized Cross-Correlation with Phase Transform (GCC-PHAT) \cite{knapp1976gcc} not between the two microphones (which is jammed), but between the clean LDV anchor and each individual microphone:
 %
 \begin{equation}
   R_{Vm}(\tau) = \int \frac{X_v(f)\,X_m^*(f)}{\left|X_v(f)\,X_m^*(f)\right|}\,e^{j2\pi f\tau}\,df, \quad m \in \{L, R\}
@@ -186,7 +188,7 @@ The barrier is a standard 12.5\,mm-thick gypsum drywall partition ($2.4\times2.4
 
 In the receiving room, two measurement microphones (Earthworks M23) are placed 0.5\,m from the wall with a spacing of $d = 0.4$\,m. An industrial LDV (Polytec PDV-100) is mounted on a tripod, casting its laser onto a small strip of retroreflective tape affixed to the drywall's receiving side, positioned midway between the microphones' projection onto the wall.
 
-To evaluate robustness against interference, a second "jammer" speaker is placed inside the receiving room, 1.0\,m from the microphones. The jammer broadcasts continuous babble noise. We define the Signal-to-Jammer Ratio (SJR) as the ratio of the (unattenuated) target power to the jammer power. Because the target suffers $\approx 35$\,dB transmission loss through the drywall, the \emph{effective} SJR at the microphones is profoundly negative even for moderate jammer volumes.
+To evaluate robustness against interference, a second "jammer" speaker is placed inside the receiving room, 1.0\,m from the microphones. The jammer broadcasts continuous babble noise, which is completely uncorrelated with the target speech. We define the Signal-to-Jammer Ratio (SJR) as the ratio of the (unattenuated) target power to the jammer power. Because the target suffers $\approx 35$\,dB transmission loss through the drywall, the \emph{effective} SJR at the microphones is profoundly negative even for moderate jammer volumes.
 
 \subsection{Implementation Details}
 Signals are synchronously acquired at 48\,kHz. The PI-DNN is trained on a synthetic dataset simulating the geometric delays of the setup, using measured $h_{\text{wall}}$ and $h_{\text{surf}}$ impulse responses to guarantee realistic spectral shaping. The model is trained for 50 epochs using the Adam optimizer with a learning rate of $10^{-3}$. We process 0.5-second audio frames, extracting 1024-point GCC-PHAT features per microphone-LDV pair.
@@ -255,7 +257,7 @@ The true advantage of the LDV anchor emerges when introducing the in-room jammer
   \end{tikzpicture}%
   }
   \vspace{-2mm}
-  \caption{Probability of "Confidently Wrong" estimations ($P_{CW}$) versus SJR for a jammer operating inside the receiving room. Mic-only systems collapse under interference mapping falsely to the jammer, whereas the LDV-anchored system remains highly robust.}
+  \caption{Probability of "Confidently Wrong" estimations ($P_{CW}$) versus SJR for a jammer operating inside the receiving room. Mic-only systems collapse under interference mapping falsely to the jammer, whereas our PI-DNN, explicitly anchored by the jammer-immune LDV, maintains a near-zero $P_{CW}$.}
   \label{fig:jammer}
 \end{figure}
 
@@ -273,7 +275,7 @@ We presented a novel heterogeneous sensing framework that utilizes a Laser Doppl
 % ============================================================================
 % References (pages 5--6)
 % ============================================================================
-\bibliographystyle{ieeetr}
+\bibliographystyle{IEEEtran}
 \bibliography{references}
 
 \end{document}
