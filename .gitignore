@@ -1,1 +1,4 @@
 _old_reports/
+*.wav
+*.pyc
+__pycache__/
