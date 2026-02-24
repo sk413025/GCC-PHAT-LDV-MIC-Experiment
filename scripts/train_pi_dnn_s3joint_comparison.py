@@ -148,6 +148,60 @@ def s3_joint(gcc_vl, lags_vl, gcc_vr, lags_vr, spk_x, hw=0.5):
     return (best_tvl, best_tvr, dt, best_score)
 
 
+def s3_joint_2d(gcc_vl, lags_vl, gcc_vr, lags_vr, hw=0.5,
+                vx_range=(-1.2, 1.2), vx_step=0.005):
+    """S3-joint-2D: grid search over vx with S3-joint's windowing constraint.
+
+    For each candidate vibration point vx (vy fixed at BOARD_Y):
+      1. Compute theoretical τ_VL, τ_VR from v=(vx, BOARD_Y)
+      2. Find peak near τ_VL in gcc_vl (±hw ms)
+      3. Find peak near τ_VR in gcc_vr (±hw ms)
+      4. Score = a_VL + a_VR
+    Best vx → estimate vibration x-coordinate.
+
+    Then compute DoA two ways:
+    - θ_naive  = arcsin(Δτ·c/d_mic)                 [same as S3-joint]
+    - θ_source = arcsin((d_sL - d_sR)/d_mic)        [source at (vx, 0)]
+    """
+    my = MIC_Y - BOARD_Y
+    vx_grid = np.arange(vx_range[0], vx_range[1] + vx_step, vx_step)
+
+    best_score = -np.inf
+    best = None
+
+    for vx in vx_grid:
+        d_vl = np.sqrt((vx + 0.7)**2 + my**2)
+        d_vr = np.sqrt((vx - 0.7)**2 + my**2)
+        tau_vl_ms = -d_vl / c * 1000
+        tau_vr_ms = -d_vr / c * 1000
+
+        tvl, avl = find_peak_in_range(gcc_vl, lags_vl, tau_vl_ms, hw)
+        tvr, avr = find_peak_in_range(gcc_vr, lags_vr, tau_vr_ms, hw)
+
+        if np.isnan(tvl) or np.isnan(tvr):
+            continue
+
+        score = avl + avr
+        if score > best_score:
+            best_score = score
+            dt = tvr - tvl
+            # Naive angle (same as S3-joint)
+            theta_naive = np.degrees(np.arcsin(np.clip(dt / 1000 * c / d_mic, -1, 1)))
+            # Source-corrected angle: source at (vx, 0), mics at (±0.7, 2.0)
+            d_sL = np.sqrt((vx + 0.7)**2 + MIC_Y**2)
+            d_sR = np.sqrt((vx - 0.7)**2 + MIC_Y**2)
+            tau_source = (d_sL - d_sR) / c
+            theta_source = np.degrees(np.arcsin(np.clip(tau_source * c / d_mic, -1, 1)))
+            best = {
+                'vx': vx, 'score': best_score,
+                'tvl': tvl, 'tvr': tvr, 'dt': dt,
+                'theta_naive': theta_naive,
+                'theta_source': theta_source,
+            }
+
+    return best
+
+
 # ============================================================
 # Step 7: S3-joint Baseline (full-length WAV, no windowing)
 # ============================================================
@@ -179,6 +233,7 @@ def run_s3joint_baseline():
         gcc_vl, lags_vl = gcc_phat(ldv, ml, fs)
         gcc_vr, lags_vr = gcc_phat(ldv, mr, fs)
 
+        # Original S3-joint (1D, needs spk_x as input)
         s3 = s3_joint(gcc_vl, lags_vl, gcc_vr, lags_vr, spk_x, hw=0.5)
         if s3:
             _, _, dt, _ = s3
@@ -187,12 +242,37 @@ def run_s3joint_baseline():
         else:
             theta_s3 = float('nan'); err = float('nan')
 
-        results[spk_x] = {'theta_true': theta_true, 'theta_s3': theta_s3, 'err': err}
+        # S3-joint-2D (no spk_x needed — blind grid search)
+        s3_2d = s3_joint_2d(gcc_vl, lags_vl, gcc_vr, lags_vr, hw=0.5)
+        if s3_2d:
+            err_naive = s3_2d['theta_naive'] - theta_true
+            err_src = s3_2d['theta_source'] - theta_true
+        else:
+            err_naive = float('nan'); err_src = float('nan')
+            s3_2d = {'vx': float('nan'), 'theta_naive': float('nan'),
+                     'theta_source': float('nan')}
+
+        results[spk_x] = {
+            'theta_true': theta_true,
+            'theta_s3': theta_s3, 'err': err,
+            'vx_2d': s3_2d['vx'],
+            'theta_2d_naive': s3_2d['theta_naive'],
+            'err_2d_naive': err_naive,
+            'theta_2d_source': s3_2d['theta_source'],
+            'err_2d_source': err_src,
+        }
         print(f"  spk_x={spk_x:+.1f}m  theta_true={theta_true:+.2f}°  "
-              f"S3-joint={theta_s3:+.2f}°  err={err:+.2f}°")
+              f"S3={theta_s3:+.2f}°(err={err:+.2f}°)  "
+              f"S3-2D vx={s3_2d['vx']:+.3f} "
+              f"naive={s3_2d['theta_naive']:+.2f}°(err={err_naive:+.2f}°)  "
+              f"source={s3_2d['theta_source']:+.2f}°(err={err_src:+.2f}°)")
 
     mae = np.mean([abs(r['err']) for r in results.values()])
-    print(f"\n  S3-joint MAE = {mae:.2f}°")
+    mae_2d_naive = np.mean([abs(r['err_2d_naive']) for r in results.values()])
+    mae_2d_src = np.mean([abs(r['err_2d_source']) for r in results.values()])
+    print(f"\n  S3-joint MAE         = {mae:.2f}°")
+    print(f"  S3-2D (naive) MAE    = {mae_2d_naive:.2f}°")
+    print(f"  S3-2D (source@y=0) MAE = {mae_2d_src:.2f}°")
 
     # Sanity check: expected results from commit 9b680c6
     expected = {0.4: 1.37, 0.8: 2.33, 0.0: 0.00, -0.4: -1.37, -0.8: -2.33}
@@ -808,10 +888,11 @@ def main():
     print("FINAL COMPARISON TABLE (per-angle error in degrees)")
     print(f"{'=' * 120}")
 
-    col_names = ["S3-joint", "Phys-Full", "Phys-Win"] + [f"TT lam={l}" for l in lambdas] + [f"CV lam={l}" for l in lambdas]
-    hdr = f"{'Pos':>6} {'theta':>7}"
+    # Core methods to compare
+    col_names = ["S3-1D", "S3-2D naive", "S3-2D src"]
+    hdr = f"{'Pos':>6} {'theta':>8}"
     for cn in col_names:
-        hdr += f"{cn:>11}"
+        hdr += f"{cn:>12}"
     print(hdr)
     print("-" * len(hdr))
 
@@ -819,65 +900,29 @@ def main():
 
     for spk_x_val in positions:
         theta_tv = thetas_for_pos[spk_x_val]
+        r = s3_results[spk_x_val]
 
         row = f"{spk_x_val:+.1f}m".rjust(6)
-        row += f"{theta_tv:+.2f}°".rjust(7)
+        row += f"{theta_tv:+.2f}°".rjust(8)
 
-        # S3-joint
-        s3_err = s3_results[spk_x_val]['err']
-        row += f"{s3_err:+.2f}°".rjust(11)
-        all_errs["S3-joint"].append(abs(s3_err))
+        row += f"{r['err']:+.2f}°".rjust(12)
+        all_errs["S3-1D"].append(abs(r['err']))
 
-        # Physics-only Full-WAV
-        pf = phys_full_results.get(spk_x_val)
-        if pf:
-            pfe = pf['err']
-            row += f"{pfe:+.2f}°".rjust(11)
-            all_errs["Phys-Full"].append(abs(pfe))
-        else:
-            row += "N/A".rjust(11)
+        row += f"{r['err_2d_naive']:+.2f}°".rjust(12)
+        all_errs["S3-2D naive"].append(abs(r['err_2d_naive']))
 
-        # Physics-only Windowed
-        m = _find_by_theta(phys_only_results, theta_tv)
-        if m:
-            pe = m['median_theta'] - theta_tv
-            row += f"{pe:+.2f}°".rjust(11)
-            all_errs["Phys-Win"].append(abs(pe))
-        else:
-            row += "N/A".rjust(11)
+        row += f"{r['err_2d_source']:+.2f}°".rjust(12)
+        all_errs["S3-2D src"].append(abs(r['err_2d_source']))
 
-        # DNN Train=Test
-        for lam in lambdas:
-            cn = f"TT lam={lam}"
-            m = _find_by_theta(dnn_results[lam], theta_tv)
-            if m:
-                de = m['median_theta'] - theta_tv
-                row += f"{de:+.2f}°".rjust(11)
-                all_errs[cn].append(abs(de))
-            else:
-                row += "N/A".rjust(11)
-
-        # DNN LOO-CV
-        for lam in lambdas:
-            cn = f"CV lam={lam}"
-            m = _find_by_theta(cv_results[lam], theta_tv)
-            if m:
-                de = m['median_theta'] - theta_tv
-                row += f"{de:+.2f}°".rjust(11)
-                all_errs[cn].append(abs(de))
-            else:
-                row += "N/A".rjust(11)
+        # Also show vx
+        row += f"   vx={r['vx_2d']:+.3f}"
 
         print(row)
 
-    # MAE row
     print("-" * len(hdr))
-    row_mae = "MAE".rjust(6) + " ".rjust(7)
+    row_mae = "MAE".rjust(6) + " ".rjust(8)
     for cn in col_names:
-        if all_errs[cn]:
-            row_mae += f"{np.mean(all_errs[cn]):.2f}°".rjust(11)
-        else:
-            row_mae += "N/A".rjust(11)
+        row_mae += f"{np.mean(all_errs[cn]):.2f}°".rjust(12)
     print(row_mae)
 
     # ================================================================
@@ -887,33 +932,41 @@ def main():
     print("SUMMARY")
     print(f"{'=' * 90}")
 
-    phys_full_mae_val = np.mean(all_errs["Phys-Full"]) if all_errs["Phys-Full"] else float('nan')
-    phys_win_mae = np.mean(all_errs["Phys-Win"]) if all_errs["Phys-Win"] else float('nan')
+    mae_2d_naive = np.mean(all_errs["S3-2D naive"])
+    mae_2d_src = np.mean(all_errs["S3-2D src"])
 
-    print(f"\n  Method comparison (MAE):")
-    print(f"  {'S3-joint (discrete 1D, full-WAV, no labels)':<50} {s3_mae_val:.2f}°")
-    print(f"  {'Physics-GD (continuous 2D, full-WAV, no labels)':<50} {phys_full_mae_val:.2f}°")
-    print(f"  {'Physics-GD (continuous 2D, 0.5s windows, no labels)':<50} {phys_win_mae:.2f}°")
-    for lam in lambdas:
-        tt = np.mean(all_errs[f"TT lam={lam}"]) if all_errs[f"TT lam={lam}"] else float('nan')
-        cv = np.mean(all_errs[f"CV lam={lam}"]) if all_errs[f"CV lam={lam}"] else float('nan')
-        print(f"  {'PI-DNN lam=' + str(lam) + ' (train=test)':<50} {tt:.2f}°")
-        print(f"  {'PI-DNN lam=' + str(lam) + ' (LOO-CV)':<50} {cv:.2f}°")
+    print(f"\n  Signal-processing methods (no training data, no labels):")
+    print(f"  {'S3-joint 1D (commit 9b680c6, needs spk_x hint)':<55} {s3_mae_val:.2f}°")
+    print(f"  {'S3-2D naive (blind grid, vibration-point angle)':<55} {mae_2d_naive:.2f}°")
+    print(f"  {'S3-2D source (blind grid, source@y=0 correction)':<55} {mae_2d_src:.2f}°")
+
+    print(f"\n  DNN methods (for reference):")
+    for lam in [1.0]:
+        tt_errs = []
+        cv_errs = []
+        for spk_x_val in positions:
+            theta_tv = thetas_for_pos[spk_x_val]
+            m = _find_by_theta(dnn_results[lam], theta_tv)
+            if m: tt_errs.append(abs(m['median_theta'] - theta_tv))
+            m = _find_by_theta(cv_results[lam], theta_tv)
+            if m: cv_errs.append(abs(m['median_theta'] - theta_tv))
+        print(f"  {'PI-DNN lam=1.0 (train=test) — OVERFIT':<55} {np.mean(tt_errs):.2f}°")
+        print(f"  {'PI-DNN lam=1.0 (LOO-CV) — true performance':<55} {np.mean(cv_errs):.2f}°")
 
     print(f"\n  Key findings:")
-    if phys_full_mae_val <= s3_mae_val:
-        print(f"  [OK] Physics-GD Full-WAV MAE={phys_full_mae_val:.2f}° <= S3-joint MAE={s3_mae_val:.2f}°")
+    if mae_2d_src < s3_mae_val:
+        print(f"  S3-2D+source correction achieves MAE={mae_2d_src:.2f}° vs S3-1D={s3_mae_val:.2f}°")
+        print(f"  This is a {s3_mae_val/max(mae_2d_src,0.001):.1f}x improvement using pure geometry —")
+        print(f"  no DNN, no labels, no training data needed.")
     else:
-        print(f"  [!!] Physics-GD Full-WAV MAE={phys_full_mae_val:.2f}° > S3-joint MAE={s3_mae_val:.2f}°")
+        print(f"  S3-2D+source MAE={mae_2d_src:.2f}° vs S3-1D={s3_mae_val:.2f}°")
 
-    # Physics-GD Full-WAV position diagnostics
-    print(f"\n  Physics-GD Full-WAV converged positions:")
+    # S3-2D position diagnostics
+    print(f"\n  S3-2D estimated vibration point vs true speaker:")
     for spk_x_val in positions:
-        r = phys_full_results.get(spk_x_val)
-        if r:
-            print(f"    spk_x={spk_x_val:+.1f}m  pos=({r['x']:+.3f}, {r['y']:.3f})  "
-                  f"true=({spk_x_val:+.1f}, {BOARD_Y})  "
-                  f"dx={r['x']-spk_x_val:+.3f}  dy={r['y']-BOARD_Y:+.3f}")
+        r = s3_results[spk_x_val]
+        print(f"    spk_x={spk_x_val:+.1f}m  vx_found={r['vx_2d']:+.3f}  "
+              f"dx={r['vx_2d']-spk_x_val:+.3f}")
 
 
 if __name__ == '__main__':
