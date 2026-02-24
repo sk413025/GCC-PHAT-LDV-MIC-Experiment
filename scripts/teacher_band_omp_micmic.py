@@ -60,8 +60,10 @@ try:
     # When executed as a script: `python scripts/teacher_band_omp_micmic.py`
     from mic_corruption import (  # type: ignore
         CommonModeInterferenceConfig,
+        DelayedCoherentInterferenceConfig,
         MicCorruptionConfig,
         add_common_mode_interference,
+        add_delayed_coherent_interference,
         apply_mic_corruption,
         apply_occlusion_fft,
         choose_noise_center,
@@ -71,8 +73,10 @@ except ImportError:  # pragma: no cover
     # When imported from repo root: `import scripts.teacher_band_omp_micmic`
     from scripts.mic_corruption import (  # type: ignore
         CommonModeInterferenceConfig,
+        DelayedCoherentInterferenceConfig,
         MicCorruptionConfig,
         add_common_mode_interference,
+        add_delayed_coherent_interference,
         apply_mic_corruption,
         apply_occlusion_fft,
         choose_noise_center,
@@ -442,7 +446,14 @@ def compute_obs_vector(
     cpl_band_for_obs: np.ndarray,
     fs: int,
     obs_mode: str,
-) -> tuple[np.ndarray, np.ndarray]:
+    ldv_scale_mode: str,
+    ldv_scale_fixed: float,
+    ldv_scale_coh_lo: float,
+    ldv_scale_coh_hi: float,
+    ldv_scale_ratio_lo: float,
+    ldv_scale_ratio_hi: float,
+    tau_ref_ratio_full: float | None,
+) -> tuple[np.ndarray, np.ndarray, float]:
     f, P_ldv = welch_psd(ldv, fs=fs)
     _f2, P_l = welch_psd(micl, fs=fs)
     _f3, P_r = welch_psd(micr, fs=fs)
@@ -455,23 +466,54 @@ def compute_obs_vector(
     mic_band = band_means(np.log(P_mic_avg + 1e-20), f, edges_hz)
     coh_band = band_means(mic_coh, f, edges_hz)
 
+    ldv_z = zscore_inband(ldv_band)
+    mic_z = zscore_inband(mic_band)
+    coh_z = zscore_inband(coh_band)
+
+    ldv_scale = 0.0
+    if obs_mode in {"ldv_mic", "ldv_only"}:
+        if ldv_scale_mode == "fixed":
+            ldv_scale = float(ldv_scale_fixed)
+        elif ldv_scale_mode == "coh_gate":
+            lo = float(ldv_scale_coh_lo)
+            hi = float(ldv_scale_coh_hi)
+            if not (hi > lo):
+                raise ValueError(f"Invalid ldv_scale_coh bounds: lo={lo} hi={hi} (need hi>lo)")
+            coh_med = float(np.median(coh_band))
+            # High mic coherence => mic-only is sufficient => suppress LDV term.
+            # Low mic coherence => allow LDV term at full strength.
+            ldv_scale = float(np.clip((hi - coh_med) / (hi - lo), 0.0, 1.0))
+        elif ldv_scale_mode == "tau_ref_ratio_gate":
+            if tau_ref_ratio_full is None or not np.isfinite(float(tau_ref_ratio_full)):
+                raise ValueError("tau_ref_ratio_full is required for ldv_scale_mode=tau_ref_ratio_gate")
+            lo = float(ldv_scale_ratio_lo)
+            hi = float(ldv_scale_ratio_hi)
+            if not (hi > lo):
+                raise ValueError(f"Invalid ldv_scale_ratio bounds: lo={lo} hi={hi} (need hi>lo)")
+            r = float(tau_ref_ratio_full)
+            # If guided peak is a small fraction of the global peak, mic-only is likely dominated
+            # by a coherent-but-wrong path (coherence trap) => emphasize LDV.
+            ldv_scale = float(np.clip((hi - r) / (hi - lo), 0.0, 1.0))
+        else:
+            raise ValueError(f"Unknown ldv_scale_mode: {ldv_scale_mode}")
+
     if obs_mode == "ldv_mic":
-        obs = zscore_inband(ldv_band) + zscore_inband(mic_band) + zscore_inband(coh_band)
+        obs = (ldv_scale * ldv_z) + mic_z + coh_z
     elif obs_mode == "mic_only_control":
-        obs = zscore_inband(mic_band) + zscore_inband(coh_band)
+        obs = mic_z + coh_z
     elif obs_mode == "mic_only_coh_only":
-        obs = zscore_inband(coh_band)
+        obs = coh_z
     elif obs_mode == "mic_only_psd_only":
-        obs = zscore_inband(mic_band)
+        obs = mic_z
     elif obs_mode == "mic_only_strict":
-        obs = zscore_inband(mic_band) + zscore_inband(coh_band)
+        obs = mic_z + coh_z
     elif obs_mode == "ldv_only":
-        obs = zscore_inband(ldv_band)
+        obs = ldv_scale * ldv_z
     else:
         raise ValueError(f"Unknown obs_mode: {obs_mode}")
 
     obs = obs - 2.0 * zscore_inband(cpl_band_for_obs)
-    return obs.astype(np.float64, copy=False), coh_band.astype(np.float64, copy=False)
+    return obs.astype(np.float64, copy=False), coh_band.astype(np.float64, copy=False), float(ldv_scale)
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -654,6 +696,57 @@ def main() -> None:
         help="Minimum guided-peak ratio to keep a band when --tau_ref_gate_enable=1. Default: 0.60.",
     )
     parser.add_argument(
+        "--include_stop_action",
+        type=int,
+        default=0,
+        choices=[0, 1],
+        help="If 1, include an explicit STOP action in trajectories (stop_id=B). Default: 0.",
+    )
+    parser.add_argument(
+        "--stateful_obs_enable",
+        type=int,
+        default=0,
+        choices=[0, 1],
+        help="If 1, append a selected-band mask to the observation (obs_dim=2B). Default: 0.",
+    )
+    parser.add_argument(
+        "--ldv_scale_mode",
+        type=str,
+        default="fixed",
+        choices=["fixed", "coh_gate", "tau_ref_ratio_gate"],
+        help="LDV term scaling mode for obs_mode that include LDV. fixed: ldv_scale_fixed. coh_gate: scale=clip((hi-median(coh))/(hi-lo),0,1). Default: fixed.",
+    )
+    parser.add_argument(
+        "--ldv_scale_fixed",
+        type=float,
+        default=1.0,
+        help="Fixed LDV term scale applied when --ldv_scale_mode=fixed. Default: 1.0.",
+    )
+    parser.add_argument(
+        "--ldv_scale_coh_lo",
+        type=float,
+        default=0.05,
+        help="Lower coherence bound for --ldv_scale_mode=coh_gate. Default: 0.05.",
+    )
+    parser.add_argument(
+        "--ldv_scale_coh_hi",
+        type=float,
+        default=0.20,
+        help="Upper coherence bound for --ldv_scale_mode=coh_gate. Default: 0.20.",
+    )
+    parser.add_argument(
+        "--ldv_scale_ratio_lo",
+        type=float,
+        default=0.40,
+        help="Lower guided/global peak ratio for --ldv_scale_mode=tau_ref_ratio_gate. Default: 0.40.",
+    )
+    parser.add_argument(
+        "--ldv_scale_ratio_hi",
+        type=float,
+        default=0.90,
+        help="Upper guided/global peak ratio for --ldv_scale_mode=tau_ref_ratio_gate. Default: 0.90.",
+    )
+    parser.add_argument(
         "--corrupt_enable",
         type=int,
         default=0,
@@ -687,6 +780,38 @@ def main() -> None:
         type=int,
         default=1337,
         help="Seed for deterministic common-mode interference noise selection. Default: 1337.",
+    )
+    parser.add_argument(
+        "--cd_interf_enable",
+        type=int,
+        default=0,
+        choices=[0, 1],
+        help="Enable coherent interference with a fixed relative delay between mics (mic-only). Default: 0.",
+    )
+    parser.add_argument(
+        "--cd_interf_snr_db",
+        type=float,
+        default=None,
+        help="Target in-band SNR (dB) for delayed coherent interference (required if --cd_interf_enable=1).",
+    )
+    parser.add_argument(
+        "--cd_interf_delay_ms",
+        type=float,
+        default=0.0,
+        help="Relative delay (ms) applied to the interference on --cd_interf_target (integer-sample, zero-padded).",
+    )
+    parser.add_argument(
+        "--cd_interf_target",
+        type=str,
+        default="micr",
+        choices=["micl", "micr"],
+        help="Which mic receives the delayed interference copy. Default: micr.",
+    )
+    parser.add_argument(
+        "--cd_interf_seed",
+        type=int,
+        default=1337,
+        help="Seed for deterministic delayed-interference noise selection. Default: 1337.",
     )
     parser.add_argument(
         "--occlusion_enable",
@@ -746,6 +871,14 @@ def main() -> None:
     dynamic_coh_min = float(args.dynamic_coh_min)
     tau_ref_gate_enable = bool(int(args.tau_ref_gate_enable))
     tau_ref_gate_ratio_min = float(args.tau_ref_gate_ratio_min)
+    include_stop_action = bool(int(args.include_stop_action))
+    stateful_obs_enable = bool(int(args.stateful_obs_enable))
+    ldv_scale_mode = str(args.ldv_scale_mode)
+    ldv_scale_fixed = float(args.ldv_scale_fixed)
+    ldv_scale_coh_lo = float(args.ldv_scale_coh_lo)
+    ldv_scale_coh_hi = float(args.ldv_scale_coh_hi)
+    ldv_scale_ratio_lo = float(args.ldv_scale_ratio_lo)
+    ldv_scale_ratio_hi = float(args.ldv_scale_ratio_hi)
     corrupt_enable = bool(int(args.corrupt_enable))
     corrupt_snr_db = args.corrupt_snr_db
     corrupt_seed = int(args.corrupt_seed)
@@ -754,6 +887,11 @@ def main() -> None:
     cm_interf_enable = bool(int(args.cm_interf_enable))
     cm_interf_snr_db = args.cm_interf_snr_db
     cm_interf_seed = int(args.cm_interf_seed)
+    cd_interf_enable = bool(int(args.cd_interf_enable))
+    cd_interf_snr_db = args.cd_interf_snr_db
+    cd_interf_delay_ms = float(args.cd_interf_delay_ms)
+    cd_interf_target = str(args.cd_interf_target)
+    cd_interf_seed = int(args.cd_interf_seed)
     occlusion_enable = bool(int(args.occlusion_enable))
     occlusion_target = str(args.occlusion_target)
     occlusion_kind = str(args.occlusion_kind)
@@ -769,6 +907,12 @@ def main() -> None:
         raise ValueError("--corrupt_snr_db is required when --corrupt_enable=1")
     if cm_interf_enable and cm_interf_snr_db is None:
         raise ValueError("--cm_interf_snr_db is required when --cm_interf_enable=1")
+    if cd_interf_enable and cd_interf_snr_db is None:
+        raise ValueError("--cd_interf_snr_db is required when --cd_interf_enable=1")
+
+    stop_action_id = int(N_BANDS)
+    n_actions = int(N_BANDS + 1) if include_stop_action else int(N_BANDS)
+    obs_dim = int(N_BANDS * 2) if stateful_obs_enable else int(N_BANDS)
 
     run_config = {
         "generated": datetime.now().isoformat(),
@@ -776,12 +920,27 @@ def main() -> None:
         "truth_ref_root": str(truth_ref_root),
         "speakers": speakers,
         "obs_mode": obs_mode,
+        "ldv_term_scaling": {
+            "mode": str(ldv_scale_mode),
+            "fixed": float(ldv_scale_fixed),
+            "coh_lo": float(ldv_scale_coh_lo),
+            "coh_hi": float(ldv_scale_coh_hi),
+            "ratio_lo": float(ldv_scale_ratio_lo),
+            "ratio_hi": float(ldv_scale_ratio_hi),
+        },
         "coupling_mode": coupling_mode,
         "fs_expected": int(FS_EXPECTED),
         "window_sec": float(WINDOW_SEC),
         "center_grid": [float(center_start_sec), float(center_end_sec), float(center_step_sec)],
         "band_hz": [float(BAND_HZ[0]), float(BAND_HZ[1])],
         "n_bands": int(N_BANDS),
+        "trajectories": {
+            "include_stop_action": bool(include_stop_action),
+            "stop_action_id": int(stop_action_id),
+            "n_actions": int(n_actions),
+            "stateful_obs_enable": bool(stateful_obs_enable),
+            "obs_dim": int(obs_dim),
+        },
         "teacher": {
             "k_horizon": int(K_HORIZON),
             "tau_norm_ms": float(TAU_NORM_MS),
@@ -816,6 +975,15 @@ def main() -> None:
                 "enabled": bool(cm_interf_enable),
                 "snr_db": None if cm_interf_snr_db is None else float(cm_interf_snr_db),
                 "seed": int(cm_interf_seed),
+                "band_lo_hz": float(BAND_HZ[0]),
+                "band_hi_hz": float(BAND_HZ[1]),
+            },
+            "delayed_coherent_interference": {
+                "enabled": bool(cd_interf_enable),
+                "snr_db": None if cd_interf_snr_db is None else float(cd_interf_snr_db),
+                "delay_ms": float(cd_interf_delay_ms),
+                "target_delayed": str(cd_interf_target),
+                "seed": int(cd_interf_seed),
                 "band_lo_hz": float(BAND_HZ[0]),
                 "band_hi_hz": float(BAND_HZ[1]),
             },
@@ -857,6 +1025,11 @@ def main() -> None:
     traj_cm_noise_center: list[float] = []
     traj_cm_snr_target: list[float] = []
     traj_cm_snr_ach: list[float] = []
+    traj_cd_noise_center: list[float] = []
+    traj_cd_snr_target: list[float] = []
+    traj_cd_snr_ach: list[float] = []
+    traj_cd_delay_ms: list[float] = []
+    traj_cd_target: list[str] = []
 
     centers_grid = np.arange(center_start_sec, center_end_sec + 1e-9, center_step_sec, dtype=np.float64)
     win_samples = int(round(WINDOW_SEC * FS_EXPECTED))
@@ -1044,6 +1217,24 @@ def main() -> None:
             )
             rng_cm = np.random.default_rng(int(cm_interf_seed + spk_int))
 
+        cfg_cd = None
+        rng_cd = None
+        if cd_interf_enable:
+            spk_key = speaker.split("-")[0]
+            try:
+                spk_int = int(spk_key)
+            except Exception as e:
+                raise ValueError(f"Failed to parse speaker id for cd interference seeding: {speaker}") from e
+            cfg_cd = DelayedCoherentInterferenceConfig(
+                snr_db=float(cd_interf_snr_db),
+                band_lo_hz=float(BAND_HZ[0]),
+                band_hi_hz=float(BAND_HZ[1]),
+                delay_ms=float(cd_interf_delay_ms),
+                target_delayed=str(cd_interf_target),
+                seed=int(cd_interf_seed),
+            )
+            rng_cd = np.random.default_rng(int(cd_interf_seed + spk_int))
+
         dyn_forbidden_counts: list[int] = []
         tau_forbidden_counts: list[int] = []
 
@@ -1102,6 +1293,33 @@ def main() -> None:
                 else:
                     noise_center_cm = float("nan")
 
+                cd_record: dict[str, Any] | None = None
+                if cd_interf_enable:
+                    assert cfg_cd is not None
+                    assert rng_cd is not None
+                    noise_center_cd = choose_noise_center(rng_cd, silence_centers)
+                    noise_cd = extract_centered_window(
+                        micl, fs=FS_EXPECTED, center_sec=noise_center_cd, window_sec=WINDOW_SEC
+                    )
+                    (sigL_mix, sigR_mix), diag_cd = add_delayed_coherent_interference(
+                        sigL_mix,
+                        sigR_mix,
+                        noise_cd,
+                        cfg=cfg_cd,
+                        fs=FS_EXPECTED,
+                        signal_for_alpha=seg_micl_clean,
+                    )
+                    cd_record = {
+                        "enabled": True,
+                        "noise_center_sec": float(noise_center_cd),
+                        "snr_target_db": float(cfg_cd.snr_db),
+                        "delay_ms": float(cfg_cd.delay_ms),
+                        "target_delayed": str(cfg_cd.target_delayed),
+                        "diag": diag_cd,
+                    }
+                else:
+                    noise_center_cd = float("nan")
+
                 corruption_record: dict[str, Any] | None = None
                 if corrupt_enable:
                     assert cfg is not None
@@ -1132,6 +1350,7 @@ def main() -> None:
                         "noise_center_sec_L": float(noise_center_L),
                         "noise_center_sec_R": float(noise_center_R),
                         "common_mode_interference": cm_record,
+                        "delayed_coherent_interference": cd_record,
                         "occlusion": {
                             "enabled": bool(occlusion_enable),
                             "target": str(occlusion_target),
@@ -1149,6 +1368,7 @@ def main() -> None:
                     corruption_record = {
                         "enabled": False,
                         "common_mode_interference": cm_record,
+                        "delayed_coherent_interference": cd_record,
                         "occlusion": {
                             "enabled": bool(occlusion_enable),
                             "target": str(occlusion_target),
@@ -1158,30 +1378,6 @@ def main() -> None:
                             "tilt_pivot_hz": float(occlusion_tilt_pivot_hz),
                         },
                     }
-
-                obs_vec, mic_coh_speech_band = compute_obs_vector(
-                    ldv=seg_ldv,
-                    micl=seg_micl,
-                    micr=seg_micr,
-                    edges_hz=edges_hz,
-                    cpl_band_for_obs=cpl_band_for_obs,
-                    fs=FS_EXPECTED,
-                    obs_mode=obs_mode,
-                )
-
-                mic_coh_summary = {
-                    "min": float(np.min(mic_coh_speech_band)),
-                    "median": float(np.median(mic_coh_speech_band)),
-                    "p90": float(np.percentile(mic_coh_speech_band, 90)),
-                    "max": float(np.max(mic_coh_speech_band)),
-                }
-
-                forbidden_dyn = np.zeros((N_BANDS,), dtype=bool)
-                if dynamic_coh_gate_enable:
-                    forbidden_dyn = (mic_coh_speech_band < float(dynamic_coh_min)).astype(bool, copy=False)
-                forbidden_eff = (forbidden_static_effective | forbidden_dyn).astype(bool, copy=False)
-                forbidden_dyn_idx = np.where(forbidden_dyn)[0].tolist()
-                dyn_forbidden_counts.append(int(np.sum(forbidden_dyn)))
 
                 X = np.fft.rfft(seg_micl, n_fft)
                 Y = np.fft.rfft(seg_micr, n_fft)
@@ -1198,10 +1394,48 @@ def main() -> None:
                     guided_radius_sec=guided_radius_sec,
                     psr_exclude_samples=int(PSR_EXCLUDE_SAMPLES),
                 )
+                tau_ref_ratio_full = guided_peak_ratio(
+                    cc_base,
+                    fs=FS_EXPECTED,
+                    max_shift=max_shift,
+                    guided_tau_sec=guided_tau_sec,
+                    guided_radius_sec=guided_radius_sec,
+                )
                 base_tau_ms = float(base_tp.tau_sec * 1000.0)
                 base_theta = tau_to_theta_deg(base_tp.tau_sec)
                 err_ref_base = abs(base_theta - float(truth_ref["theta_ref_deg"]))
                 err_geo_base = abs(base_theta - float(geom["theta_true_deg"]))
+
+                obs_vec, mic_coh_speech_band, obs_ldv_scale = compute_obs_vector(
+                    ldv=seg_ldv,
+                    micl=seg_micl,
+                    micr=seg_micr,
+                    edges_hz=edges_hz,
+                    cpl_band_for_obs=cpl_band_for_obs,
+                    fs=FS_EXPECTED,
+                    obs_mode=obs_mode,
+                    ldv_scale_mode=ldv_scale_mode,
+                    ldv_scale_fixed=ldv_scale_fixed,
+                    ldv_scale_coh_lo=ldv_scale_coh_lo,
+                    ldv_scale_coh_hi=ldv_scale_coh_hi,
+                    ldv_scale_ratio_lo=ldv_scale_ratio_lo,
+                    ldv_scale_ratio_hi=ldv_scale_ratio_hi,
+                    tau_ref_ratio_full=float(tau_ref_ratio_full),
+                )
+
+                mic_coh_summary = {
+                    "min": float(np.min(mic_coh_speech_band)),
+                    "median": float(np.median(mic_coh_speech_band)),
+                    "p90": float(np.percentile(mic_coh_speech_band, 90)),
+                    "max": float(np.max(mic_coh_speech_band)),
+                }
+
+                forbidden_dyn = np.zeros((N_BANDS,), dtype=bool)
+                if dynamic_coh_gate_enable:
+                    forbidden_dyn = (mic_coh_speech_band < float(dynamic_coh_min)).astype(bool, copy=False)
+                forbidden_eff = (forbidden_static_effective | forbidden_dyn).astype(bool, copy=False)
+                forbidden_dyn_idx = np.where(forbidden_dyn)[0].tolist()
+                dyn_forbidden_counts.append(int(np.sum(forbidden_dyn)))
 
                 # Teacher: precompute per-band cc windows for allowed bands only.
                 cc_band: list[np.ndarray] = []
@@ -1313,14 +1547,39 @@ def main() -> None:
                 speaker_fail_ref_base.append(bool(err_ref_base > 5.0))
                 speaker_fail_ref_teacher.append(bool(err_ref_teacher > 5.0))
 
-                # Save trajectories (obs repeated for each step)
-                obs_KB = np.repeat(obs_vec[None, :], K_HORIZON, axis=0)
+                # Save trajectories
+                # - actions: band indices in [0..B-1], optional STOP action (id=B), and -1 padding
+                # - observations: either repeated per-step (stateless) or include selected-mask state (stateful)
+                selected_len = int(valid_len)
+
                 act_K = np.full((K_HORIZON,), -1, dtype=np.int32)
-                if valid_len > 0:
-                    act_K[:valid_len] = np.asarray(selected[:valid_len], dtype=np.int32)
-                traj_obs.append(obs_KB.astype(np.float32, copy=False))
-                traj_act.append(act_K)
-                traj_len.append(valid_len)
+                if selected_len > 0:
+                    act_K[:selected_len] = np.asarray(selected[:selected_len], dtype=np.int32)
+
+                valid_len_actions = int(selected_len)
+                if include_stop_action:
+                    if selected_len < int(K_HORIZON):
+                        act_K[selected_len] = int(stop_action_id)
+                        valid_len_actions = int(selected_len + 1)
+                    else:
+                        valid_len_actions = int(K_HORIZON)
+
+                if stateful_obs_enable:
+                    obs_dim = int(N_BANDS * 2)
+                    obs_KD = np.zeros((K_HORIZON, obs_dim), dtype=np.float32)
+                    for step_idx in range(int(K_HORIZON)):
+                        obs_KD[step_idx, : int(N_BANDS)] = obs_vec.astype(np.float32, copy=False)
+                        sel = np.zeros((int(N_BANDS),), dtype=np.float32)
+                        n_sel = min(int(step_idx), int(selected_len))
+                        if n_sel > 0:
+                            sel[np.asarray(selected[:n_sel], dtype=np.int32)] = 1.0
+                        obs_KD[step_idx, int(N_BANDS) :] = sel
+                else:
+                    obs_KD = np.repeat(obs_vec[None, :], K_HORIZON, axis=0).astype(np.float32, copy=False)
+
+                traj_obs.append(obs_KD.astype(np.float32, copy=False))
+                traj_act.append(act_K.astype(np.int32, copy=False))
+                traj_len.append(int(valid_len_actions))
                 traj_spk.append(str(speaker))
                 traj_center.append(center_sec)
                 traj_forbidden.append(forbidden_eff.astype(bool, copy=False))
@@ -1349,9 +1608,27 @@ def main() -> None:
                     diag = cm_block.get("diag", None)
                     traj_cm_snr_ach.append(float(diag.get("snr_achieved_db")) if isinstance(diag, dict) else float("nan"))
                 else:
-                    traj_cm_noise_center.append(float("nan"))
-                    traj_cm_snr_target.append(float("nan"))
-                    traj_cm_snr_ach.append(float("nan"))
+                    # Use deterministic sentinels (NOT NaN) so identity checks can
+                    # compare arrays even when the feature is disabled.
+                    traj_cm_noise_center.append(-1.0)
+                    traj_cm_snr_target.append(-1.0)
+                    traj_cm_snr_ach.append(-1.0)
+
+                cd_block = (corruption_record or {}).get("delayed_coherent_interference", None)
+                if cd_interf_enable and isinstance(cd_block, dict) and bool(cd_block.get("enabled", False)):
+                    traj_cd_noise_center.append(float(cd_block["noise_center_sec"]))
+                    traj_cd_snr_target.append(float(cd_block["snr_target_db"]))
+                    traj_cd_delay_ms.append(float(cd_block.get("delay_ms", cd_interf_delay_ms)))
+                    traj_cd_target.append(str(cd_block.get("target_delayed", cd_interf_target)))
+                    diag = cd_block.get("diag", None)
+                    traj_cd_snr_ach.append(float(diag.get("snr_achieved_db")) if isinstance(diag, dict) else float("nan"))
+                else:
+                    # Deterministic sentinels (NOT NaN) for identity checks.
+                    traj_cd_noise_center.append(-1.0)
+                    traj_cd_snr_target.append(-1.0)
+                    traj_cd_snr_ach.append(-1.0)
+                    traj_cd_delay_ms.append(-1.0)
+                    traj_cd_target.append("")
 
                 record = {
                     "speaker_id": speaker,
@@ -1367,6 +1644,8 @@ def main() -> None:
                     "forbidden_tau_ref_bands": forbidden_tau_idx,
                     "forbidden_tau_ref_count": int(np.sum(forbidden_tau)),
                     "mic_coh_speech_band_summary": mic_coh_summary,
+                    "mic_tau_ref_guided_ratio_fullband": float(tau_ref_ratio_full),
+                    "obs_ldv_scale": float(obs_ldv_scale),
                     "tau_ref_gate": None
                     if not tau_ref_gate_enable
                     else {
@@ -1408,7 +1687,10 @@ def main() -> None:
                         "theta_error_ref_deg": float(err_ref_teacher),
                         "theta_error_geo_deg": float(err_geo_teacher),
                         "selected_bands": selected,
-                        "valid_len": valid_len,
+                        "valid_len": int(valid_len),
+                        "valid_len_actions": int(valid_len_actions),
+                        "include_stop_action": bool(include_stop_action),
+                        "stateful_obs_enable": bool(stateful_obs_enable),
                         "step_scores": step_scores,
                         "score_final": float(current_score),
                     },
@@ -1517,6 +1799,15 @@ def main() -> None:
             "band_lo_hz": float(BAND_HZ[0]),
             "band_hi_hz": float(BAND_HZ[1]),
         }
+        payload["delayed_coherent_interference"] = {
+            "enabled": bool(cd_interf_enable),
+            "snr_db": None if cd_interf_snr_db is None else float(cd_interf_snr_db),
+            "delay_ms": float(cd_interf_delay_ms),
+            "target_delayed": str(cd_interf_target),
+            "seed": int(cd_interf_seed),
+            "band_lo_hz": float(BAND_HZ[0]),
+            "band_hi_hz": float(BAND_HZ[1]),
+        }
         corruption_config_json = json.dumps(payload, sort_keys=True)
 
     np.savez_compressed(
@@ -1524,6 +1815,9 @@ def main() -> None:
         observations=np.stack(traj_obs, axis=0).astype(np.float32, copy=False),
         actions=np.stack(traj_act, axis=0).astype(np.int32, copy=False),
         valid_len=np.asarray(traj_len, dtype=np.int32),
+        stop_action_id=np.asarray(int(stop_action_id), dtype=np.int32),
+        n_actions=np.asarray(int(n_actions), dtype=np.int32),
+        stateful_obs_enable=np.asarray(int(stateful_obs_enable), dtype=np.int32),
         speaker_id=np.asarray(traj_spk),
         center_sec=np.asarray(traj_center, dtype=np.float64),
         forbidden_mask=np.stack(traj_forbidden, axis=0).astype(bool, copy=False),
@@ -1538,6 +1832,11 @@ def main() -> None:
         cm_noise_center_sec=np.asarray(traj_cm_noise_center, dtype=np.float64),
         cm_snr_target_db=np.asarray(traj_cm_snr_target, dtype=np.float64),
         cm_snr_achieved_db=np.asarray(traj_cm_snr_ach, dtype=np.float64),
+        cd_noise_center_sec=np.asarray(traj_cd_noise_center, dtype=np.float64),
+        cd_snr_target_db=np.asarray(traj_cd_snr_target, dtype=np.float64),
+        cd_snr_achieved_db=np.asarray(traj_cd_snr_ach, dtype=np.float64),
+        cd_delay_ms=np.asarray(traj_cd_delay_ms, dtype=np.float64),
+        cd_target_delayed=np.asarray(traj_cd_target),
         corruption_config_json=np.asarray(corruption_config_json, dtype=np.str_),
     )
 
@@ -1548,6 +1847,8 @@ def main() -> None:
         "n_samples": int(valid_len_arr.size),
         "k_horizon": int(K_HORIZON),
         "n_bands": int(N_BANDS),
+        "include_stop_action": bool(include_stop_action),
+        "stateful_obs_enable": bool(stateful_obs_enable),
         "valid_len": {
             "mean": float(np.mean(valid_len_arr)),
             "median": float(np.median(valid_len_arr)),

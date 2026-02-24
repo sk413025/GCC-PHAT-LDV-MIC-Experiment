@@ -33,8 +33,8 @@ The goal of this restructuring is to eliminate "cognitive jumps"—moments where
     *   *Paragraph 1:* Before looking at error numbers, let's *look* at what the fusion does. Reference **Figure 3 (The MVDR Heatmap)**.
     *   *Paragraph 2:* Contrast the flat Mic-only line with the sharp LDV-Mic peak. This proves the LDV restores the spatial sparsity/resolution that was destroyed by the wall.
 *   **5.2 Pure Barrier Accuracy vs Ablation Baseline:**
-    *   *Paragraph 1:* Now quantify the error. Reference **Table 1**.
-    *   *Paragraph 2 (Ablation - newly fixed previously):* *Transition:* Is the PI-DNN really necessary? What if we just used a CNN on raw STFTs? We explain the CNN raw STFT baseline (which fails at $6.5^\circ$ error because it overfits the wall color) compared to our 1.4° error. This proves the "Physics-Informed" GCC extraction is vital.
+    *   *Paragraph 1:* Now quantify the error and algorithmic confidence. Reference **Table 1**, pointing out that traditional Mic-Mic SRP has a disastrous PSR (1.2dB), whereas the LDV Anchor restores it to a highly confident 8.5dB.
+    *   *Paragraph 2 (Ablation - newly fixed previously):* *Transition:* Is the PI-DNN really necessary? What if we just used a CNN on raw STFTs? We explain the CNN raw STFT baseline (which fails at $6.5^\circ$ error because the dual-objective mapping of deconvolving the wall transfer function while estimating angle is ill-posed) compared to our 1.4° error. This proves the "Physics-Informed" GCC extraction is vital.
 *   **5.3 Defeating the "Confidently Wrong" Phenomenon:**
     *   *Paragraph 1:* The ultimate test: the Jammer scenario. Reference **Figure 4 (The P_CW curve)**.
     *   *Paragraph 2:* Walk the reviewer through the graph. Point out how the Mic-only curve spikes to 95% error at negative SJRs, while the LDV-Mic PI-DNN curve stays pinned to the floor. *Transition:* Reiterate that the CNN (Raw STFT) baseline also struggles here (the middle curve in Fig 4), cementing our exact design choice.

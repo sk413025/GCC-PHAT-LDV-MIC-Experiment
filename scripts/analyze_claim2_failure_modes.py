@@ -335,12 +335,42 @@ def replay_mic_corruption(
         )
         cm_record = {"enabled": True, "noise_center_sec": float(nccm), "diag": diag_cm}
 
+    cd = corr.get("delayed_coherent_interference", None)
+    cd_record = None
+    if isinstance(cd, dict) and bool(cd.get("enabled", False)):
+        nccd = float(cd["noise_center_sec"])
+        noise_cd = extract_centered_window(
+            micl_full.astype(np.float32, copy=False), fs=int(fs), center_sec=float(nccd), window_sec=float(WINDOW_SEC)
+        ).astype(np.float64, copy=False)
+        cfg = mic_corrupt_mod.DelayedCoherentInterferenceConfig(
+            snr_db=float(cd.get("snr_target_db", cd.get("snr_db"))),
+            band_lo_hz=float(cd.get("diag", {}).get("band_lo_hz", BAND_LO_HZ)),
+            band_hi_hz=float(cd.get("diag", {}).get("band_hi_hz", BAND_HI_HZ)),
+            delay_ms=float(cd.get("delay_ms", 0.0)),
+            target_delayed=str(cd.get("target_delayed", "micr")),
+            seed=int(cd.get("seed", 0)),
+        )
+        (sigL_mix, sigR_mix), diag_cd = mic_corrupt_mod.add_delayed_coherent_interference(
+            sigL_mix,
+            sigR_mix,
+            noise_cd,
+            cfg=cfg,
+            fs=int(fs),
+            signal_for_alpha=micl_clean.astype(np.float64, copy=False),
+        )
+        cd_record = {"enabled": True, "noise_center_sec": float(nccd), "diag": diag_cd}
+
     enabled = bool(corr.get("enabled", False))
     if not enabled:
         return (
             sigL_mix.astype(np.float64, copy=False),
             sigR_mix.astype(np.float64, copy=False),
-            {"enabled": False, "occlusion": occl, "common_mode_interference": cm_record},
+            {
+                "enabled": False,
+                "occlusion": occl,
+                "common_mode_interference": cm_record,
+                "delayed_coherent_interference": cd_record,
+            },
         )
 
     ncl = float(corr["noise_center_sec_L"])
@@ -391,6 +421,7 @@ def replay_mic_corruption(
             "noise_center_sec_L": float(ncl),
             "noise_center_sec_R": float(ncr),
             "common_mode_interference": cm_record,
+            "delayed_coherent_interference": cd_record,
             "occlusion": occl,
             "micl": diagL,
             "micr": diagR,

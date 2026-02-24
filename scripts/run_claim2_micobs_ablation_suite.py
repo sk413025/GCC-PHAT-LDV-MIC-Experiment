@@ -124,6 +124,26 @@ def run_cmd(cmd: list[str], *, cwd: Path) -> None:
     subprocess.run(cmd, cwd=str(cwd), check=True)
 
 
+def teacher_artifacts_exist(teacher_dir: Path, speakers: list[str]) -> bool:
+    npz = teacher_dir / "teacher_trajectories.npz"
+    per_speaker = teacher_dir / "per_speaker"
+    if not npz.exists() or not per_speaker.exists():
+        return False
+    for spk in speakers:
+        if not (per_speaker / spk / "windows.jsonl").exists():
+            return False
+    return True
+
+
+def student_artifacts_exist(student_dir: Path) -> bool:
+    # Require summary.json as a completion marker (test_windows/model can exist mid-run).
+    return (
+        (student_dir / "summary.json").exists()
+        and (student_dir / "test_windows.jsonl").exists()
+        and (student_dir / "model_dtmin_band_policy_k6.npz").exists()
+    )
+
+
 def assert_np_equal(a: np.ndarray, b: np.ndarray, *, name: str) -> None:
     if not np.array_equal(a, b):
         diff = int(np.sum(a != b))
@@ -322,6 +342,103 @@ def main() -> None:
         default=1337,
         help="Seed for deterministic common-mode interference noise selection. Default: 1337.",
     )
+    ap.add_argument(
+        "--cd_interf_enable",
+        type=int,
+        default=0,
+        choices=[0, 1],
+        help="Enable coherent interference with a fixed relative delay between mics (mic-only). Default: 0.",
+    )
+    ap.add_argument(
+        "--cd_interf_snr_db",
+        type=float,
+        default=None,
+        help="Target in-band SNR (dB) for delayed coherent interference (required if --cd_interf_enable=1).",
+    )
+    ap.add_argument(
+        "--cd_interf_delay_ms",
+        type=float,
+        default=0.0,
+        help="Relative delay (ms) applied to the interference on --cd_interf_target (integer-sample, zero-padded).",
+    )
+    ap.add_argument(
+        "--cd_interf_target",
+        type=str,
+        default="micr",
+        choices=["micl", "micr"],
+        help="Which mic receives the delayed interference copy. Default: micr.",
+    )
+    ap.add_argument(
+        "--cd_interf_seed",
+        type=int,
+        default=1337,
+        help="Seed for deterministic delayed-interference noise selection. Default: 1337.",
+    )
+    ap.add_argument("--include_stop_action", type=int, default=0, choices=[0, 1])
+    ap.add_argument("--stateful_obs_enable", type=int, default=0, choices=[0, 1])
+    ap.add_argument(
+        "--stop_target_frac_add",
+        type=float,
+        default=0.0,
+        help="Passed to train_dtmin_from_band_trajectories.py. If STOP is enabled, bias STOP slightly earlier by increasing the target STOP rate by this additive amount.",
+    )
+    ap.add_argument(
+        "--inference_psr_stop_enable",
+        type=int,
+        default=0,
+        choices=[0, 1],
+        help="Passed to train_dtmin_from_band_trajectories.py. If 1, apply inference-time PSR-monotone stopping for student-selected bands.",
+    )
+    ap.add_argument(
+        "--inference_psr_stop_min_gain_db",
+        type=float,
+        default=0.01,
+        help="Passed to train_dtmin_from_band_trajectories.py. Minimum guided-PSR improvement (dB) required to accept adding the next band when PSR stop is enabled.",
+    )
+    ap.add_argument(
+        "--inference_psr_stop_mode",
+        type=str,
+        default="monotone",
+        choices=["monotone", "best_prefix"],
+        help="Passed to train_dtmin_from_band_trajectories.py. PSR-stop mode when enabled. Default: monotone.",
+    )
+    ap.add_argument(
+        "--ldv_scale_mode",
+        type=str,
+        default="fixed",
+        choices=["fixed", "coh_gate", "tau_ref_ratio_gate"],
+        help="Passed to teacher_band_omp_micmic.py. LDV term scaling mode for obs_mode that include LDV. Default: fixed.",
+    )
+    ap.add_argument(
+        "--ldv_scale_fixed",
+        type=float,
+        default=1.0,
+        help="Passed to teacher_band_omp_micmic.py. Fixed LDV term scale when --ldv_scale_mode=fixed. Default: 1.0.",
+    )
+    ap.add_argument(
+        "--ldv_scale_coh_lo",
+        type=float,
+        default=0.05,
+        help="Passed to teacher_band_omp_micmic.py. Lower coherence bound for --ldv_scale_mode=coh_gate. Default: 0.05.",
+    )
+    ap.add_argument(
+        "--ldv_scale_coh_hi",
+        type=float,
+        default=0.20,
+        help="Passed to teacher_band_omp_micmic.py. Upper coherence bound for --ldv_scale_mode=coh_gate. Default: 0.20.",
+    )
+    ap.add_argument(
+        "--ldv_scale_ratio_lo",
+        type=float,
+        default=0.40,
+        help="Passed to teacher_band_omp_micmic.py. Lower guided/global peak ratio for --ldv_scale_mode=tau_ref_ratio_gate. Default: 0.40.",
+    )
+    ap.add_argument(
+        "--ldv_scale_ratio_hi",
+        type=float,
+        default=0.90,
+        help="Passed to teacher_band_omp_micmic.py. Upper guided/global peak ratio for --ldv_scale_mode=tau_ref_ratio_gate. Default: 0.90.",
+    )
     args = ap.parse_args()
 
     repo_root = Path(__file__).resolve().parents[1]
@@ -348,9 +465,28 @@ def main() -> None:
     cm_interf_enable = int(args.cm_interf_enable)
     cm_interf_snr_db = args.cm_interf_snr_db
     cm_interf_seed = int(args.cm_interf_seed)
+    cd_interf_enable = int(args.cd_interf_enable)
+    cd_interf_snr_db = args.cd_interf_snr_db
+    cd_interf_delay_ms = float(args.cd_interf_delay_ms)
+    cd_interf_target = str(args.cd_interf_target)
+    cd_interf_seed = int(args.cd_interf_seed)
+    include_stop_action = bool(int(args.include_stop_action))
+    stateful_obs_enable = bool(int(args.stateful_obs_enable))
+    stop_target_frac_add = float(args.stop_target_frac_add)
+    inference_psr_stop_enable = int(args.inference_psr_stop_enable)
+    inference_psr_stop_min_gain_db = float(args.inference_psr_stop_min_gain_db)
+    inference_psr_stop_mode = str(args.inference_psr_stop_mode)
+    ldv_scale_mode = str(args.ldv_scale_mode)
+    ldv_scale_fixed = float(args.ldv_scale_fixed)
+    ldv_scale_coh_lo = float(args.ldv_scale_coh_lo)
+    ldv_scale_coh_hi = float(args.ldv_scale_coh_hi)
+    ldv_scale_ratio_lo = float(args.ldv_scale_ratio_lo)
+    ldv_scale_ratio_hi = float(args.ldv_scale_ratio_hi)
 
     if bool(cm_interf_enable) and cm_interf_snr_db is None:
         raise ValueError("--cm_interf_snr_db is required when --cm_interf_enable=1")
+    if bool(cd_interf_enable) and cd_interf_snr_db is None:
+        raise ValueError("--cd_interf_snr_db is required when --cd_interf_enable=1")
 
     run_cfg = {
         "generated": datetime.now().isoformat(),
@@ -365,6 +501,24 @@ def main() -> None:
             "guided_radius_ms": 0.3,
             "max_lag_ms": 10.0,
         },
+        "trajectories": {
+            "include_stop_action": bool(include_stop_action),
+            "stateful_obs_enable": bool(stateful_obs_enable),
+            "stop_action_id": 64,
+            "n_actions": 65 if bool(include_stop_action) else 64,
+            "stop_target_frac_add": float(stop_target_frac_add),
+            "inference_psr_stop_enable": bool(int(inference_psr_stop_enable)),
+            "inference_psr_stop_min_gain_db": float(inference_psr_stop_min_gain_db),
+            "inference_psr_stop_mode": str(inference_psr_stop_mode),
+        },
+        "ldv_term_scaling": {
+            "mode": str(ldv_scale_mode),
+            "fixed": float(ldv_scale_fixed),
+            "coh_lo": float(ldv_scale_coh_lo),
+            "coh_hi": float(ldv_scale_coh_hi),
+            "ratio_lo": float(ldv_scale_ratio_lo),
+            "ratio_hi": float(ldv_scale_ratio_hi),
+        },
         "coupling_mode": COUPLING_MODE,
         "coupling_hard_forbid_enable": bool(coupling_hard_forbid_enable),
         "dynamic_coh_gate_enable": bool(dynamic_coh_gate_enable),
@@ -375,6 +529,14 @@ def main() -> None:
             "enabled": bool(cm_interf_enable),
             "snr_db": None if cm_interf_snr_db is None else float(cm_interf_snr_db),
             "seed": int(cm_interf_seed),
+            "band_hz": [500.0, 2000.0],
+        },
+        "delayed_coherent_interference": {
+            "enabled": bool(cd_interf_enable),
+            "snr_db": None if cd_interf_snr_db is None else float(cd_interf_snr_db),
+            "delay_ms": float(cd_interf_delay_ms),
+            "target_delayed": str(cd_interf_target),
+            "seed": int(cd_interf_seed),
             "band_hz": [500.0, 2000.0],
         },
         "corruption": {
@@ -394,63 +556,92 @@ def main() -> None:
     for obs_mode in OBS_MODES:
         tdir = out_dir / "teacher" / obs_mode
         teacher_dirs[obs_mode] = tdir
-        cmd = [
-            sys.executable,
-            "-u",
-            "scripts/teacher_band_omp_micmic.py",
-            "--data_root",
-            str(data_root),
-            "--truth_ref_root",
-            str(truth_ref_root),
-            "--out_dir",
-            str(tdir),
-            "--speakers",
-            *speakers,
-            "--obs_mode",
-            obs_mode,
-            "--coupling_mode",
-            COUPLING_MODE,
-            "--coupling_hard_forbid_enable",
-            str(int(coupling_hard_forbid_enable)),
-            "--dynamic_coh_gate_enable",
-            str(int(dynamic_coh_gate_enable)),
-            "--dynamic_coh_min",
-            str(float(dynamic_coh_min)),
-            "--tau_ref_gate_enable",
-            str(int(tau_ref_gate_enable)),
-            "--tau_ref_gate_ratio_min",
-            str(float(tau_ref_gate_ratio_min)),
-            "--cm_interf_enable",
-            str(int(cm_interf_enable)),
-            "--cm_interf_snr_db",
-            str(float(cm_interf_snr_db)) if cm_interf_snr_db is not None else "0.0",
-            "--cm_interf_seed",
-            str(int(cm_interf_seed)),
-            "--corrupt_enable",
-            "1",
-            "--corrupt_snr_db",
-            str(float(SNR_DB)),
-            "--corrupt_seed",
-            str(int(CORRUPT_SEED)),
-            "--preclip_gain",
-            str(float(PRECLIP_GAIN)),
-            "--clip_limit",
-            str(float(CLIP_LIMIT)),
-            "--occlusion_enable",
-            str(int(OCCLUSION["occlusion_enable"])),
-            "--occlusion_target",
-            str(OCCLUSION["occlusion_target"]),
-            "--occlusion_kind",
-            str(OCCLUSION["occlusion_kind"]),
-            "--occlusion_lowpass_hz",
-            str(float(OCCLUSION["occlusion_lowpass_hz"])),
-            "--occlusion_tilt_k",
-            str(float(OCCLUSION["occlusion_tilt_k"])),
-            "--occlusion_tilt_pivot_hz",
-            str(float(OCCLUSION["occlusion_tilt_pivot_hz"])),
-            *teacher_center_overrides,
-        ]
-        run_cmd(cmd, cwd=repo_root)
+        if teacher_artifacts_exist(tdir, speakers):
+            logger.info("Teacher artifacts exist for obs_mode=%s; skipping teacher run.", obs_mode)
+        else:
+            cmd = [
+                sys.executable,
+                "-u",
+                "scripts/teacher_band_omp_micmic.py",
+                "--data_root",
+                str(data_root),
+                "--truth_ref_root",
+                str(truth_ref_root),
+                "--out_dir",
+                str(tdir),
+                "--speakers",
+                *speakers,
+                "--obs_mode",
+                obs_mode,
+                "--include_stop_action",
+                str(int(include_stop_action)),
+                "--stateful_obs_enable",
+                str(int(stateful_obs_enable)),
+                "--ldv_scale_mode",
+                str(ldv_scale_mode),
+                "--ldv_scale_fixed",
+                str(float(ldv_scale_fixed)),
+                "--ldv_scale_coh_lo",
+                str(float(ldv_scale_coh_lo)),
+                "--ldv_scale_coh_hi",
+                str(float(ldv_scale_coh_hi)),
+                "--ldv_scale_ratio_lo",
+                str(float(ldv_scale_ratio_lo)),
+                "--ldv_scale_ratio_hi",
+                str(float(ldv_scale_ratio_hi)),
+                "--coupling_mode",
+                COUPLING_MODE,
+                "--coupling_hard_forbid_enable",
+                str(int(coupling_hard_forbid_enable)),
+                "--dynamic_coh_gate_enable",
+                str(int(dynamic_coh_gate_enable)),
+                "--dynamic_coh_min",
+                str(float(dynamic_coh_min)),
+                "--tau_ref_gate_enable",
+                str(int(tau_ref_gate_enable)),
+                "--tau_ref_gate_ratio_min",
+                str(float(tau_ref_gate_ratio_min)),
+                "--cm_interf_enable",
+                str(int(cm_interf_enable)),
+                "--cm_interf_snr_db",
+                str(float(cm_interf_snr_db)) if cm_interf_snr_db is not None else "0.0",
+                "--cm_interf_seed",
+                str(int(cm_interf_seed)),
+                "--cd_interf_enable",
+                str(int(cd_interf_enable)),
+                "--cd_interf_snr_db",
+                str(float(cd_interf_snr_db)) if cd_interf_snr_db is not None else "0.0",
+                "--cd_interf_delay_ms",
+                str(float(cd_interf_delay_ms)),
+                "--cd_interf_target",
+                str(cd_interf_target),
+                "--cd_interf_seed",
+                str(int(cd_interf_seed)),
+                "--corrupt_enable",
+                "1",
+                "--corrupt_snr_db",
+                str(float(SNR_DB)),
+                "--corrupt_seed",
+                str(int(CORRUPT_SEED)),
+                "--preclip_gain",
+                str(float(PRECLIP_GAIN)),
+                "--clip_limit",
+                str(float(CLIP_LIMIT)),
+                "--occlusion_enable",
+                str(int(OCCLUSION["occlusion_enable"])),
+                "--occlusion_target",
+                str(OCCLUSION["occlusion_target"]),
+                "--occlusion_kind",
+                str(OCCLUSION["occlusion_kind"]),
+                "--occlusion_lowpass_hz",
+                str(float(OCCLUSION["occlusion_lowpass_hz"])),
+                "--occlusion_tilt_k",
+                str(float(OCCLUSION["occlusion_tilt_k"])),
+                "--occlusion_tilt_pivot_hz",
+                str(float(OCCLUSION["occlusion_tilt_pivot_hz"])),
+                *teacher_center_overrides,
+            ]
+            run_cmd(cmd, cwd=repo_root)
 
     # 2) Teacher identity checks
     ref_npz = teacher_dirs[OBS_MODES[0]] / "teacher_trajectories.npz"
@@ -461,6 +652,7 @@ def main() -> None:
     ref_ncl = ref["noise_center_sec_L"]
     ref_ncr = ref["noise_center_sec_R"]
     ref_cm = ref["cm_noise_center_sec"] if "cm_noise_center_sec" in ref else None
+    ref_cd = ref["cd_noise_center_sec"] if "cd_noise_center_sec" in ref else None
     ref_forbid = ref["forbidden_mask"]
 
     teacher_identity: dict[str, Any] = {
@@ -475,6 +667,8 @@ def main() -> None:
         assert_np_equal(ref_ncr, d["noise_center_sec_R"], name=f"noise_center_sec_R ({obs_mode})")
         if ref_cm is not None:
             assert_np_equal(ref_cm, d["cm_noise_center_sec"], name=f"cm_noise_center_sec ({obs_mode})")
+        if ref_cd is not None:
+            assert_np_equal(ref_cd, d["cd_noise_center_sec"], name=f"cd_noise_center_sec ({obs_mode})")
         assert_np_equal(ref_forbid, d["forbidden_mask"], name=f"forbidden_mask ({obs_mode})")
         teacher_identity["checks"][obs_mode] = {"ok": True, "npz": str(npz)}
     write_json(out_dir / "teacher_identity.json", teacher_identity)
@@ -485,23 +679,34 @@ def main() -> None:
         sdir = out_dir / "student" / obs_mode
         student_dirs[obs_mode] = sdir
         traj = teacher_dirs[obs_mode] / "teacher_trajectories.npz"
-        cmd = [
-            sys.executable,
-            "-u",
-            "scripts/train_dtmin_from_band_trajectories.py",
-            "--traj_path",
-            str(traj),
-            "--data_root",
-            str(data_root),
-            "--truth_ref_root",
-            str(truth_ref_root),
-            "--out_dir",
-            str(sdir),
-            "--use_traj_corruption",
-            "1",
-            *student_split_overrides,
-        ]
-        run_cmd(cmd, cwd=repo_root)
+        if student_artifacts_exist(sdir):
+            logger.info("Student artifacts exist for obs_mode=%s; skipping student run.", obs_mode)
+        else:
+            cmd = [
+                sys.executable,
+                "-u",
+                "scripts/train_dtmin_from_band_trajectories.py",
+                "--traj_path",
+                str(traj),
+                "--data_root",
+                str(data_root),
+                "--truth_ref_root",
+                str(truth_ref_root),
+                "--out_dir",
+                str(sdir),
+                "--use_traj_corruption",
+                "1",
+                "--stop_target_frac_add",
+                str(stop_target_frac_add),
+                "--inference_psr_stop_enable",
+                str(int(inference_psr_stop_enable)),
+                "--inference_psr_stop_min_gain_db",
+                str(float(inference_psr_stop_min_gain_db)),
+                "--inference_psr_stop_mode",
+                str(inference_psr_stop_mode),
+                *student_split_overrides,
+            ]
+            run_cmd(cmd, cwd=repo_root)
 
     # 4) Metrics + report
     metrics: dict[str, Any] = {"generated": datetime.now().isoformat(), "out_dir": str(out_dir), "variants": {}}

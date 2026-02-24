@@ -63,8 +63,10 @@ try:
     # When executed as a script: `python scripts/train_dtmin_from_band_trajectories.py`
     from mic_corruption import (  # type: ignore
         CommonModeInterferenceConfig,
+        DelayedCoherentInterferenceConfig,
         MicCorruptionConfig,
         add_common_mode_interference,
+        add_delayed_coherent_interference,
         apply_mic_corruption,
         apply_occlusion_fft,
     )
@@ -72,8 +74,10 @@ except ImportError:  # pragma: no cover
     # When imported from repo root: `import scripts.train_dtmin_from_band_trajectories`
     from scripts.mic_corruption import (  # type: ignore
         CommonModeInterferenceConfig,
+        DelayedCoherentInterferenceConfig,
         MicCorruptionConfig,
         add_common_mode_interference,
+        add_delayed_coherent_interference,
         apply_mic_corruption,
         apply_occlusion_fft,
     )
@@ -349,14 +353,24 @@ def predict_sequence(
     centroids: np.ndarray,
     action_valid: np.ndarray,
     forbidden_mask: np.ndarray,
+    stop_action_id: int | None = None,
+    stop_preference_delta: np.ndarray | None = None,
 ) -> list[int]:
     """
-    Stop-early policy:
-    - If predicted action is forbidden or already selected, stop (do not search fallback).
-    - If no valid actions exist for a step, stop.
+    Predict a variable-length band set with optional STOP action.
+
+    Selection rule (fail-fast, no fallbacks outside the action set):
+    - Evaluate distances to all valid action centroids for each step.
+    - Choose the closest *allowed* band action, skipping forbidden/already-selected bands.
+    - If STOP is enabled and sufficiently close to the best-allowed band (per step delta),
+      stop early.
+    - If no allowed band actions exist for a step, stop.
     """
     horizon, n_actions, dim = centroids.shape
     assert obs_kb.shape == (horizon, dim)
+    if stop_preference_delta is not None:
+        if stop_preference_delta.shape != (horizon,):
+            raise ValueError(f"stop_preference_delta must have shape ({horizon},), got {stop_preference_delta.shape}")
     selected: list[int] = []
     for step_idx in range(horizon):
         if not np.any(action_valid[step_idx]):
@@ -365,13 +379,111 @@ def predict_sequence(
         diffs = centroids[step_idx] - o[None, :]
         d2 = np.sum(diffs * diffs, axis=1)  # (n_actions,)
         d2 = np.where(action_valid[step_idx], d2, np.inf)
-        a = int(np.argmin(d2))
-        if not np.isfinite(d2[a]):
+
+        # Identify best-allowed band candidate (skip forbidden/already-selected).
+        order = np.argsort(d2)
+        best_band: int | None = None
+        best_band_d2: float | None = None
+        for a in order:
+            if not np.isfinite(d2[a]):
+                break
+            a = int(a)
+            if stop_action_id is not None and int(a) == int(stop_action_id):
+                continue
+            if a < 0 or a >= int(forbidden_mask.size):
+                continue
+            if bool(forbidden_mask[a]) or a in selected:
+                continue
+            best_band = a
+            best_band_d2 = float(d2[a])
             break
-        if bool(forbidden_mask[a]) or a in selected:
+
+        if best_band is None or best_band_d2 is None:
             break
-        selected.append(a)
+
+        # Optional STOP preference: stop if STOP is close to the best allowed band.
+        if stop_action_id is not None and stop_preference_delta is not None:
+            if action_valid[step_idx, stop_action_id]:
+                d2_stop = float(d2[int(stop_action_id)])
+                if np.isfinite(d2_stop):
+                    delta = float(stop_preference_delta[step_idx])
+                    if d2_stop <= best_band_d2 + delta:
+                        break
+
+        selected.append(int(best_band))
     return selected
+
+
+def calibrate_stop_preference_delta(
+    *,
+    observations: np.ndarray,
+    actions: np.ndarray,
+    valid_len: np.ndarray,
+    centroids: np.ndarray,
+    action_valid: np.ndarray,
+    stop_action_id: int,
+    stop_target_frac_add: float = 0.0,
+) -> np.ndarray:
+    """
+    Calibrate a per-step STOP preference delta so that the *frequency* of STOP decisions
+    roughly matches the teacher on the training split.
+
+    Rule: stop if d2(stop) <= d2(best_nonstop) + delta[step].
+    """
+    horizon, n_actions, dim = centroids.shape
+    if observations.shape[1] != horizon or observations.shape[2] != dim:
+        raise ValueError(f"observations shape mismatch: {observations.shape} vs ({observations.shape[0]},{horizon},{dim})")
+    if actions.shape[1] != horizon:
+        raise ValueError(f"actions shape mismatch: {actions.shape}")
+    if int(stop_action_id) < 0 or int(stop_action_id) >= int(n_actions):
+        raise ValueError(f"Invalid stop_action_id={stop_action_id} for n_actions={n_actions}")
+    deltas = np.zeros((horizon,), dtype=np.float32)
+
+    for step_idx in range(horizon):
+        step_mask = valid_len > step_idx
+        if not np.any(step_mask):
+            deltas[step_idx] = 0.0
+            continue
+        if not bool(action_valid[step_idx, stop_action_id]):
+            # No STOP examples at this step; discourage STOP.
+            deltas[step_idx] = -1e6
+            continue
+
+        obs_step = observations[step_mask, step_idx, :].astype(np.float32, copy=False)
+        act_step = actions[step_mask, step_idx].astype(np.int32, copy=False)
+
+        # Compute d2 to STOP and to the best non-STOP action for each sample.
+        diffs = centroids[step_idx][None, :, :] - obs_step[:, None, :]
+        d2_all = np.sum(diffs * diffs, axis=2)  # (Ns, n_actions)
+        valid_actions = action_valid[step_idx].astype(bool, copy=False)
+        d2_all = np.where(valid_actions[None, :], d2_all, np.inf)
+
+        d2_stop = d2_all[:, int(stop_action_id)]
+        # Best non-stop
+        d2_nonstop = d2_all.copy()
+        d2_nonstop[:, int(stop_action_id)] = np.inf
+        d2_best = np.min(d2_nonstop, axis=1)
+
+        finite = np.isfinite(d2_stop) & np.isfinite(d2_best)
+        if not np.any(finite):
+            deltas[step_idx] = -1e6
+            continue
+
+        diff = (d2_stop[finite] - d2_best[finite]).astype(np.float64)
+        target_frac = float(np.mean(act_step[finite] == int(stop_action_id)))
+        target_frac = float(np.clip(target_frac + float(stop_target_frac_add), 0.0, 1.0))
+
+        if target_frac <= 0.0:
+            deltas[step_idx] = float(np.min(diff) - 1e-6)
+            continue
+        if target_frac >= 1.0:
+            deltas[step_idx] = float(np.max(diff) + 1e-6)
+            continue
+
+        q = float(np.clip(target_frac * 100.0, 0.0, 100.0))
+        deltas[step_idx] = float(np.percentile(diff, q))
+
+    return deltas.astype(np.float32, copy=False)
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -420,11 +532,49 @@ def main() -> None:
         choices=[0, 1],
         help="If 1, apply mic corruption as specified by the trajectory NPZ (Claim-2). Default: 1.",
     )
+    parser.add_argument(
+        "--stop_to_teacher_valid_len",
+        type=int,
+        default=0,
+        choices=[0, 1],
+        help="If 1, truncate the student's selected band sequence to the teacher's valid_len per sample (analysis-only).",
+    )
+    parser.add_argument(
+        "--stop_target_frac_add",
+        type=float,
+        default=0.0,
+        help="If STOP is enabled, increase the per-step teacher STOP rate target by this additive amount when calibrating stop_preference_delta. Default: 0.0.",
+    )
+    parser.add_argument(
+        "--inference_psr_stop_enable",
+        type=int,
+        default=0,
+        choices=[0, 1],
+        help="If 1, apply a truth-free inference-time filter: stop adding bands if the guided PSR does not improve. Default: 0.",
+    )
+    parser.add_argument(
+        "--inference_psr_stop_min_gain_db",
+        type=float,
+        default=0.01,
+        help="Minimum guided-PSR improvement (dB) required to accept adding the next band when --inference_psr_stop_enable=1. Default: 0.01.",
+    )
+    parser.add_argument(
+        "--inference_psr_stop_mode",
+        type=str,
+        default="monotone",
+        choices=["monotone", "best_prefix"],
+        help="PSR-based selection mode when --inference_psr_stop_enable=1. monotone: stop on first non-improving step. best_prefix: choose prefix that maximizes PSR. Default: monotone.",
+    )
     args = parser.parse_args()
 
     out_dir = Path(args.out_dir)
     use_traj_corruption = bool(int(args.use_traj_corruption))
+    stop_to_teacher_valid_len = bool(int(args.stop_to_teacher_valid_len))
     train_max_center_sec = float(args.train_max_center_sec)
+    stop_target_frac_add = float(args.stop_target_frac_add)
+    inference_psr_stop_enable = bool(int(args.inference_psr_stop_enable))
+    inference_psr_stop_min_gain_db = float(args.inference_psr_stop_min_gain_db)
+    inference_psr_stop_mode = str(args.inference_psr_stop_mode)
     configure_logging(out_dir)
     write_code_state(out_dir, Path(__file__))
 
@@ -437,13 +587,20 @@ def main() -> None:
     center_sec = payload["center_sec"].astype(np.float64, copy=False)
     forbidden_mask = payload["forbidden_mask"].astype(bool, copy=False)  # (N, B)
     edges_hz = payload["band_edges_hz"].astype(np.float64, copy=False)
+    stop_action_id = None
+    n_actions = None
+    if "stop_action_id" in payload and "n_actions" in payload:
+        stop_action_id = int(payload["stop_action_id"].item())
+        n_actions = int(payload["n_actions"].item())
 
     noise_center_sec_L = None
     noise_center_sec_R = None
     cm_noise_center_sec = None
+    cd_noise_center_sec = None
     corruption_cfg = None
     occlusion_cfg = None
     cm_interf_cfg = None
+    cd_interf_cfg = None
     if use_traj_corruption:
         required = ["noise_center_sec_L", "noise_center_sec_R", "corruption_config_json"]
         missing = [k for k in required if k not in payload]
@@ -456,6 +613,8 @@ def main() -> None:
         noise_center_sec_R = payload["noise_center_sec_R"].astype(np.float64, copy=False)
         if "cm_noise_center_sec" in payload:
             cm_noise_center_sec = payload["cm_noise_center_sec"].astype(np.float64, copy=False)
+        if "cd_noise_center_sec" in payload:
+            cd_noise_center_sec = payload["cd_noise_center_sec"].astype(np.float64, copy=False)
         cfg_json = str(payload["corruption_config_json"].item())
         if cfg_json.strip():
             cfg_payload = json.loads(cfg_json)
@@ -481,17 +640,47 @@ def main() -> None:
                     seed=int(cm_payload.get("seed", 0)),
                 )
 
+            cd_payload = cfg_payload.get("delayed_coherent_interference", None)
+            if isinstance(cd_payload, dict) and bool(cd_payload.get("enabled", False)):
+                if cd_noise_center_sec is None:
+                    raise ValueError("Trajectory NPZ missing cd_noise_center_sec for enabled delayed coherent interference")
+                if cd_payload.get("snr_db", None) is None:
+                    raise ValueError("delayed_coherent_interference.snr_db is required when enabled")
+                cd_interf_cfg = DelayedCoherentInterferenceConfig(
+                    snr_db=float(cd_payload["snr_db"]),
+                    band_lo_hz=float(cd_payload.get("band_lo_hz", BAND_HZ[0])),
+                    band_hi_hz=float(cd_payload.get("band_hi_hz", BAND_HZ[1])),
+                    delay_ms=float(cd_payload.get("delay_ms", 0.0)),
+                    target_delayed=str(cd_payload.get("target_delayed", "micr")),
+                    seed=int(cd_payload.get("seed", 0)),
+                )
+
     if observations.ndim != 3:
         raise ValueError(f"Expected observations (N,K,B), got shape={observations.shape}")
-    N, K, B = observations.shape
-    if B != int(len(edges_hz) - 1):
-        raise ValueError(f"B mismatch: observations B={B}, edges={len(edges_hz)-1}")
+    N, K, obs_dim = observations.shape
+    B_bands = int(len(edges_hz) - 1)
+    if B_bands <= 0:
+        raise ValueError("Invalid band_edges_hz (need >=2 edges)")
+    if forbidden_mask.shape != (N, B_bands):
+        raise ValueError(f"forbidden_mask shape {forbidden_mask.shape} != {(N, B_bands)}")
+    if n_actions is None:
+        n_actions = int(B_bands)
+    if stop_action_id is None:
+        stop_action_id = int(B_bands) if int(n_actions) == int(B_bands + 1) else None
+    if stop_action_id is not None:
+        if int(n_actions) != int(B_bands + 1) or int(stop_action_id) != int(B_bands):
+            raise ValueError(f"Inconsistent stop action config: B={B_bands}, n_actions={n_actions}, stop_action_id={stop_action_id}")
     if actions.shape != (N, K):
         raise ValueError(f"actions shape {actions.shape} != {(N, K)}")
-    if forbidden_mask.shape != (N, B):
-        raise ValueError(f"forbidden_mask shape {forbidden_mask.shape} != {(N, B)}")
 
-    logger.info("Dataset: N=%d, horizon=%d, bands=%d", N, K, B)
+    # Validate action range
+    act = actions.astype(np.int32, copy=False)
+    ok = (act == -1) | ((act >= 0) & (act < int(n_actions)))
+    if not bool(np.all(ok)):
+        bad = int(np.sum(~ok))
+        raise ValueError(f"Actions out of range: n_actions={n_actions}, bad_count={bad}")
+
+    logger.info("Dataset: N=%d, horizon=%d, bands=%d, obs_dim=%d, n_actions=%d", N, K, B_bands, obs_dim, int(n_actions))
 
     # Train/test split (per speaker, time-based)
     train_mask = center_sec <= float(train_max_center_sec)
@@ -501,8 +690,20 @@ def main() -> None:
     logger.info("Train: %d samples, Test: %d samples", int(np.sum(train_mask)), int(np.sum(test_mask)))
 
     centroids, action_valid, action_counts = train_nearest_centroid(
-        observations[train_mask], actions[train_mask], valid_len[train_mask], horizon=K, n_actions=B
+        observations[train_mask], actions[train_mask], valid_len[train_mask], horizon=K, n_actions=int(n_actions)
     )
+
+    stop_preference_delta = None
+    if stop_action_id is not None:
+        stop_preference_delta = calibrate_stop_preference_delta(
+            observations=observations[train_mask],
+            actions=actions[train_mask],
+            valid_len=valid_len[train_mask],
+            centroids=centroids,
+            action_valid=action_valid,
+            stop_action_id=int(stop_action_id),
+            stop_target_frac_add=stop_target_frac_add,
+        )
 
     model_path = out_dir / f"model_dtmin_band_policy_k{K}.npz"
     metadata = {
@@ -510,7 +711,14 @@ def main() -> None:
         "traj_path": str(traj_path),
         "n_samples": int(N),
         "horizon": int(K),
-        "n_actions": int(B),
+        "n_bands": int(B_bands),
+        "n_actions": int(n_actions),
+        "stop_action_id": None if stop_action_id is None else int(stop_action_id),
+        "stop_target_frac_add": float(stop_target_frac_add),
+        "stop_preference_delta": None if stop_preference_delta is None else stop_preference_delta.tolist(),
+        "inference_psr_stop_enable": bool(inference_psr_stop_enable),
+        "inference_psr_stop_min_gain_db": float(inference_psr_stop_min_gain_db),
+        "inference_psr_stop_mode": str(inference_psr_stop_mode),
         "model_type": "nearest_centroid_stepwise",
         "train_max_center_sec": float(train_max_center_sec),
     }
@@ -520,6 +728,7 @@ def main() -> None:
         action_valid=action_valid,
         action_counts=action_counts,
         band_edges_hz=edges_hz,
+        stop_preference_delta=(np.array([], dtype=np.float32) if stop_preference_delta is None else stop_preference_delta),
         metadata_json=json.dumps(metadata),
     )
     write_json(
@@ -645,6 +854,32 @@ def main() -> None:
                         "diag": diag_cm,
                     }
 
+                cd_record = None
+                if cd_interf_cfg is not None:
+                    assert cd_noise_center_sec is not None
+                    nccd = float(cd_noise_center_sec[i])
+                    if not np.isfinite(nccd):
+                        raise ValueError("Non-finite cd_noise_center_sec for enabled delayed coherent interference")
+                    noise_cd = extract_centered_window(micl, fs=FS_EXPECTED, center_sec=nccd, window_sec=WINDOW_SEC).astype(
+                        np.float64, copy=False
+                    )
+                    (sig_l_mix, sig_r_mix), diag_cd = add_delayed_coherent_interference(
+                        sig_l_mix,
+                        sig_r_mix,
+                        noise_cd,
+                        cfg=cd_interf_cfg,
+                        fs=FS_EXPECTED,
+                        signal_for_alpha=seg_l,
+                    )
+                    cd_record = {
+                        "enabled": True,
+                        "noise_center_sec": float(nccd),
+                        "snr_target_db": float(cd_interf_cfg.snr_db),
+                        "delay_ms": float(cd_interf_cfg.delay_ms),
+                        "target_delayed": str(cd_interf_cfg.target_delayed),
+                        "diag": diag_cd,
+                    }
+
                 seg_l, diag_l = apply_mic_corruption(
                     seg_l,
                     noise_l,
@@ -667,6 +902,7 @@ def main() -> None:
                     "noise_center_sec_R": ncr,
                     "occlusion": occlusion_cfg,
                     "common_mode_interference": cm_record,
+                    "delayed_coherent_interference": cd_record,
                     "micl": diag_l,
                     "micr": diag_r,
                 }
@@ -703,7 +939,78 @@ def main() -> None:
                 centroids=centroids,
                 action_valid=action_valid,
                 forbidden_mask=forbid,
+                stop_action_id=stop_action_id,
+                stop_preference_delta=stop_preference_delta,
             )
+            if stop_to_teacher_valid_len:
+                k_stop = int(valid_len[i])
+                if k_stop < 0:
+                    raise ValueError(f"Invalid teacher valid_len at i={i}: {k_stop}")
+                selected = list(selected[:k_stop])
+
+            if inference_psr_stop_enable and selected:
+                if inference_psr_stop_mode == "monotone":
+                    spec_sum = np.zeros_like(R_phat, dtype=np.complex128)
+                    kept: list[int] = []
+                    prev_psr = -1e9
+                    for b in selected:
+                        b = int(b)
+                        bm = band_masks_fft[b].astype(np.float64, copy=False)
+                        spec_sum = spec_sum + (R_phat * bm).astype(np.complex128, copy=False)
+                        k_sel = float(len(kept) + 1)
+                        spec_mean = spec_sum / k_sel
+                        cc_tmp = ccwin_from_spectrum(
+                            spec_mean.astype(np.complex128, copy=False), n_fft=n_fft, max_shift=max_shift
+                        )
+                        tp_tmp = estimate_tau_psr_from_ccwin(
+                            cc_tmp,
+                            fs=FS_EXPECTED,
+                            max_shift=max_shift,
+                            guided_tau_sec=guided_tau_sec,
+                            guided_radius_sec=guided_radius_sec,
+                            psr_exclude_samples=int(PSR_EXCLUDE_SAMPLES),
+                        )
+                        if float(tp_tmp.psr_db) < float(prev_psr) + float(inference_psr_stop_min_gain_db):
+                            break
+                        kept.append(int(b))
+                        prev_psr = float(tp_tmp.psr_db)
+                    selected = kept
+                elif inference_psr_stop_mode == "best_prefix":
+                    # Choose the prefix length that maximizes guided PSR.
+                    spec_sum = np.zeros_like(R_phat, dtype=np.complex128)
+                    prefixes: list[list[int]] = []
+                    psr_vals: list[float] = []
+                    kept: list[int] = []
+                    for b in selected:
+                        b = int(b)
+                        bm = band_masks_fft[b].astype(np.float64, copy=False)
+                        spec_sum = spec_sum + (R_phat * bm).astype(np.complex128, copy=False)
+                        k_sel = float(len(kept) + 1)
+                        spec_mean = spec_sum / k_sel
+                        cc_tmp = ccwin_from_spectrum(
+                            spec_mean.astype(np.complex128, copy=False), n_fft=n_fft, max_shift=max_shift
+                        )
+                        tp_tmp = estimate_tau_psr_from_ccwin(
+                            cc_tmp,
+                            fs=FS_EXPECTED,
+                            max_shift=max_shift,
+                            guided_tau_sec=guided_tau_sec,
+                            guided_radius_sec=guided_radius_sec,
+                            psr_exclude_samples=int(PSR_EXCLUDE_SAMPLES),
+                        )
+                        kept.append(int(b))
+                        prefixes.append(list(kept))
+                        psr_vals.append(float(tp_tmp.psr_db))
+                    if not psr_vals:
+                        selected = []
+                    else:
+                        best_idx = int(np.argmax(np.asarray(psr_vals, dtype=np.float64)))
+                        if best_idx > 0 and (psr_vals[best_idx] - psr_vals[0]) < float(inference_psr_stop_min_gain_db):
+                            selected = prefixes[0]
+                        else:
+                            selected = prefixes[best_idx]
+                else:
+                    raise ValueError(f"Unknown inference_psr_stop_mode: {inference_psr_stop_mode}")
 
             if selected:
                 mask_sel = np.mean(band_masks_fft[np.asarray(selected, dtype=np.int32)], axis=0)
@@ -789,6 +1096,7 @@ def main() -> None:
         "generated": datetime.now().isoformat(),
         "run_dir": str(out_dir),
         "acceptance": win,
+        "stop_to_teacher_valid_len": bool(stop_to_teacher_valid_len),
         "corruption": {
             "use_traj_corruption": bool(use_traj_corruption),
             "config": None

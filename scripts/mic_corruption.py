@@ -49,6 +49,50 @@ class CommonModeInterferenceConfig:
         return asdict(self)
 
 
+@dataclass(frozen=True)
+class DelayedCoherentInterferenceConfig:
+    """
+    Coherent interference injected into both mics, but with a fixed relative delay.
+
+    This models a coherent competitor that is highly correlated across microphones
+    but has a nonzero TDOA, potentially biasing GCC-PHAT toward a wrong delay while
+    keeping coherence high.
+    """
+
+    snr_db: float
+    band_lo_hz: float
+    band_hi_hz: float
+    delay_ms: float
+    target_delayed: str  # "micl" or "micr"
+    seed: int
+
+    def to_jsonable(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+def shift_zeropad(x: np.ndarray, shift_samples: int) -> np.ndarray:
+    """
+    Shift a signal by an integer number of samples using zero padding (no wrap-around).
+
+    - shift_samples > 0: delay (shift right)
+    - shift_samples < 0: advance (shift left)
+    """
+    x = np.asarray(x, dtype=np.float64)
+    n = int(x.size)
+    s = int(shift_samples)
+    if s == 0:
+        return x.astype(np.float64, copy=False)
+    y = np.zeros((n,), dtype=np.float64)
+    if s > 0:
+        if s < n:
+            y[s:] = x[: n - s]
+    else:
+        s = -s
+        if s < n:
+            y[: n - s] = x[s:]
+    return y
+
+
 def bandpass_fft(x: np.ndarray, *, fs: int, lo_hz: float, hi_hz: float) -> np.ndarray:
     """
     Deterministic frequency-domain hard-mask bandpass.
@@ -185,6 +229,80 @@ def add_common_mode_interference(
         "snr_target_db": snr_db,
         "snr_achieved_db": float(snr_achieved_db),
         "alpha": float(alpha),
+        "P_s_ref": float(P_s),
+        "P_i": float(P_i),
+        "band_lo_hz": lo,
+        "band_hi_hz": hi,
+    }
+    return (micl_out, micr_out), diag
+
+
+def add_delayed_coherent_interference(
+    micl_mix: np.ndarray,
+    micr_mix: np.ndarray,
+    noise_window: np.ndarray,
+    *,
+    cfg: DelayedCoherentInterferenceConfig,
+    fs: int,
+    signal_for_alpha: np.ndarray,
+    eps: float = 1e-18,
+) -> tuple[tuple[np.ndarray, np.ndarray], dict[str, float]]:
+    """
+    Add coherent interference to both mics, with a fixed relative delay.
+
+    The base interference waveform is band-limited and scaled to achieve target in-band SNR.
+    Then it is shifted (zero-padded) by delay_ms on the selected target mic.
+    """
+    micl_mix = np.asarray(micl_mix, dtype=np.float64)
+    micr_mix = np.asarray(micr_mix, dtype=np.float64)
+    noise_window = np.asarray(noise_window, dtype=np.float64)
+    signal_for_alpha = np.asarray(signal_for_alpha, dtype=np.float64)
+    if micl_mix.shape != micr_mix.shape or micl_mix.shape != noise_window.shape or micl_mix.shape != signal_for_alpha.shape:
+        raise ValueError("Shape mismatch in add_delayed_coherent_interference")
+
+    lo = float(cfg.band_lo_hz)
+    hi = float(cfg.band_hi_hz)
+    snr_db = float(cfg.snr_db)
+
+    s_bp = bandpass_fft(signal_for_alpha, fs=fs, lo_hz=lo, hi_hz=hi)
+    n_bp = bandpass_fft(noise_window, fs=fs, lo_hz=lo, hi_hz=hi)
+    P_s = float(np.mean(s_bp * s_bp))
+    P_n = float(np.mean(n_bp * n_bp))
+    if not (np.isfinite(P_s) and np.isfinite(P_n)):
+        raise ValueError("Non-finite powers in delayed coherent interference")
+    if P_s <= 0.0:
+        raise ValueError("Zero in-band signal power for delayed coherent interference")
+    if P_n <= eps:
+        raise ValueError("Noise in-band power too small for delayed coherent interference")
+
+    alpha = float(np.sqrt(P_s / (P_n * (10.0 ** (snr_db / 10.0)) + eps)))
+    i_bp = (alpha * n_bp).astype(np.float64, copy=False)
+
+    delay_samples = int(round(float(cfg.delay_ms) * float(fs) / 1000.0))
+    target = str(cfg.target_delayed).lower().strip()
+    if target not in ("micl", "micr"):
+        raise ValueError(f"Invalid target_delayed: {cfg.target_delayed}")
+
+    i_l = i_bp
+    i_r = i_bp
+    if delay_samples != 0:
+        if target == "micl":
+            i_l = shift_zeropad(i_bp, delay_samples)
+        else:
+            i_r = shift_zeropad(i_bp, delay_samples)
+
+    micl_out = (micl_mix + i_l).astype(np.float64, copy=False)
+    micr_out = (micr_mix + i_r).astype(np.float64, copy=False)
+
+    P_i = float((alpha * alpha) * P_n)
+    snr_achieved_db = 10.0 * float(np.log10(P_s / (P_i + eps)))
+    diag = {
+        "snr_target_db": snr_db,
+        "snr_achieved_db": float(snr_achieved_db),
+        "alpha": float(alpha),
+        "delay_ms": float(cfg.delay_ms),
+        "delay_samples": int(delay_samples),
+        "target_delayed": target,
         "P_s_ref": float(P_s),
         "P_i": float(P_i),
         "band_lo_hz": lo,
