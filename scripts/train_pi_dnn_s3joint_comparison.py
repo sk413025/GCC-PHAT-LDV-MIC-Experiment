@@ -476,7 +476,90 @@ def train_pi_dnn(features, gcc_vl, gcc_vr, theta_true, spk_x,
 
 
 # ============================================================
-# Step 8: Main — run everything
+# Step 8: Leave-One-Angle-Out Cross-Validation
+# ============================================================
+def train_pi_dnn_cv(features, gcc_vl, gcc_vr, theta_true, spk_x,
+                    lag_ms_axis, lam, held_out_theta, seed=42):
+    """Train on all angles EXCEPT held_out_theta, evaluate on held_out_theta."""
+    torch.manual_seed(seed)
+    np.random.seed(seed)
+
+    input_dim = features.shape[1]
+    n_lags = gcc_vl.shape[1]
+    lag_step_ms = float(lag_ms_axis[1] - lag_ms_axis[0])
+    lag_start_ms_val = float(lag_ms_axis[0])
+
+    # Split train/test by angle
+    train_mask = ~np.isclose(theta_true, held_out_theta, atol=0.01)
+    test_mask = np.isclose(theta_true, held_out_theta, atol=0.01)
+
+    X_train = torch.tensor(features[train_mask])
+    gvl_train = torch.tensor(gcc_vl[train_mask])
+    gvr_train = torch.tensor(gcc_vr[train_mask])
+    theta_train = torch.tensor(theta_true[train_mask])
+
+    X_test = torch.tensor(features[test_mask])
+    gvl_test = torch.tensor(gcc_vl[test_mask])
+    gvr_test = torch.tensor(gcc_vr[test_mask])
+
+    model = PIDNN(input_dim)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
+
+    n_train = len(X_train)
+    batch_size = 32
+    warmup_epochs = 50
+    total_epochs = 200
+
+    for epoch in range(total_epochs):
+        model.train()
+        perm = torch.randperm(n_train)
+
+        for i in range(0, n_train, batch_size):
+            idx = perm[i:i+batch_size]
+            xb = X_train[idx]
+            gvl_b = gvl_train[idx]
+            gvr_b = gvr_train[idx]
+            theta_b = theta_train[idx]
+
+            p_hat = model(xb)
+            theta_pred = compute_theta_from_pos(p_hat)
+            loss_mse = torch.mean((theta_pred - theta_b)**2)
+
+            if epoch >= warmup_epochs and lam > 0:
+                tau_vl_ms, tau_vr_ms = compute_tau_vm(p_hat)
+                r_vl = differentiable_interp(gvl_b, tau_vl_ms,
+                                             lag_start_ms_val, lag_step_ms, n_lags)
+                r_vr = differentiable_interp(gvr_b, tau_vr_ms,
+                                             lag_start_ms_val, lag_step_ms, n_lags)
+                loss_phys = torch.mean(r_vl + r_vr)
+            else:
+                loss_phys = torch.tensor(0.0)
+
+            loss = loss_mse - lam * loss_phys if epoch >= warmup_epochs else loss_mse
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+    # Evaluate on held-out angle
+    model.eval()
+    with torch.no_grad():
+        p_test = model(X_test)
+        theta_preds = compute_theta_from_pos(p_test).numpy()
+        p_test_np = p_test.numpy()
+
+    median_theta = float(np.median(theta_preds))
+    mean_pos = p_test_np.mean(axis=0)
+    return {
+        'median_theta': median_theta,
+        'mean_xy': (float(mean_pos[0]), float(mean_pos[1])),
+        'std_theta': float(np.std(theta_preds)),
+        'n_test': int(test_mask.sum()),
+        'n_train': int(train_mask.sum()),
+    }
+
+
+# ============================================================
+# Step 9: Main — run everything
 # ============================================================
 def main():
     # --- S3-joint baseline ---
@@ -489,20 +572,21 @@ def main():
     (features, gcc_vl, gcc_vr,
      theta_true, spk_x, lag_ms_axis) = extract_windowed_features()
 
-    # --- Lambda sweep ---
+    # ================================================================
+    # Part A: Train=Test (original experiment, for reference)
+    # ================================================================
     lambdas = [0.0, 0.1, 0.5, 1.0, 5.0, 10.0]
     dnn_results = {}
 
     for lam in lambdas:
         print(f"\n{'=' * 90}")
-        print(f"Training PI-DNN with lambda={lam}")
+        print(f"[Train=Test] Training PI-DNN with lambda={lam}")
         print(f"{'=' * 90}")
         angle_results = train_pi_dnn(features, gcc_vl, gcc_vr,
                                       theta_true, spk_x, lag_ms_axis,
                                       lam=lam)
         dnn_results[lam] = angle_results
 
-        # Print per-angle diagnostics
         print(f"\n    Per-angle results (lambda={lam}):")
         for theta, res in sorted(angle_results.items()):
             err = res['median_theta'] - theta
@@ -511,18 +595,48 @@ def main():
                   f"err={err:+.2f}°  pos=({xy[0]:+.3f},{xy[1]:.3f})  "
                   f"true_pos=({res['spk_x']:+.1f},{BOARD_Y})")
 
-    # --- Comparison table ---
-    print(f"\n\n{'=' * 110}")
-    print("COMPARISON TABLE: S3-joint vs PI-DNN (per-angle error in degrees)")
-    print(f"{'=' * 110}")
+    # ================================================================
+    # Part B: Leave-One-Angle-Out Cross-Validation
+    # ================================================================
+    unique_thetas = sorted(set(theta_true.tolist()))
+    # Map theta -> spk_x for display
+    theta_to_spkx = {}
+    for theta in unique_thetas:
+        mask = np.isclose(theta_true, theta, atol=0.01)
+        theta_to_spkx[theta] = float(spk_x[mask][0])
 
-    # Unique angles from S3-joint (5 original positions)
+    cv_results = {}  # {lam: {theta: result_dict}}
+
+    for lam in lambdas:
+        print(f"\n{'=' * 90}")
+        print(f"[LOO-CV] Leave-One-Angle-Out with lambda={lam}")
+        print(f"{'=' * 90}")
+        cv_results[lam] = {}
+
+        for held_out_theta in unique_thetas:
+            spk_x_val = theta_to_spkx[held_out_theta]
+            res = train_pi_dnn_cv(features, gcc_vl, gcc_vr,
+                                   theta_true, spk_x, lag_ms_axis,
+                                   lam=lam, held_out_theta=held_out_theta)
+            cv_results[lam][held_out_theta] = res
+            err = res['median_theta'] - held_out_theta
+            print(f"    held_out={held_out_theta:+.2f}° (spk_x={spk_x_val:+.1f}m)  "
+                  f"pred={res['median_theta']:+.2f}°  err={err:+.2f}°  "
+                  f"train={res['n_train']} test={res['n_test']}")
+
+    # ================================================================
+    # Combined Comparison Table
+    # ================================================================
     positions = sorted(s3_results.keys())
     thetas_for_pos = {}
     for spk_x_val in positions:
         thetas_for_pos[spk_x_val] = s3_results[spk_x_val]['theta_true']
 
-    # Header
+    # --- Table 1: Train=Test ---
+    print(f"\n\n{'=' * 110}")
+    print("TABLE 1: Train=Test (per-angle error in degrees) — OVERFITTING REFERENCE")
+    print(f"{'=' * 110}")
+
     lam_strs = [f"  lam={l}" for l in lambdas]
     hdr = f"{'Position':>10} {'theta_true':>10} {'S3-joint':>10}"
     for ls in lam_strs:
@@ -531,7 +645,7 @@ def main():
     print("-" * len(hdr))
 
     all_s3_errs = []
-    all_dnn_errs = {l: [] for l in lambdas}
+    all_dnn_errs_tt = {l: [] for l in lambdas}
 
     for spk_x_val in positions:
         theta_true_val = thetas_for_pos[spk_x_val]
@@ -544,53 +658,98 @@ def main():
 
         for lam in lambdas:
             ar = dnn_results[lam]
-            # Find the angle entry matching this theta_true
             match = None
             for theta, res in ar.items():
                 if abs(theta - theta_true_val) < 0.1:
-                    match = res
-                    break
+                    match = res; break
             if match:
                 dnn_err = match['median_theta'] - theta_true_val
-                all_dnn_errs[lam].append(abs(dnn_err))
+                all_dnn_errs_tt[lam].append(abs(dnn_err))
                 row += f"{dnn_err:+.2f}".rjust(9) + "°"
             else:
                 row += "N/A".rjust(10)
         print(row)
 
-    # MAE row
     s3_mae_val = np.mean(all_s3_errs)
     row_mae = "MAE".rjust(10) + " ".rjust(10) + " "
     row_mae += f"{s3_mae_val:.2f}".rjust(9) + "°"
     for lam in lambdas:
-        if all_dnn_errs[lam]:
-            mae_val = np.mean(all_dnn_errs[lam])
-            row_mae += f"{mae_val:.2f}".rjust(9) + "°"
+        if all_dnn_errs_tt[lam]:
+            row_mae += f"{np.mean(all_dnn_errs_tt[lam]):.2f}".rjust(9) + "°"
         else:
             row_mae += "N/A".rjust(10)
     print("-" * len(hdr))
     print(row_mae)
 
-    # --- Warnings ---
-    print(f"\n{'=' * 90}")
-    print("Diagnostics")
-    print(f"{'=' * 90}")
-    best_lam = None
-    best_mae = 999.0
-    for lam in lambdas:
-        if all_dnn_errs[lam]:
-            mae_val = np.mean(all_dnn_errs[lam])
-            if mae_val > s3_mae_val:
-                print(f"  WARNING: lambda={lam} MAE={mae_val:.2f}° > S3-joint MAE={s3_mae_val:.2f}°")
-            if mae_val < best_mae:
-                best_mae = mae_val
-                best_lam = lam
+    # --- Table 2: LOO-CV ---
+    print(f"\n\n{'=' * 110}")
+    print("TABLE 2: Leave-One-Angle-Out CV (per-angle error in degrees) — GENERALIZATION TEST")
+    print(f"{'=' * 110}")
+    print(hdr)
+    print("-" * len(hdr))
 
-    print(f"\n  Best lambda = {best_lam}  (MAE = {best_mae:.2f}°)")
-    if best_mae <= s3_mae_val:
-        print(f"  [OK] PI-DNN (lambda={best_lam}) MAE={best_mae:.2f}° <= S3-joint MAE={s3_mae_val:.2f}°")
+    all_dnn_errs_cv = {l: [] for l in lambdas}
+
+    for spk_x_val in positions:
+        theta_true_val = thetas_for_pos[spk_x_val]
+        s3_err = s3_results[spk_x_val]['err']
+
+        row = f"{spk_x_val:+.1f}m".rjust(10)
+        row += f"{theta_true_val:+.2f}".rjust(10) + "°"
+        row += f"{s3_err:+.2f}".rjust(9) + "°"
+
+        for lam in lambdas:
+            # Find the CV result for this theta
+            match = None
+            for theta, res in cv_results[lam].items():
+                if abs(theta - theta_true_val) < 0.1:
+                    match = res; break
+            if match:
+                dnn_err = match['median_theta'] - theta_true_val
+                all_dnn_errs_cv[lam].append(abs(dnn_err))
+                row += f"{dnn_err:+.2f}".rjust(9) + "°"
+            else:
+                row += "N/A".rjust(10)
+        print(row)
+
+    row_mae = "MAE".rjust(10) + " ".rjust(10) + " "
+    row_mae += f"{s3_mae_val:.2f}".rjust(9) + "°"
+    for lam in lambdas:
+        if all_dnn_errs_cv[lam]:
+            row_mae += f"{np.mean(all_dnn_errs_cv[lam]):.2f}".rjust(9) + "°"
+        else:
+            row_mae += "N/A".rjust(10)
+    print("-" * len(hdr))
+    print(row_mae)
+
+    # --- Summary ---
+    print(f"\n\n{'=' * 90}")
+    print("SUMMARY")
+    print(f"{'=' * 90}")
+    print(f"  S3-joint MAE = {s3_mae_val:.2f}°")
+    for lam in lambdas:
+        tt_mae = np.mean(all_dnn_errs_tt[lam]) if all_dnn_errs_tt[lam] else float('nan')
+        cv_mae = np.mean(all_dnn_errs_cv[lam]) if all_dnn_errs_cv[lam] else float('nan')
+        gap = cv_mae - tt_mae
+        flag = "  <<<OVERFIT" if gap > 1.0 else ""
+        print(f"  lambda={lam:<5}  Train=Test MAE={tt_mae:.2f}°  "
+              f"LOO-CV MAE={cv_mae:.2f}°  gap={gap:+.2f}°{flag}")
+
+    best_cv_lam = None
+    best_cv_mae = 999.0
+    for lam in lambdas:
+        if all_dnn_errs_cv[lam]:
+            cv_mae = np.mean(all_dnn_errs_cv[lam])
+            if cv_mae < best_cv_mae:
+                best_cv_mae = cv_mae
+                best_cv_lam = lam
+
+    print(f"\n  Best CV lambda = {best_cv_lam}  (LOO-CV MAE = {best_cv_mae:.2f}°)")
+    if best_cv_mae <= s3_mae_val:
+        print(f"  [OK] PI-DNN LOO-CV MAE={best_cv_mae:.2f}° <= S3-joint MAE={s3_mae_val:.2f}°")
     else:
-        print(f"  [WARN] Best PI-DNN MAE={best_mae:.2f}° > S3-joint MAE={s3_mae_val:.2f}°")
+        print(f"  [WARN] PI-DNN LOO-CV MAE={best_cv_mae:.2f}° > S3-joint MAE={s3_mae_val:.2f}°")
+        print(f"  DNN cannot generalize to unseen angles better than S3-joint.")
 
 
 if __name__ == '__main__':
