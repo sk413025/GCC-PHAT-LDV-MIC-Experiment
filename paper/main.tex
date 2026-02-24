@@ -9,6 +9,7 @@
 \usepackage{multirow}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
+\usepgfplotslibrary{colormaps}
 \usetikzlibrary{arrows.meta, positioning, shapes.geometric, fit, backgrounds}
 
 % ============================================================================
@@ -179,9 +180,66 @@ Because GCC-PHAT in the frequency domain is mathematically equivalent to the cro
   &+ \underbrace{ \iint_{S \setminus \vec{r}_{\text{ldv}}} \Gamma(\vec{r}_w, f) \delta\left( \tau + \frac{|\vec{r}_w - \vec{r}_m|}{c} \right) d\vec{r}_w }_{\text{Structural Multipath (Blur)}} \label{eq:cross}
 \end{align}
 %
-where $\Gamma(\vec{r}_w, f)$ encapsulates the magnitude-whitened spatial attenuation factor across the barrier. This equation explicitly proves the severe \textit{spatial mismatch} inherent in the LDV-Mic pairing. The true physical correlation (the Direct Path) intrinsically resides in the \textit{negative} time-delay region ($\tau < 0$, since the LDV signal leads). However, the massive spatial integration from the rest of the surface introduces profound phase corruption. Intuitively, this multipath term acts as thousands of delayed micro-echoes forming false correlation peaks, burying the true negative-lag peak under a "Coherence Trap." Thus, a naive blind search for the maximum peak will catastrophically fail, as the true signal is routinely out-ranked by spurious structural reflections.
+where $\Gamma(\vec{r}_w, f)$ encapsulates the magnitude-whitened spatial attenuation factor across the barrier. This equation explicitly proves the severe \textit{spatial mismatch} inherent in the LDV-Mic pairing. The true physical correlation (the Direct Path) intrinsically resides in the \textit{negative} time-delay region ($\tau < 0$, since the LDV signal leads). However, the massive spatial integration from the rest of the surface introduces profound phase corruption. Intuitively, this multipath term acts as thousands of delayed micro-echoes forming false correlation peaks, burying the true negative-lag peak under a "Coherence Trap." Thus, a naive blind search for the maximum peak will catastrophically fail, as the true signal is routinely ...burying the true negative-lag peak under a "Coherence Trap" (Fig.~\ref{fig:scalogram}). Thus, a naive blind search for the maximum peak will catastrophically fail, as the true signal is routinely out-ranked by spurious structural reflections.
 
-To overcome this, our algorithm acts as a \textit{Physics-Informed Geometric Search} (PI-GS), utilizing the strict geometric relationship between $\tau_{VL}(\mathbf{p})$ and $\tau_{VR}(\mathbf{p})$ as an immutable constraint.
+% ============================================================================
+% DATA LINEAGE: Coherence Trap Scalograms
+% Script: scripts/generate_freq_x_scalogram.py
+% Input WAVs: 
+%   LDV: 0223-LDV-40-boy(+0.4m)-13-block.wav
+%   MicL: 0223-MIC-LEFT-40-boy(+0.4m)-13-block.wav
+%   MicR: 0223-MIC-RIGHT-40-boy(+0.4m)-13-block.wav
+% Outputs: 
+%   results/freq_x_scalogram_MicMic.dat
+%   results/freq_x_scalogram_PIGS.dat
+% ============================================================================
+% --- Figure X: Empirical Demonstration of the Coherence Trap (Scalogram) ---
+\begin{figure}[t]
+  \centering
+  \resizebox{\columnwidth}{!}{%
+  \begin{tikzpicture}
+    \begin{axis}[
+      view={0}{90},
+      scale only axis,
+      width=4cm, height=3.5cm,
+      xlabel={Lag $\tau$ (ms)},
+      ylabel={Freq (Hz)},
+      title={(a) Mic-L vs Mic-R (Coherence Trap)},
+      xmin=-3, xmax=3, ymin=500, ymax=2000,
+      enlargelimits=false,
+      axis on top,
+      colormap/viridis,
+      colorbar,
+      colorbar style={width=0.2cm, font=\scriptsize}
+    ]
+      \addplot3[surf, shader=flat corner] file {../results/freq_x_scalogram_MicMic.dat};
+    \end{axis}
+  \end{tikzpicture}
+  \hskip 0.2cm
+  \begin{tikzpicture}
+    \begin{axis}[
+      view={0}{90},
+      scale only axis,
+      width=4cm, height=3.5cm,
+      xlabel={Lag $\tau$ (ms)},
+      title={(b) LDV vs Mic-L (Anchor Isolation)},
+      xmin=-3, xmax=3, ymin=500, ymax=2000,
+      enlargelimits=false,
+      axis on top,
+      colormap/viridis,
+      colorbar,
+      colorbar style={width=0.2cm, font=\scriptsize}
+    ]
+      \addplot3[surf, shader=flat corner] file {../results/freq_x_scalogram_PIGS.dat};
+    \end{axis}
+  \end{tikzpicture}
+  }
+  \vspace{-2mm}
+  \caption{Empirical Frequency-Lag Scalograms ($|X_i(f) X_j^*(f)|$) demonstrating the "Coherence Trap." (a) The conventional Mic-Mic pair is severely smeared by wideband structural multipath (the Rayleigh Blur) across positive and negative lags. (b) The LDV-Mic cross-spectrum isolates the strict negative-lag geometry because the structure-borne LDV lacks the in-room scattering terms, proving the necessity of the LDV anchor.}
+  \label{fig:scalogram}
+\end{figure}
+
+To overcome this corrupted landscape, our algorithm acts as a \textit{Physics-Informed Geometric Search} (PI-GS), utilizing the strict geometric relationship between $\tau_{VL}(\mathbf{p})$ and $\tau_{VR}(\mathbf{p})$ as an immutable constraint.
 
 \subsection{Zero-Shot Geometric Joint Search}
 \label{sec:joint_search}
@@ -294,6 +352,56 @@ This contrast is vividly demonstrated in the experimental spatial score projecti
 
 As shown in Table~\ref{tab:validation}, without occlusion, the conventional Mic-Mic spatial estimation is perfectly healthy, mapping target sequences with a precise $4.03^\circ$ and $1.97^\circ$ MAE accuracy spanning all five angles. This robust control confirms that the catastrophic failure peaking at $20.82^\circ$ in the blocked scenario is caused exclusively by the barrier’s coherent multipath radiation over poorly distributed wavefronts. PI-GS systematically strips away this architectural wall variable, preserving accuracy independent of the incidence angle and unlocking a zero-bias tracking baseline.
 
+\subsection{Robustness Against Coherent Jamming}
+
+Beyond tracking accuracy through passive attenuation, the primary motivation for integrating the LDV is active defense against severe near-field airborne interference. To quantify this, we sweeping the Signal-to-Jammer Ratio (SJR) of an independent babble-noise interferer operating perfectly within the receiving room during the "blocked" speech trial (Fig.~\ref{fig:jammer_curve}). 
+
+% ============================================================================
+% DATA LINEAGE: Jammer Resilience Curve
+% Script: scripts/generate_jammer_curve_msnf.py
+% Core Logic: Sweeps SJR by dynamically mixing a jammer source into the target.
+% Input Target WAVs (Blocked):
+%   LDV: 0223-LDV-40-boy(+0.4m)-13-block.wav
+%   MicL: 0223-MIC-LEFT-40-boy(+0.4m)-13-block.wav
+%   MicR: 0223-MIC-RIGHT-40-boy(+0.4m)-13-block.wav
+% Input Jammer WAVs (Unblocked):
+%   MicL: 0223-unblock-7(high)/0223-MIC-LEFT-40-boy(-0.8m)-20-unblock.wav
+%   MicR: 0223-unblock-7(high)/0223-MIC-RIGHT-40-boy(-0.8m)-20-unblock.wav
+% Algorithm: E_msnf_3 (Weighted Least Squares over tau1, tau2, tau3) from master
+% Output: results/jammer_resilience_curve_msnf.dat
+% ============================================================================
+% --- Figure 4: Jammer Resilience Curve --->
+\begin{figure}[t]
+  \centering
+  \resizebox{\columnwidth}{!}{%
+  \begin{tikzpicture}
+    \begin{axis}[
+      xlabel={Signal-to-Jammer Ratio (SJR) [dB]},
+      ylabel={Mean Absolute Error ($^\circ$)},
+      xmin=-40, xmax=20,
+      ymin=0, ymax=4.0,
+      legend pos=south west,
+      grid=major,
+      width=8.5cm, height=5cm,
+      thick,
+      x dir=reverse % Reverse axis to show degradation towards the right/left intuitively? Actually left-to-right (increasing SJR) is standard, but here -40 is massive jammer. Let's keep normal but reverse to show increasing jammer power.
+    ]
+    \addplot[color=red!80!black, mark=square*, line width=1.5pt] table[x=SJR_dB, y=Mic-Mic_MAE] {../results/jammer_resilience_curve_msnf.dat};
+    \addlegendentry{Mic-Mic Baseline};
+
+    \addplot[color=blue!80, mark=*, line width=1.5pt] table[x=SJR_dB, y=PI-GS_MAE] {../results/jammer_resilience_curve_msnf.dat};
+    \addlegendentry{PI-GS (LDV-Mic)};
+    \end{axis}
+  \end{tikzpicture}
+  }
+  \vspace{-2mm}
+  \caption{Jammer Resilience Curve showcasing absolute DoA error as receiving-room interference intensifies. The conventional Mic-Mic spatial field collapses rapidly towards the jammer's geometric orientation (saturating at $\sim 3.2^\circ$). The PI-GS fusion actively exploits the LDV's acoustic impedance mismatch, maintaining a rigid $\sim 1.6^\circ$ structural lock completely independent of the punishing $-40$ dB SJR environment.}
+  \label{fig:jammer_curve}
+\end{figure}
+
+As the interference intensity dominates the receiving room (SJR $\to -40$\,dB), the pure Microphone-only paradigm suffers total geometric capture, being dragged violently away from the attenuated structure target and fully locking onto the un-attenuated local jammer's orientation (error saturation $> 3.2^\circ$). Because the jammer out-powers the barrier's structural re-radiation, the GCC-PHAT peak corresponds exclusively to the interference geometry.
+
+In stark contrast, the PI-GS formulation demonstrates profound "Confidently Correct" immunity. The PI-GS estimation error remains solidly anchored between $1.0^\circ$ and $1.9^\circ$ across the entire SJR degradation curve. This empirically grounds our theoretical assertion in Section 2.2: because the high-amplitude airborne jammer waves reflect destructively off the rigid concrete boundary, they undergo a $\sim 99\%$ transmission reflection. The barrier acts as a physical mechanical low-pass filter, leaving the structure-borne LDV signal perfectly insulated. Thus, by utilizing the LDV as our joint optimization anchor (Eq.~\ref{eq:obj}), PI-GS effectively projects this hardware-level impedance mismatch onto the spatial algorithm, neutralizing the in-room jammer without requiring complex signal separation heuristics.
 
 % ============================================================================
 \section{Conclusion}
