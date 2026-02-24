@@ -212,7 +212,7 @@ where $\Gamma(\vec{r}_w, f)$ encapsulates the magnitude-whitened spatial attenua
       colorbar,
       colorbar style={width=0.2cm, font=\scriptsize}
     ]
-      \addplot3[surf, shader=flat corner] file {../results/freq_x_scalogram_MicMic.dat};
+      \addplot3[surf, shader=flat corner, mesh/cols=50] table[x=X, y=Freq, z=Value] {../results/freq_x_scalogram_MicMic.dat};
     \end{axis}
   \end{tikzpicture}
   \hskip 0.2cm
@@ -230,7 +230,7 @@ where $\Gamma(\vec{r}_w, f)$ encapsulates the magnitude-whitened spatial attenua
       colorbar,
       colorbar style={width=0.2cm, font=\scriptsize}
     ]
-      \addplot3[surf, shader=flat corner] file {../results/freq_x_scalogram_PIGS.dat};
+      \addplot3[surf, shader=flat corner, mesh/cols=50] table[x=X, y=Freq, z=Value] {../results/freq_x_scalogram_PIGS.dat};
     \end{axis}
   \end{tikzpicture}
   }
