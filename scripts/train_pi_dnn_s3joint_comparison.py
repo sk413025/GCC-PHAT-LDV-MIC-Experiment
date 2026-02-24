@@ -476,7 +476,152 @@ def train_pi_dnn(features, gcc_vl, gcc_vr, theta_true, spk_x,
 
 
 # ============================================================
-# Step 8: Leave-One-Angle-Out Cross-Validation
+# Step 8: Physics-Only Gradient Descent (no labels, per-window)
+# ============================================================
+def physics_only_optimize(gcc_vl_win, gcc_vr_win, lag_ms_axis,
+                          n_steps=300, lr=0.01, n_inits=9):
+    """Per-window gradient descent: maximize R_VL(τ_VL(p)) + R_VR(τ_VR(p)).
+
+    No labels needed. Equivalent to continuous 2D S3-joint.
+    Tries n_inits starting positions on a grid to avoid local optima.
+    Returns best (x, y, theta, score).
+    """
+    n_lags = len(lag_ms_axis)
+    lag_step_ms = float(lag_ms_axis[1] - lag_ms_axis[0])
+    lag_start_ms_val = float(lag_ms_axis[0])
+
+    gvl_t = torch.tensor(gcc_vl_win, dtype=torch.float32).unsqueeze(0)  # (1, n_lags)
+    gvr_t = torch.tensor(gcc_vr_win, dtype=torch.float32).unsqueeze(0)
+
+    # Grid of starting positions: x in {-0.8, 0, 0.8}, y in {0.15, 0.25, 0.35}
+    x_inits = [-0.8, 0.0, 0.8]
+    y_inits = [0.15, 0.25, 0.35]
+
+    best_score = -np.inf
+    best_result = None
+
+    for x0 in x_inits:
+        for y0 in y_inits:
+            p = torch.tensor([[x0, y0]], dtype=torch.float32, requires_grad=True)
+            opt = torch.optim.Adam([p], lr=lr)
+
+            for _ in range(n_steps):
+                tau_vl, tau_vr = compute_tau_vm(p)
+                r_vl = differentiable_interp(gvl_t, tau_vl,
+                                             lag_start_ms_val, lag_step_ms, n_lags)
+                r_vr = differentiable_interp(gvr_t, tau_vr,
+                                             lag_start_ms_val, lag_step_ms, n_lags)
+                loss = -(r_vl + r_vr)  # maximize → minimize negative
+                opt.zero_grad()
+                loss.backward()
+                opt.step()
+
+            with torch.no_grad():
+                tau_vl, tau_vr = compute_tau_vm(p)
+                r_vl = differentiable_interp(gvl_t, tau_vl,
+                                             lag_start_ms_val, lag_step_ms, n_lags)
+                r_vr = differentiable_interp(gvr_t, tau_vr,
+                                             lag_start_ms_val, lag_step_ms, n_lags)
+                score = (r_vl + r_vr).item()
+                if score > best_score:
+                    best_score = score
+                    theta = compute_theta_from_pos(p).item()
+                    best_result = {
+                        'x': p[0, 0].item(),
+                        'y': p[0, 1].item(),
+                        'theta': theta,
+                        'score': score,
+                    }
+
+    return best_result
+
+
+def run_physics_only(features, gcc_vl, gcc_vr, theta_true, spk_x, lag_ms_axis):
+    """Run physics-only optimization on every window, return per-angle medians."""
+    unique_thetas = sorted(set(theta_true.tolist()))
+    n_windows = len(features)
+
+    all_thetas = np.zeros(n_windows)
+    all_scores = np.zeros(n_windows)
+    all_xy = np.zeros((n_windows, 2))
+
+    for i in range(n_windows):
+        res = physics_only_optimize(gcc_vl[i], gcc_vr[i], lag_ms_axis)
+        all_thetas[i] = res['theta']
+        all_scores[i] = res['score']
+        all_xy[i] = [res['x'], res['y']]
+        if (i + 1) % 100 == 0:
+            print(f"    window {i+1}/{n_windows}")
+
+    # Per-angle median
+    angle_results = {}
+    for theta in unique_thetas:
+        mask = np.isclose(theta_true, theta, atol=0.01)
+        preds = all_thetas[mask]
+        positions = all_xy[mask]
+        scores = all_scores[mask]
+        spk_x_val = float(spk_x[mask][0])
+        angle_results[theta] = {
+            'median_theta': float(np.median(preds)),
+            'mean_theta': float(np.mean(preds)),
+            'std_theta': float(np.std(preds)),
+            'mean_xy': (float(positions[:, 0].mean()), float(positions[:, 1].mean())),
+            'mean_score': float(scores.mean()),
+            'spk_x': spk_x_val,
+        }
+    return angle_results
+
+
+def run_physics_only_fullwav():
+    """Run physics-only GD on the 5 original full-length WAVs (same as S3-joint).
+    Fair comparison: same data, same signals, only the search method differs.
+    """
+    print(f"\n{'=' * 90}")
+    print("[Physics-Only Full-WAV] Per-recording gradient descent on full 13s signals")
+    print(f"{'=' * 90}")
+
+    original_ds = datasets[:5]
+    results = {}
+
+    for ds in original_ds:
+        spk_x_val = ds['spk_x']
+        d_SL = np.sqrt((spk_x_val + 0.7)**2 + MIC_Y**2)
+        d_SR = np.sqrt((spk_x_val - 0.7)**2 + MIC_Y**2)
+        tau_mic_ms = (d_SL - d_SR) / c * 1000
+        theta_true_val = np.degrees(np.arcsin(np.clip(tau_mic_ms / 1000 * c / d_mic, -1, 1)))
+
+        _, ml = wavfile.read(os.path.join(ds['path'], ds['ml']))
+        _, mr = wavfile.read(os.path.join(ds['path'], ds['mr']))
+        _, ldv = wavfile.read(os.path.join(ds['path'], ds['ldv']))
+        ml = ml.astype(np.float64); mr = mr.astype(np.float64); ldv = ldv.astype(np.float64)
+
+        gvl, lags = gcc_phat(ldv, ml, fs)
+        gvr, _    = gcc_phat(ldv, mr, fs)
+        lags_ms = lags * 1000
+
+        # Crop to [-8.5, -3.5] ms
+        mask = (lags_ms >= LAG_START_MS) & (lags_ms <= LAG_END_MS)
+        gvl_crop = gvl[mask].astype(np.float32)
+        gvr_crop = gvr[mask].astype(np.float32)
+        lag_ax = lags_ms[mask]
+
+        res = physics_only_optimize(gvl_crop, gvr_crop, lag_ax,
+                                     n_steps=500, lr=0.005, n_inits=9)
+        err = res['theta'] - theta_true_val
+        results[spk_x_val] = {'theta_true': theta_true_val, 'theta_pred': res['theta'],
+                               'err': err, 'x': res['x'], 'y': res['y'],
+                               'score': res['score']}
+        print(f"  spk_x={spk_x_val:+.1f}m  theta_true={theta_true_val:+.2f}°  "
+              f"pred={res['theta']:+.2f}°  err={err:+.2f}°  "
+              f"pos=({res['x']:+.3f},{res['y']:.3f})  score={res['score']:.4f}")
+
+    mae = np.mean([abs(r['err']) for r in results.values()])
+    print(f"\n  Physics-Only Full-WAV MAE = {mae:.2f}°")
+    return results, mae
+
+
+# ============================================================
+# Step 9: Leave-One-Angle-Out Cross-Validation
 # ============================================================
 def train_pi_dnn_cv(features, gcc_vl, gcc_vr, theta_true, spk_x,
                     lag_ms_axis, lam, held_out_theta, seed=42):
@@ -559,8 +704,16 @@ def train_pi_dnn_cv(features, gcc_vl, gcc_vr, theta_true, spk_x,
 
 
 # ============================================================
-# Step 9: Main — run everything
+# Step 10: Main — run everything
 # ============================================================
+def _find_by_theta(results_dict, target_theta):
+    """Find result entry matching target_theta."""
+    for theta, res in results_dict.items():
+        if abs(theta - target_theta) < 0.1:
+            return res
+    return None
+
+
 def main():
     # --- S3-joint baseline ---
     s3_results, s3_mae = run_s3joint_baseline()
@@ -572,15 +725,49 @@ def main():
     (features, gcc_vl, gcc_vr,
      theta_true, spk_x, lag_ms_axis) = extract_windowed_features()
 
+    unique_thetas = sorted(set(theta_true.tolist()))
+    theta_to_spkx = {}
+    for theta in unique_thetas:
+        mask = np.isclose(theta_true, theta, atol=0.01)
+        theta_to_spkx[theta] = float(spk_x[mask][0])
+
+    positions = sorted(s3_results.keys())
+    thetas_for_pos = {}
+    for spk_x_val in positions:
+        thetas_for_pos[spk_x_val] = s3_results[spk_x_val]['theta_true']
+    all_s3_errs = [abs(s3_results[p]['err']) for p in positions]
+    s3_mae_val = np.mean(all_s3_errs)
+
     # ================================================================
-    # Part A: Train=Test (original experiment, for reference)
+    # Part A: Physics-Only Gradient Descent
     # ================================================================
-    lambdas = [0.0, 0.1, 0.5, 1.0, 5.0, 10.0]
+    # A1: Per-window (0.5s)
+    print(f"\n{'=' * 90}")
+    print("[Physics-Only Windowed] Per-window gradient descent: max R_VL + R_VR")
+    print(f"{'=' * 90}")
+    phys_only_results = run_physics_only(features, gcc_vl, gcc_vr,
+                                          theta_true, spk_x, lag_ms_axis)
+
+    print(f"\n    Per-angle results (physics-only windowed):")
+    for theta, res in sorted(phys_only_results.items()):
+        err = res['median_theta'] - theta
+        xy = res['mean_xy']
+        print(f"      theta_true={theta:+.2f}°  median={res['median_theta']:+.2f}°  "
+              f"err={err:+.2f}°  std={res['std_theta']:.2f}°  "
+              f"pos=({xy[0]:+.3f},{xy[1]:.3f})  score={res['mean_score']:.4f}")
+
+    # A2: Full-WAV (13s, same signals as S3-joint)
+    phys_full_results, phys_full_mae = run_physics_only_fullwav()
+
+    # ================================================================
+    # Part B: PI-DNN Train=Test (reference, reduced lambda set)
+    # ================================================================
+    lambdas = [0.0, 1.0, 10.0]
     dnn_results = {}
 
     for lam in lambdas:
         print(f"\n{'=' * 90}")
-        print(f"[Train=Test] Training PI-DNN with lambda={lam}")
+        print(f"[Train=Test] PI-DNN lambda={lam}")
         print(f"{'=' * 90}")
         angle_results = train_pi_dnn(features, gcc_vl, gcc_vr,
                                       theta_true, spk_x, lag_ms_axis,
@@ -590,26 +777,17 @@ def main():
         print(f"\n    Per-angle results (lambda={lam}):")
         for theta, res in sorted(angle_results.items()):
             err = res['median_theta'] - theta
-            xy = res['mean_xy']
             print(f"      theta_true={theta:+.2f}°  pred={res['median_theta']:+.2f}°  "
-                  f"err={err:+.2f}°  pos=({xy[0]:+.3f},{xy[1]:.3f})  "
-                  f"true_pos=({res['spk_x']:+.1f},{BOARD_Y})")
+                  f"err={err:+.2f}°")
 
     # ================================================================
-    # Part B: Leave-One-Angle-Out Cross-Validation
+    # Part C: LOO-CV (reduced lambda set)
     # ================================================================
-    unique_thetas = sorted(set(theta_true.tolist()))
-    # Map theta -> spk_x for display
-    theta_to_spkx = {}
-    for theta in unique_thetas:
-        mask = np.isclose(theta_true, theta, atol=0.01)
-        theta_to_spkx[theta] = float(spk_x[mask][0])
-
-    cv_results = {}  # {lam: {theta: result_dict}}
+    cv_results = {}
 
     for lam in lambdas:
         print(f"\n{'=' * 90}")
-        print(f"[LOO-CV] Leave-One-Angle-Out with lambda={lam}")
+        print(f"[LOO-CV] Leave-One-Angle-Out lambda={lam}")
         print(f"{'=' * 90}")
         cv_results[lam] = {}
 
@@ -621,135 +799,121 @@ def main():
             cv_results[lam][held_out_theta] = res
             err = res['median_theta'] - held_out_theta
             print(f"    held_out={held_out_theta:+.2f}° (spk_x={spk_x_val:+.1f}m)  "
-                  f"pred={res['median_theta']:+.2f}°  err={err:+.2f}°  "
-                  f"train={res['n_train']} test={res['n_test']}")
+                  f"pred={res['median_theta']:+.2f}°  err={err:+.2f}°")
 
     # ================================================================
-    # Combined Comparison Table
+    # FINAL COMPARISON TABLE
     # ================================================================
-    positions = sorted(s3_results.keys())
-    thetas_for_pos = {}
-    for spk_x_val in positions:
-        thetas_for_pos[spk_x_val] = s3_results[spk_x_val]['theta_true']
+    print(f"\n\n{'=' * 120}")
+    print("FINAL COMPARISON TABLE (per-angle error in degrees)")
+    print(f"{'=' * 120}")
 
-    # --- Table 1: Train=Test ---
-    print(f"\n\n{'=' * 110}")
-    print("TABLE 1: Train=Test (per-angle error in degrees) — OVERFITTING REFERENCE")
-    print(f"{'=' * 110}")
-
-    lam_strs = [f"  lam={l}" for l in lambdas]
-    hdr = f"{'Position':>10} {'theta_true':>10} {'S3-joint':>10}"
-    for ls in lam_strs:
-        hdr += f"{ls:>10}"
+    col_names = ["S3-joint", "Phys-Full", "Phys-Win"] + [f"TT lam={l}" for l in lambdas] + [f"CV lam={l}" for l in lambdas]
+    hdr = f"{'Pos':>6} {'theta':>7}"
+    for cn in col_names:
+        hdr += f"{cn:>11}"
     print(hdr)
     print("-" * len(hdr))
 
-    all_s3_errs = []
-    all_dnn_errs_tt = {l: [] for l in lambdas}
+    all_errs = {cn: [] for cn in col_names}
 
     for spk_x_val in positions:
-        theta_true_val = thetas_for_pos[spk_x_val]
+        theta_tv = thetas_for_pos[spk_x_val]
+
+        row = f"{spk_x_val:+.1f}m".rjust(6)
+        row += f"{theta_tv:+.2f}°".rjust(7)
+
+        # S3-joint
         s3_err = s3_results[spk_x_val]['err']
-        all_s3_errs.append(abs(s3_err))
+        row += f"{s3_err:+.2f}°".rjust(11)
+        all_errs["S3-joint"].append(abs(s3_err))
 
-        row = f"{spk_x_val:+.1f}m".rjust(10)
-        row += f"{theta_true_val:+.2f}".rjust(10) + "°"
-        row += f"{s3_err:+.2f}".rjust(9) + "°"
+        # Physics-only Full-WAV
+        pf = phys_full_results.get(spk_x_val)
+        if pf:
+            pfe = pf['err']
+            row += f"{pfe:+.2f}°".rjust(11)
+            all_errs["Phys-Full"].append(abs(pfe))
+        else:
+            row += "N/A".rjust(11)
 
+        # Physics-only Windowed
+        m = _find_by_theta(phys_only_results, theta_tv)
+        if m:
+            pe = m['median_theta'] - theta_tv
+            row += f"{pe:+.2f}°".rjust(11)
+            all_errs["Phys-Win"].append(abs(pe))
+        else:
+            row += "N/A".rjust(11)
+
+        # DNN Train=Test
         for lam in lambdas:
-            ar = dnn_results[lam]
-            match = None
-            for theta, res in ar.items():
-                if abs(theta - theta_true_val) < 0.1:
-                    match = res; break
-            if match:
-                dnn_err = match['median_theta'] - theta_true_val
-                all_dnn_errs_tt[lam].append(abs(dnn_err))
-                row += f"{dnn_err:+.2f}".rjust(9) + "°"
+            cn = f"TT lam={lam}"
+            m = _find_by_theta(dnn_results[lam], theta_tv)
+            if m:
+                de = m['median_theta'] - theta_tv
+                row += f"{de:+.2f}°".rjust(11)
+                all_errs[cn].append(abs(de))
             else:
-                row += "N/A".rjust(10)
+                row += "N/A".rjust(11)
+
+        # DNN LOO-CV
+        for lam in lambdas:
+            cn = f"CV lam={lam}"
+            m = _find_by_theta(cv_results[lam], theta_tv)
+            if m:
+                de = m['median_theta'] - theta_tv
+                row += f"{de:+.2f}°".rjust(11)
+                all_errs[cn].append(abs(de))
+            else:
+                row += "N/A".rjust(11)
+
         print(row)
 
-    s3_mae_val = np.mean(all_s3_errs)
-    row_mae = "MAE".rjust(10) + " ".rjust(10) + " "
-    row_mae += f"{s3_mae_val:.2f}".rjust(9) + "°"
-    for lam in lambdas:
-        if all_dnn_errs_tt[lam]:
-            row_mae += f"{np.mean(all_dnn_errs_tt[lam]):.2f}".rjust(9) + "°"
-        else:
-            row_mae += "N/A".rjust(10)
+    # MAE row
     print("-" * len(hdr))
+    row_mae = "MAE".rjust(6) + " ".rjust(7)
+    for cn in col_names:
+        if all_errs[cn]:
+            row_mae += f"{np.mean(all_errs[cn]):.2f}°".rjust(11)
+        else:
+            row_mae += "N/A".rjust(11)
     print(row_mae)
 
-    # --- Table 2: LOO-CV ---
-    print(f"\n\n{'=' * 110}")
-    print("TABLE 2: Leave-One-Angle-Out CV (per-angle error in degrees) — GENERALIZATION TEST")
-    print(f"{'=' * 110}")
-    print(hdr)
-    print("-" * len(hdr))
-
-    all_dnn_errs_cv = {l: [] for l in lambdas}
-
-    for spk_x_val in positions:
-        theta_true_val = thetas_for_pos[spk_x_val]
-        s3_err = s3_results[spk_x_val]['err']
-
-        row = f"{spk_x_val:+.1f}m".rjust(10)
-        row += f"{theta_true_val:+.2f}".rjust(10) + "°"
-        row += f"{s3_err:+.2f}".rjust(9) + "°"
-
-        for lam in lambdas:
-            # Find the CV result for this theta
-            match = None
-            for theta, res in cv_results[lam].items():
-                if abs(theta - theta_true_val) < 0.1:
-                    match = res; break
-            if match:
-                dnn_err = match['median_theta'] - theta_true_val
-                all_dnn_errs_cv[lam].append(abs(dnn_err))
-                row += f"{dnn_err:+.2f}".rjust(9) + "°"
-            else:
-                row += "N/A".rjust(10)
-        print(row)
-
-    row_mae = "MAE".rjust(10) + " ".rjust(10) + " "
-    row_mae += f"{s3_mae_val:.2f}".rjust(9) + "°"
-    for lam in lambdas:
-        if all_dnn_errs_cv[lam]:
-            row_mae += f"{np.mean(all_dnn_errs_cv[lam]):.2f}".rjust(9) + "°"
-        else:
-            row_mae += "N/A".rjust(10)
-    print("-" * len(hdr))
-    print(row_mae)
-
-    # --- Summary ---
+    # ================================================================
+    # SUMMARY
+    # ================================================================
     print(f"\n\n{'=' * 90}")
     print("SUMMARY")
     print(f"{'=' * 90}")
-    print(f"  S3-joint MAE = {s3_mae_val:.2f}°")
-    for lam in lambdas:
-        tt_mae = np.mean(all_dnn_errs_tt[lam]) if all_dnn_errs_tt[lam] else float('nan')
-        cv_mae = np.mean(all_dnn_errs_cv[lam]) if all_dnn_errs_cv[lam] else float('nan')
-        gap = cv_mae - tt_mae
-        flag = "  <<<OVERFIT" if gap > 1.0 else ""
-        print(f"  lambda={lam:<5}  Train=Test MAE={tt_mae:.2f}°  "
-              f"LOO-CV MAE={cv_mae:.2f}°  gap={gap:+.2f}°{flag}")
 
-    best_cv_lam = None
-    best_cv_mae = 999.0
-    for lam in lambdas:
-        if all_dnn_errs_cv[lam]:
-            cv_mae = np.mean(all_dnn_errs_cv[lam])
-            if cv_mae < best_cv_mae:
-                best_cv_mae = cv_mae
-                best_cv_lam = lam
+    phys_full_mae_val = np.mean(all_errs["Phys-Full"]) if all_errs["Phys-Full"] else float('nan')
+    phys_win_mae = np.mean(all_errs["Phys-Win"]) if all_errs["Phys-Win"] else float('nan')
 
-    print(f"\n  Best CV lambda = {best_cv_lam}  (LOO-CV MAE = {best_cv_mae:.2f}°)")
-    if best_cv_mae <= s3_mae_val:
-        print(f"  [OK] PI-DNN LOO-CV MAE={best_cv_mae:.2f}° <= S3-joint MAE={s3_mae_val:.2f}°")
+    print(f"\n  Method comparison (MAE):")
+    print(f"  {'S3-joint (discrete 1D, full-WAV, no labels)':<50} {s3_mae_val:.2f}°")
+    print(f"  {'Physics-GD (continuous 2D, full-WAV, no labels)':<50} {phys_full_mae_val:.2f}°")
+    print(f"  {'Physics-GD (continuous 2D, 0.5s windows, no labels)':<50} {phys_win_mae:.2f}°")
+    for lam in lambdas:
+        tt = np.mean(all_errs[f"TT lam={lam}"]) if all_errs[f"TT lam={lam}"] else float('nan')
+        cv = np.mean(all_errs[f"CV lam={lam}"]) if all_errs[f"CV lam={lam}"] else float('nan')
+        print(f"  {'PI-DNN lam=' + str(lam) + ' (train=test)':<50} {tt:.2f}°")
+        print(f"  {'PI-DNN lam=' + str(lam) + ' (LOO-CV)':<50} {cv:.2f}°")
+
+    print(f"\n  Key findings:")
+    if phys_full_mae_val <= s3_mae_val:
+        print(f"  [OK] Physics-GD Full-WAV MAE={phys_full_mae_val:.2f}° <= S3-joint MAE={s3_mae_val:.2f}°")
     else:
-        print(f"  [WARN] PI-DNN LOO-CV MAE={best_cv_mae:.2f}° > S3-joint MAE={s3_mae_val:.2f}°")
-        print(f"  DNN cannot generalize to unseen angles better than S3-joint.")
+        print(f"  [!!] Physics-GD Full-WAV MAE={phys_full_mae_val:.2f}° > S3-joint MAE={s3_mae_val:.2f}°")
+
+    # Physics-GD Full-WAV position diagnostics
+    print(f"\n  Physics-GD Full-WAV converged positions:")
+    for spk_x_val in positions:
+        r = phys_full_results.get(spk_x_val)
+        if r:
+            print(f"    spk_x={spk_x_val:+.1f}m  pos=({r['x']:+.3f}, {r['y']:.3f})  "
+                  f"true=({spk_x_val:+.1f}, {BOARD_Y})  "
+                  f"dx={r['x']-spk_x_val:+.3f}  dy={r['y']-BOARD_Y:+.3f}")
 
 
 if __name__ == '__main__':
