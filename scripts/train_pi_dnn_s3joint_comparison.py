@@ -595,6 +595,40 @@ def s3joint_with_correction(gcc_vl, lags_vl, gcc_vr, lags_vr, spk_x, hw=0.5):
 # ============================================================
 # Step 9: Constrained PI-DNN (S3-joint priors built in)
 # ============================================================
+
+class ConvPIDNN(nn.Module):
+    """1D-CNN PI-DNN: processes GCC-VL and GCC-VR as 2-channel 1D signal.
+
+    CNN is a natural fit for S3-joint's peak-finding rule:
+    - Conv filters detect local peaks (like matched filters)
+    - Translation equivariance: a peak at different lags triggers the same filter
+    - Peak POSITION encodes the delay → maps to vx via geometry
+    """
+    def __init__(self, n_lags):
+        super().__init__()
+        self.conv = nn.Sequential(
+            nn.Conv1d(2, 32, kernel_size=7, padding=3),
+            nn.ReLU(),
+            nn.Conv1d(32, 64, kernel_size=5, padding=2),
+            nn.ReLU(),
+            nn.Conv1d(64, 64, kernel_size=5, padding=2),
+            nn.ReLU(),
+        )
+        self.pool = nn.AdaptiveMaxPool1d(1)   # global max → strongest peak response
+        self.fc = nn.Sequential(
+            nn.Linear(64, 32),
+            nn.ReLU(),
+            nn.Linear(32, 1),
+        )
+
+    def forward(self, gcc_vl, gcc_vr):
+        # gcc_vl, gcc_vr: (batch, n_lags)
+        x = torch.stack([gcc_vl, gcc_vr], dim=1)  # (batch, 2, n_lags)
+        x = self.conv(x)          # (batch, 64, n_lags)
+        x = self.pool(x).squeeze(-1)  # (batch, 64)
+        return self.fc(x).squeeze(-1)  # (batch,): vx
+
+
 class ConstrainedPIDNN(nn.Module):
     """PI-DNN with S3-joint priors:
     - Output: scalar vx (not 2D)
@@ -756,7 +790,242 @@ def train_constrained_dnn(features, gcc_vl, gcc_vr, theta_true, spk_x,
 
 
 # ============================================================
-# Step 10: Physics-Only Gradient Descent (no labels, per-window)
+# Step 10: Normalized Constrained PI-DNN (fix physics loss scale)
+# ============================================================
+def train_constrained_dnn_v2(features, gcc_vl, gcc_vr, theta_true, spk_x,
+                              lag_ms_axis, lam, seed=42,
+                              held_out_theta=None,
+                              mse_weight=1.0,
+                              epochs=200, warmup=50, lr=1e-3):
+    """Constrained PI-DNN with per-window GCC normalization.
+
+    Key difference from v1: GCC curves are normalized to peak=1 per window
+    before computing physics loss, so physics loss ≈ 0.5–1.0 instead of
+    ≈ 0.0003. This makes the physics gradient actually contribute.
+
+    mse_weight=0 → pure physics loss (learn S3-joint rule without labels).
+    """
+    torch.manual_seed(seed)
+    np.random.seed(seed)
+
+    input_dim = features.shape[1]
+    n_lags = gcc_vl.shape[1]
+    lag_step_ms = float(lag_ms_axis[1] - lag_ms_axis[0])
+    lag_start_ms_val = float(lag_ms_axis[0])
+
+    # --- Normalize GCC curves per-window: peak = 1 ---
+    gcc_vl_norm = gcc_vl.copy()
+    gcc_vr_norm = gcc_vr.copy()
+    for i in range(len(gcc_vl)):
+        peak_vl = np.max(np.abs(gcc_vl[i]))
+        peak_vr = np.max(np.abs(gcc_vr[i]))
+        if peak_vl > 1e-15:
+            gcc_vl_norm[i] /= peak_vl
+        if peak_vr > 1e-15:
+            gcc_vr_norm[i] /= peak_vr
+
+    if held_out_theta is not None:
+        train_mask = ~np.isclose(theta_true, held_out_theta, atol=0.01)
+        test_mask = np.isclose(theta_true, held_out_theta, atol=0.01)
+    else:
+        train_mask = np.ones(len(features), dtype=bool)
+        test_mask = train_mask
+
+    X_train = torch.tensor(features[train_mask])
+    gvl_train = torch.tensor(gcc_vl_norm[train_mask])
+    gvr_train = torch.tensor(gcc_vr_norm[train_mask])
+    theta_train = torch.tensor(theta_true[train_mask])
+
+    X_test = torch.tensor(features[test_mask])
+
+    model = ConstrainedPIDNN(input_dim)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-4)
+
+    n_train = len(X_train)
+    batch_size = 32
+
+    for epoch in range(epochs):
+        model.train()
+        perm = torch.randperm(n_train)
+        epoch_loss = 0.0
+        epoch_mse = 0.0
+        epoch_phys = 0.0
+        n_batches = 0
+
+        for i in range(0, n_train, batch_size):
+            idx = perm[i:i+batch_size]
+            xb = X_train[idx]
+            gvl_b = gvl_train[idx]
+            gvr_b = gvr_train[idx]
+            theta_b = theta_train[idx]
+
+            vx_hat = model(xb)
+            theta_pred = constrained_theta_from_vx(vx_hat)
+
+            # MSE loss (supervised)
+            loss_mse = torch.mean((theta_pred - theta_b)**2)
+
+            # Physics loss (S3-joint rule) — now on normalized GCC curves
+            tau_vl, tau_vr = constrained_tau_vm(vx_hat)
+            r_vl = windowed_interp(gvl_b, tau_vl,
+                                   lag_start_ms_val, lag_step_ms, n_lags)
+            r_vr = windowed_interp(gvr_b, tau_vr,
+                                   lag_start_ms_val, lag_step_ms, n_lags)
+            loss_phys = torch.mean(r_vl + r_vr)
+
+            # Combined: minimize mse_weight*MSE - lam*physics
+            if epoch < warmup and mse_weight > 0:
+                loss = mse_weight * loss_mse  # warmup: MSE only
+            else:
+                loss = mse_weight * loss_mse - lam * loss_phys
+
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            epoch_loss += loss.item()
+            epoch_mse += loss_mse.item()
+            epoch_phys += loss_phys.item()
+            n_batches += 1
+
+        if held_out_theta is None and (epoch + 1) % 50 == 0:
+            print(f"      Epoch {epoch+1:3d}  loss={epoch_loss/n_batches:+.4f}  "
+                  f"MSE={epoch_mse/n_batches:.4f}  physics={epoch_phys/n_batches:.4f}")
+
+    model.eval()
+    with torch.no_grad():
+        vx_all = model(X_test).numpy()
+        theta_all = constrained_theta_from_vx(torch.tensor(vx_all)).numpy()
+
+    test_theta_true = theta_true[test_mask]
+    test_spk_x = spk_x[test_mask]
+    unique_thetas = sorted(set(test_theta_true.tolist()))
+
+    results = {}
+    for theta in unique_thetas:
+        m = np.isclose(test_theta_true, theta, atol=0.01)
+        results[theta] = {
+            'median_theta': float(np.median(theta_all[m])),
+            'median_vx': float(np.median(vx_all[m])),
+            'std_theta': float(np.std(theta_all[m])),
+            'spk_x': float(test_spk_x[m][0]),
+        }
+    return results
+
+
+def train_conv_dnn(gcc_vl, gcc_vr, theta_true, spk_x,
+                   lag_ms_axis, lam, seed=42,
+                   held_out_theta=None,
+                   mse_weight=1.0,
+                   epochs=300, warmup=50, lr=1e-3):
+    """Train 1D-CNN PI-DNN with per-window GCC normalization.
+
+    The CNN takes (gcc_vl, gcc_vr) as 2-channel 1D input, NOT a flat
+    feature vector. This lets it use conv filters for peak detection.
+    """
+    torch.manual_seed(seed)
+    np.random.seed(seed)
+
+    n_lags = gcc_vl.shape[1]
+    lag_step_ms = float(lag_ms_axis[1] - lag_ms_axis[0])
+    lag_start_ms_val = float(lag_ms_axis[0])
+
+    # Normalize GCC curves per-window: peak = 1
+    gcc_vl_norm = gcc_vl.copy()
+    gcc_vr_norm = gcc_vr.copy()
+    for i in range(len(gcc_vl)):
+        pv = np.max(np.abs(gcc_vl[i]))
+        pr = np.max(np.abs(gcc_vr[i]))
+        if pv > 1e-15: gcc_vl_norm[i] /= pv
+        if pr > 1e-15: gcc_vr_norm[i] /= pr
+
+    if held_out_theta is not None:
+        train_mask = ~np.isclose(theta_true, held_out_theta, atol=0.01)
+        test_mask = np.isclose(theta_true, held_out_theta, atol=0.01)
+    else:
+        train_mask = np.ones(len(gcc_vl), dtype=bool)
+        test_mask = train_mask
+
+    gvl_train = torch.tensor(gcc_vl_norm[train_mask])
+    gvr_train = torch.tensor(gcc_vr_norm[train_mask])
+    theta_train = torch.tensor(theta_true[train_mask])
+
+    gvl_test = torch.tensor(gcc_vl_norm[test_mask])
+    gvr_test = torch.tensor(gcc_vr_norm[test_mask])
+
+    model = ConvPIDNN(n_lags)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-4)
+
+    n_train = len(gvl_train)
+    batch_size = 32
+
+    for epoch in range(epochs):
+        model.train()
+        perm = torch.randperm(n_train)
+        epoch_loss = 0.0
+        epoch_mse = 0.0
+        epoch_phys = 0.0
+        n_batches = 0
+
+        for i in range(0, n_train, batch_size):
+            idx = perm[i:i+batch_size]
+            gvl_b = gvl_train[idx]
+            gvr_b = gvr_train[idx]
+            theta_b = theta_train[idx]
+
+            vx_hat = model(gvl_b, gvr_b)
+            theta_pred = constrained_theta_from_vx(vx_hat)
+
+            loss_mse = torch.mean((theta_pred - theta_b)**2)
+
+            tau_vl, tau_vr = constrained_tau_vm(vx_hat)
+            r_vl = windowed_interp(gvl_b, tau_vl,
+                                   lag_start_ms_val, lag_step_ms, n_lags)
+            r_vr = windowed_interp(gvr_b, tau_vr,
+                                   lag_start_ms_val, lag_step_ms, n_lags)
+            loss_phys = torch.mean(r_vl + r_vr)
+
+            if epoch < warmup and mse_weight > 0:
+                loss = mse_weight * loss_mse
+            else:
+                loss = mse_weight * loss_mse - lam * loss_phys
+
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            epoch_loss += loss.item()
+            epoch_mse += loss_mse.item()
+            epoch_phys += loss_phys.item()
+            n_batches += 1
+
+        if held_out_theta is None and (epoch + 1) % 50 == 0:
+            print(f"      Epoch {epoch+1:3d}  loss={epoch_loss/n_batches:+.4f}  "
+                  f"MSE={epoch_mse/n_batches:.4f}  physics={epoch_phys/n_batches:.4f}")
+
+    model.eval()
+    with torch.no_grad():
+        vx_all = model(gvl_test, gvr_test).numpy()
+        theta_all = constrained_theta_from_vx(torch.tensor(vx_all)).numpy()
+
+    test_theta_true = theta_true[test_mask]
+    test_spk_x = spk_x[test_mask]
+    unique_thetas = sorted(set(test_theta_true.tolist()))
+
+    results = {}
+    for theta in unique_thetas:
+        m = np.isclose(test_theta_true, theta, atol=0.01)
+        results[theta] = {
+            'median_theta': float(np.median(theta_all[m])),
+            'median_vx': float(np.median(vx_all[m])),
+            'std_theta': float(np.std(theta_all[m])),
+            'spk_x': float(test_spk_x[m][0]),
+        }
+    return results
+
+
+# ============================================================
+# Step 12: Physics-Only Gradient Descent (no labels, per-window)
 # ============================================================
 def physics_only_optimize(gcc_vl_win, gcc_vr_win, lag_ms_axis,
                           n_steps=300, lr=0.01, n_inits=9):
@@ -1019,10 +1288,7 @@ def main():
             err_corr = res['theta_corrected'] - theta_true_val
             s3corr_results[spk_x_val] = {
                 'theta_true': theta_true_val,
-                'theta_naive': res['theta_naive'],
                 'theta_corrected': res['theta_corrected'],
-                'vx': res['vx'],
-                'err_naive': err_naive,
                 'err_corr': err_corr,
             }
             print(f"  spk_x={spk_x_val:+.1f}m  vx={res['vx']:+.3f}  "
@@ -1048,107 +1314,97 @@ def main():
     thetas_for_pos = {}
     for spk_x_val in positions:
         thetas_for_pos[spk_x_val] = s3_results[spk_x_val]['theta_true']
-    all_s3_errs = [abs(s3_results[p]['err']) for p in positions]
-    s3_mae_val = np.mean(all_s3_errs)
+    s3_mae_val = np.mean([abs(s3_results[p]['err']) for p in positions])
 
     # ================================================================
-    # Part A: Constrained PI-DNN (S3-joint priors)
+    # DIAGNOSTIC: GCC-PHAT value magnitude
     # ================================================================
-    c_lambdas = [0.0, 1.0, 5.0, 10.0]
+    print(f"\n{'=' * 90}")
+    print("DIAGNOSTIC: GCC-PHAT Value Magnitudes")
+    print(f"{'=' * 90}")
+    peak_vl = np.max(np.abs(gcc_vl), axis=1)
+    peak_vr = np.max(np.abs(gcc_vr), axis=1)
+    print(f"  gcc_vl peak: min={peak_vl.min():.6f}  mean={peak_vl.mean():.6f}  max={peak_vl.max():.6f}")
+    print(f"  gcc_vr peak: min={peak_vr.min():.6f}  mean={peak_vr.mean():.6f}  max={peak_vr.max():.6f}")
+    print(f"  → Physics loss ≈ mean(peak) ≈ {(peak_vl.mean()+peak_vr.mean())/2:.6f}")
+    print(f"  → After normalization (peak=1): physics loss ≈ 0.5–1.0")
+    print(f"  → Scale ratio: {1.0/((peak_vl.mean()+peak_vr.mean())/2):.0f}x")
 
-    # A1: Train=Test
-    cdnn_tt_results = {}
-    for lam in c_lambdas:
+    # ================================================================
+    # EXPERIMENT: CNN vs MLP, with normalized GCC, various loss configs
+    # ================================================================
+    # (label, arch, mse_weight, lam, warmup, epochs)
+    configs = [
+        # --- MLP baselines (from previous commit, quick re-run) ---
+        ("MLP MSE-only",       "mlp",  1.0,  0.0,  50, 200),
+        ("MLP phys-only λ=10", "mlp",  0.0, 10.0,   0, 200),
+        ("MLP MSE+P λ=10",    "mlp",  1.0, 10.0,  50, 200),
+        # --- CNN: same configs ---
+        ("CNN MSE-only",       "cnn",  1.0,  0.0,  50, 300),
+        ("CNN phys-only λ=1",  "cnn",  0.0,  1.0,   0, 300),
+        ("CNN phys-only λ=5",  "cnn",  0.0,  5.0,   0, 300),
+        ("CNN phys-only λ=10", "cnn",  0.0, 10.0,   0, 300),
+        ("CNN MSE+P λ=1",     "cnn",  1.0,  1.0,  50, 300),
+        ("CNN MSE+P λ=5",     "cnn",  1.0,  5.0,  50, 300),
+        ("CNN MSE+P λ=10",    "cnn",  1.0, 10.0,  50, 300),
+    ]
+
+    all_tt = {}
+    all_cv = {}
+
+    for label, arch, mse_w, lam, warmup, ep in configs:
+        train_fn = train_conv_dnn if arch == "cnn" else train_constrained_dnn_v2
+        # CNN takes (gcc_vl, gcc_vr) directly; MLP takes features
+        if arch == "cnn":
+            data_args = (gcc_vl, gcc_vr, theta_true, spk_x, lag_ms_axis)
+        else:
+            data_args = (features, gcc_vl, gcc_vr, theta_true, spk_x, lag_ms_axis)
+
+        # --- Train=Test ---
         print(f"\n{'=' * 90}")
-        print(f"[Constrained PI-DNN Train=Test] lambda={lam}")
+        print(f"[{label}] Train=Test  (mse_w={mse_w}, lam={lam}, epochs={ep})")
         print(f"{'=' * 90}")
-        res = train_constrained_dnn(features, gcc_vl, gcc_vr,
-                                     theta_true, spk_x, lag_ms_axis,
-                                     lam=lam)
-        cdnn_tt_results[lam] = res
+        res = train_fn(*data_args, lam=lam, mse_weight=mse_w,
+                        warmup=warmup, epochs=ep)
+        all_tt[label] = res
         for theta, r in sorted(res.items()):
             err = r['median_theta'] - theta
-            print(f"    theta_true={theta:+.2f}°  pred={r['median_theta']:+.2f}°  "
+            print(f"    theta={theta:+.2f}°  pred={r['median_theta']:+.2f}°  "
                   f"err={err:+.2f}°  vx={r['median_vx']:+.3f}")
 
-    # A2: LOO-CV
-    cdnn_cv_results = {}
-    for lam in c_lambdas:
-        print(f"\n{'=' * 90}")
-        print(f"[Constrained PI-DNN LOO-CV] lambda={lam}")
-        print(f"{'=' * 90}")
-        cdnn_cv_results[lam] = {}
+        # --- LOO-CV ---
+        print(f"  LOO-CV:")
+        all_cv[label] = {}
         for held_out_theta in unique_thetas:
-            spk_x_val = theta_to_spkx[held_out_theta]
-            res = train_constrained_dnn(features, gcc_vl, gcc_vr,
-                                         theta_true, spk_x, lag_ms_axis,
-                                         lam=lam,
-                                         held_out_theta=held_out_theta)
-            cdnn_cv_results[lam][held_out_theta] = res
-            # res keys are {theta: {...}} — for held_out, should have 1 entry
-            for theta, r in res.items():
-                err = r['median_theta'] - theta
-                print(f"    held_out={theta:+.2f}° (spk_x={spk_x_val:+.1f}m)  "
-                      f"pred={r['median_theta']:+.2f}°  err={err:+.2f}°  "
-                      f"vx={r['median_vx']:+.3f}")
-
-    # ================================================================
-    # Part B: Original PI-DNN (reference)
-    # ================================================================
-    lambdas = [0.0, 1.0]
-    dnn_results = {}
-
-    for lam in lambdas:
-        print(f"\n{'=' * 90}")
-        print(f"[Original PI-DNN Train=Test] lambda={lam}")
-        print(f"{'=' * 90}")
-        angle_results = train_pi_dnn(features, gcc_vl, gcc_vr,
-                                      theta_true, spk_x, lag_ms_axis,
-                                      lam=lam)
-        dnn_results[lam] = angle_results
-
-        for theta, res in sorted(angle_results.items()):
-            err = res['median_theta'] - theta
-            print(f"    theta_true={theta:+.2f}°  pred={res['median_theta']:+.2f}°  "
-                  f"err={err:+.2f}°")
-
-    cv_results = {}
-    for lam in lambdas:
-        print(f"\n{'=' * 90}")
-        print(f"[Original PI-DNN LOO-CV] lambda={lam}")
-        print(f"{'=' * 90}")
-        cv_results[lam] = {}
-        for held_out_theta in unique_thetas:
-            spk_x_val = theta_to_spkx[held_out_theta]
-            res = train_pi_dnn_cv(features, gcc_vl, gcc_vr,
-                                   theta_true, spk_x, lag_ms_axis,
-                                   lam=lam, held_out_theta=held_out_theta)
-            cv_results[lam][held_out_theta] = res
-            err = res['median_theta'] - held_out_theta
-            print(f"    held_out={held_out_theta:+.2f}° (spk_x={spk_x_val:+.1f}m)  "
-                  f"pred={res['median_theta']:+.2f}°  err={err:+.2f}°")
+            r = train_fn(*data_args, lam=lam, mse_weight=mse_w,
+                          warmup=warmup, epochs=ep,
+                          held_out_theta=held_out_theta)
+            all_cv[label][held_out_theta] = r
+            for theta, rr in r.items():
+                err = rr['median_theta'] - theta
+                print(f"    held_out={theta:+.2f}° pred={rr['median_theta']:+.2f}°  "
+                      f"err={err:+.2f}°  vx={rr['median_vx']:+.3f}")
 
     # ================================================================
     # FINAL COMPARISON TABLE
     # ================================================================
-    print(f"\n\n{'=' * 140}")
-    print("FINAL COMPARISON TABLE (per-angle error in degrees)")
-    print(f"{'=' * 140}")
+    print(f"\n\n{'=' * 120}")
+    print("FINAL COMPARISON TABLE — Normalized Physics Loss Experiment")
+    print(f"{'=' * 120}")
 
-    # Build table
-    col_names = [
-        "S3-1D", "S3+corr",
-        "C-DNN tt0", "C-DNN tt1", "C-DNN tt5", "C-DNN tt10",
-        "C-DNN cv0", "C-DNN cv1", "C-DNN cv5", "C-DNN cv10",
-        "DNN tt1", "DNN cv1",
-    ]
-    hdr = f"{'Pos':>6} {'theta':>8}"
-    for cn in col_names:
-        hdr += f"{cn:>11}"
+    # Column headers
+    method_labels = [label for label, _, _, _, _, _ in configs]
+    hdr = f"{'Pos':>6} {'theta':>8} {'S3-1D':>8} {'S3+corr':>8}"
+    for lab in method_labels:
+        short = lab.replace("MSE-only", "MSE").replace("phys-only ", "P")
+        short = short.replace("MSE+P ", "M+P")
+        hdr += f"{short:>14}"
     print(hdr)
     print("-" * len(hdr))
 
-    all_errs = {cn: [] for cn in col_names}
+    errs_s3 = []
+    errs_corr = []
+    errs_by_method = {lab: {'tt': [], 'cv': []} for lab in method_labels}
 
     for spk_x_val in positions:
         theta_tv = thetas_for_pos[spk_x_val]
@@ -1158,69 +1414,41 @@ def main():
         row += f"{theta_tv:+.2f}°".rjust(8)
 
         # S3-1D
-        row += f"{r['err']:+.2f}°".rjust(11)
-        all_errs["S3-1D"].append(abs(r['err']))
+        row += f"{r['err']:+.2f}°".rjust(8)
+        errs_s3.append(abs(r['err']))
 
         # S3+correction
-        if spk_x_val in s3corr_results:
-            e = s3corr_results[spk_x_val]['err_corr']
-            row += f"{e:+.2f}°".rjust(11)
-            all_errs["S3+corr"].append(abs(e))
-        else:
-            row += "N/A".rjust(11)
+        e_corr = s3corr_results[spk_x_val]['err_corr']
+        row += f"{e_corr:+.2f}°".rjust(8)
+        errs_corr.append(abs(e_corr))
 
-        # Constrained DNN train=test
-        for lam in c_lambdas:
-            key = f"C-DNN tt{int(lam)}" if lam == int(lam) else f"C-DNN tt{lam}"
-            m = _find_by_theta(cdnn_tt_results[lam], theta_tv)
-            if m:
-                e = m['median_theta'] - theta_tv
-                row += f"{e:+.2f}°".rjust(11)
-                all_errs[key].append(abs(e))
-            else:
-                row += "N/A".rjust(11)
-
-        # Constrained DNN LOO-CV
-        # cdnn_cv_results[lam][held_out_theta] = {theta: {median_theta, ...}}
-        for lam in c_lambdas:
-            key = f"C-DNN cv{int(lam)}" if lam == int(lam) else f"C-DNN cv{lam}"
-            inner = _find_by_theta(cdnn_cv_results[lam], theta_tv)
+        # Each method: show LOO-CV error
+        for lab in method_labels:
+            inner = _find_by_theta(all_cv[lab], theta_tv)
             if inner:
-                # inner is {theta: {median_theta, ...}}, extract the single entry
-                r_inner = list(inner.values())[0]
-                e = r_inner['median_theta'] - theta_tv
-                row += f"{e:+.2f}°".rjust(11)
-                all_errs[key].append(abs(e))
+                rr = list(inner.values())[0]
+                e = rr['median_theta'] - theta_tv
+                row += f"{e:+.2f}°".rjust(14)
+                errs_by_method[lab]['cv'].append(abs(e))
             else:
-                row += "N/A".rjust(11)
+                row += "N/A".rjust(14)
 
-        # Original DNN train=test lam=1
-        m = _find_by_theta(dnn_results.get(1.0, {}), theta_tv)
-        if m:
-            e = m['median_theta'] - theta_tv
-            row += f"{e:+.2f}°".rjust(11)
-            all_errs["DNN tt1"].append(abs(e))
-        else:
-            row += "N/A".rjust(11)
-
-        # Original DNN LOO-CV lam=1
-        m = _find_by_theta(cv_results.get(1.0, {}), theta_tv)
-        if m:
-            e = m['median_theta'] - theta_tv
-            row += f"{e:+.2f}°".rjust(11)
-            all_errs["DNN cv1"].append(abs(e))
-        else:
-            row += "N/A".rjust(11)
+            # Also collect train=test
+            m = _find_by_theta(all_tt[lab], theta_tv)
+            if m:
+                errs_by_method[lab]['tt'].append(abs(m['median_theta'] - theta_tv))
 
         print(row)
 
     print("-" * len(hdr))
     row_mae = "MAE".rjust(6) + " ".rjust(8)
-    for cn in col_names:
-        if all_errs[cn]:
-            row_mae += f"{np.mean(all_errs[cn]):.2f}°".rjust(11)
+    row_mae += f"{np.mean(errs_s3):.2f}°".rjust(8)
+    row_mae += f"{np.mean(errs_corr):.2f}°".rjust(8)
+    for lab in method_labels:
+        if errs_by_method[lab]['cv']:
+            row_mae += f"{np.mean(errs_by_method[lab]['cv']):.2f}°".rjust(14)
         else:
-            row_mae += "N/A".rjust(11)
+            row_mae += "N/A".rjust(14)
     print(row_mae)
 
     # ================================================================
@@ -1230,44 +1458,18 @@ def main():
     print("SUMMARY")
     print(f"{'=' * 90}")
 
-    print(f"\n  Signal-processing baselines:")
-    print(f"  {'S3-joint 1D (needs spk_x hint)':<55} MAE = {s3_mae_val:.2f}°")
-    print(f"  {'S3-joint + parallax correction':<55} MAE = {s3corr_mae:.2f}°")
+    print(f"\n  Baselines:")
+    print(f"  {'S3-joint 1D':<40} MAE = {np.mean(errs_s3):.2f}°")
+    print(f"  {'S3-joint + parallax correction':<40} MAE = {np.mean(errs_corr):.2f}°")
 
-    print(f"\n  Constrained PI-DNN (1D output, vy=BOARD_Y, Gaussian window):")
-    for lam in c_lambdas:
-        key_tt = f"C-DNN tt{int(lam)}"
-        key_cv = f"C-DNN cv{int(lam)}"
-        mae_tt = np.mean(all_errs[key_tt]) if all_errs[key_tt] else float('nan')
-        mae_cv = np.mean(all_errs[key_cv]) if all_errs[key_cv] else float('nan')
-        print(f"    lambda={lam:<4}  train=test MAE={mae_tt:.2f}°  LOO-CV MAE={mae_cv:.2f}°"
-              f"{'  <-- best CV' if key_cv == min((k for k in all_errs if k.startswith('C-DNN cv') and all_errs[k]), key=lambda k: np.mean(all_errs[k])) else ''}")
-
-    print(f"\n  Original PI-DNN (2D output, unconstrained):")
-    for lam in [1.0]:
-        tt_mae = np.mean(all_errs["DNN tt1"]) if all_errs["DNN tt1"] else float('nan')
-        cv_mae = np.mean(all_errs["DNN cv1"]) if all_errs["DNN cv1"] else float('nan')
-        print(f"    lambda={lam:<4}  train=test MAE={tt_mae:.2f}°  LOO-CV MAE={cv_mae:.2f}°")
-
-    print(f"\n  Key question: Does constrained PI-DNN LOO-CV beat S3-joint?")
-    best_cv_key = min(
-        (k for k in all_errs if k.startswith("C-DNN cv") and all_errs[k]),
-        key=lambda k: np.mean(all_errs[k])
-    )
-    best_cv_mae = np.mean(all_errs[best_cv_key])
-    if best_cv_mae < s3_mae_val:
-        print(f"  YES: {best_cv_key} MAE={best_cv_mae:.2f}° < S3-joint={s3_mae_val:.2f}°")
-    else:
-        print(f"  NO: best constrained DNN CV MAE={best_cv_mae:.2f}° >= S3-joint={s3_mae_val:.2f}°")
-        print(f"  (best was {best_cv_key})")
-
-    # Diagnostics: constrained DNN vx predictions
-    print(f"\n  Constrained DNN position diagnostics (best CV lambda):")
-    best_lam = float(best_cv_key.split("cv")[1])
-    for theta, r in sorted(cdnn_cv_results[best_lam].items()):
-        for t, rr in r.items():
-            print(f"    theta_true={t:+.2f}°  vx={rr['median_vx']:+.3f}  "
-                  f"spk_x={rr['spk_x']:+.1f}")
+    print(f"\n  Normalized Constrained DNN (LOO-CV):")
+    for lab in method_labels:
+        tt_mae = np.mean(errs_by_method[lab]['tt']) if errs_by_method[lab]['tt'] else float('nan')
+        cv_mae = np.mean(errs_by_method[lab]['cv']) if errs_by_method[lab]['cv'] else float('nan')
+        marker = ""
+        if cv_mae < np.mean(errs_s3):
+            marker = "  *** BEATS S3-joint ***"
+        print(f"    {lab:<25} tt={tt_mae:.2f}°  cv={cv_mae:.2f}°{marker}")
 
 
 if __name__ == '__main__':
