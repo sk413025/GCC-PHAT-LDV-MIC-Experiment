@@ -34,7 +34,7 @@
 
 % ============================================================================
 \begin{abstract}
-Acoustic source localization through severe barriers can fail catastrophically with conventional microphone arrays due to strong attenuation, barrier-induced distributed re-radiation, and vulnerability to same-room coherent interference. To address these limitations, we propose a heterogeneous sensing framework that fuses physical microphones with a laser Doppler vibrometer (LDV) probing structure-borne vibration as a reference anchor that can retain a higher effective signal-to-jammer ratio (SJR) in our testbed. Rather than feeding barrier-colored spectrograms into deep learning models, we introduce a zero-shot Physics-Informed Geometric Search (PI-GS) that computes cross-modal Generalized Cross-Correlation (GCC-PHAT) spatial features between the LDV and microphones and performs a joint geometric search. PI-GS is an engineering solver: it does not assume a universal barrier inversion model, and it is effective when the LDV--microphone pairs retain a usable LDV-coherent lag structure in the analysis band after time-frequency aggregation. In experimental evaluations, microphone-only baselines are frequently captured by structural multipath and spurious peaks (including $\tau\!\approx\!0$ collapse), while PI-GS localizes the target with a mean absolute error of $1.48^\circ$ across testing sequences without requiring neural network training.
+Acoustic source localization through severe barriers can fail catastrophically with conventional microphone arrays due to strong attenuation, barrier-induced distributed re-radiation, and vulnerability to same-room coherent interference. To address these limitations, we propose a heterogeneous sensing framework that fuses physical microphones with a laser Doppler vibrometer (LDV) probing structure-borne vibration as a reference anchor that can retain a higher effective signal-to-jammer ratio (SJR) in our testbed. Rather than feeding barrier-colored spectrograms into deep learning models, we introduce a zero-shot Physics-Informed Geometric Search (PI-GS) that computes cross-modal Generalized Cross-Correlation (GCC-PHAT) spatial features between the LDV and microphones and performs a joint geometric search. PI-GS is an engineering solver: it does not assume a universal barrier inversion model, and it is effective when the LDV--microphone pairs retain a usable LDV-coherent lag structure in the analysis band after time-frequency aggregation. In experimental evaluations, microphone-only baselines are frequently captured by structural multipath and spurious peaks (including $\tau \approx 0$ collapse), while PI-GS localizes the target with a mean absolute error of $1.48^\circ$ across testing sequences without requiring neural network training.
 \end{abstract}
 
 % ============================================================================
@@ -126,37 +126,67 @@ Contrasting this point measurement against the 2D surface integration of Eq.~\re
   \centering
   \resizebox{\columnwidth}{!}{%
   \begin{tikzpicture}[
-      box/.style={draw, rounded corners, minimum height=0.6cm, minimum width=2cm, align=center, fill=gray!10, font=\footnotesize},
-      sig/.style={draw=none, font=\footnotesize\bfseries, align=center},
-      arr/.style={-{Stealth[length=4pt]}, thick},
-      lbl/.style={font=\scriptsize, midway, fill=white, inner sep=1pt},
+      axis/.style={-{Stealth[length=4pt]}, thick},
+      wall/.style={line width=1.2pt},
+      pt/.style={circle, fill=black, inner sep=1.3pt},
+      region/.style={draw, dashed, rounded corners, line width=0.6pt},
+      contourA/.style={line width=1.0pt, blue!75!black},
+      contourB/.style={line width=1.0pt, red!75!black},
+      contourWrong/.style={line width=0.9pt, gray!70, dashed},
+      box/.style={draw, rounded corners, fill=gray!10, line width=0.6pt, align=left, font=\scriptsize},
+      lab/.style={font=\scriptsize},
     ]
 
-    \node[sig, text=green!60!black] (ldv_top) {LDV Signal};
-    \node[sig, text=blue!70, below=1.0cm of ldv_top] (mic_l) {Mic L Signal};
-    \node[sig, text=yellow!70!black, below=2.0cm of mic_l] (mic_r) {Mic R Signal};
-    \node[sig, text=green!60!black, below=1.0cm of mic_r] (ldv_bot) {LDV Signal};
+    % Axes
+    \draw[axis] (-3.6,-2.0) -- (3.2,-2.0) node[lab, below right] {$x$};
+    \draw[axis] (-3.6,-2.0) -- (-3.6,2.2) node[lab, above left] {$y$};
 
-    \node[box, right=1.0cm of ldv_top, yshift=-0.5cm] (gcc_l) {GCC-PHAT\\(V, L)};
-    \node[box, right=1.0cm of ldv_bot, yshift=0.5cm] (gcc_r) {GCC-PHAT\\(V, R)};
+    % Barrier (wall) at x = 0
+    \draw[wall] (0,-1.6) -- (0,1.8);
+    \node[lab, rotate=90] at (-0.25,0.1) {barrier};
 
-    \node[box, right=1.2cm of mic_l, yshift=-1.0cm, fill=blue!10, minimum height=1.5cm] (search) {Geometric\\Joint Search};
-    \node[sig, right=1.0cm of search] (out) {$\mathbf{\hat{p}} = (X, Y)$};
+    % Search region behind the barrier (schematic)
+    \draw[region] (-3.3,-1.5) rectangle (-0.25,1.6);
+    \node[lab] at (-2.9,1.35) {$\Omega$};
 
-    \draw[arr] (ldv_top.east) -| (gcc_l.north);
-    \draw[arr] (mic_l.east) -| (gcc_l.south);
-    
-    \draw[arr] (mic_r.east) -| (gcc_r.north);
-    \draw[arr] (ldv_bot.east) -| (gcc_r.south);
+    % Sensor locations
+    \node[pt, label={[lab]below left:$V$}] (V) at (0,0) {};
+    \node[pt, label={[lab]above right:$L$}] (L) at (2.3,1.1) {};
+    \node[pt, label={[lab]below right:$R$}] (R) at (2.3,-1.1) {};
 
-    \draw[arr] (gcc_l.east) -| node[lbl, pos=0.8] {$R_{VL}(\tau_{VL})$} (search.north);
-    \draw[arr] (gcc_r.east) -| node[lbl, pos=0.8] {$R_{VR}(\tau_{VR})$} (search.south);
+    % Candidate/true location (schematic)
+    \node[pt, label={[lab]below:$\mathbf{p}^\star$}] (P) at (-2.1,0.2) {};
 
-    \draw[arr] (search.east) -- (out.west);
+    % Light rays (distance intuition)
+    \draw[gray!55] (P) -- (V);
+    \draw[gray!55] (P) -- (L);
+    \draw[gray!55] (P) -- (R);
+
+    % Iso-delay contours (schematic hyperbola-like curves), intersecting at p*
+    \draw[contourA]
+      plot[smooth] coordinates {(-3.2,1.55) (-2.55,0.95) (-2.1,0.2) (-2.55,-0.55) (-3.2,-1.05)};
+    \node[lab, blue!75!black] at (-3.05,1.65) {$H_L$};
+
+    \draw[contourB]
+      plot[smooth] coordinates {(-3.2,0.95) (-2.55,0.55) (-2.1,0.2) (-2.55,-0.10) (-3.2,-0.35)};
+    \node[lab, red!75!black] at (-3.05,0.95) {$H_R$};
+
+    % A wrong contour illustrating a spurious peak that does not yield joint consistency in Omega
+    \draw[contourWrong]
+      plot[smooth] coordinates {(-3.2,0.25) (-2.65,0.55) (-2.25,0.95) (-1.65,1.35) (-0.65,1.55)};
+    \node[lab, gray!70] at (-2.95,0.18) {$H_L'$};
+
+    % Formula box: what PI-GS enforces (joint consistency via LDV anchor)
+    \node[box] at (1.3,-0.15) {%
+      $\tau_{VL}(\mathbf{p}) = \big(\lVert\mathbf{p}-L\rVert - \lVert\mathbf{p}-V\rVert\big)/c$\\
+      $\tau_{VR}(\mathbf{p}) = \big(\lVert\mathbf{p}-R\rVert - \lVert\mathbf{p}-V\rVert\big)/c$\\
+      $S(\mathbf{p}) = |R_{VL}(\tau_{VL}(\mathbf{p}))| + |R_{VR}(\tau_{VR}(\mathbf{p}))|$\\
+      $\hat{\mathbf{p}} = \arg\max_{\mathbf{p}\in\Omega} S(\mathbf{p})$
+    };
   \end{tikzpicture}%
   }
   \vspace{-2mm}
-  \caption{Flowchart of the Zero-Shot Physics-Informed Geometric Search (PI-GS). Instead of feeding raw STFTs into deep learning models, we pair each microphone with an LDV reference to compute independent GCC-PHAT spatial features. The PI-GS solver enforces geometric consistency across the cross-modal features, reducing sensitivity to barrier-colored magnitudes without black-box training.}
+  \caption{Textbook-style geometric interpretation of the Physics-Informed Geometric Search (PI-GS). For each candidate location $\mathbf{p}$ behind the barrier (within $\Omega$), PI-GS uses an LDV point $V$ as a shared anchor to define two relative delay templates $\tau_{VL}(\mathbf{p})$ and $\tau_{VR}(\mathbf{p})$. Iso-delay contours ($H_L$, $H_R$) visualize the joint-consistency principle: only locations whose predicted delays simultaneously agree with salient LDV--mic correlation structure across both pairs can achieve a high joint score, whereas spurious peaks typically fail to admit a consistent $\mathbf{p}$ within $\Omega$ (e.g., $H_L'$).}
   \label{fig:arch}
 \end{figure}
 
@@ -235,7 +265,7 @@ where $U_{\text{ldv}}(f)$ is the (unknown) wall response at $\vec{r}_{\text{ldv}
   \end{tikzpicture}%
   }
   \vspace{-2mm}
-  \caption{A 1D slice of the spatial objective evaluated across $X$ for a representative blocked chirp-reference window ($0.5$\,s, centered at $t=1.30$\,s) at $X=0.4$\,m. Both curves are obtained by evaluating the corresponding GCC-PHAT at the predicted lags for each $X$ (with $Y$ fixed): Mic--Mic collapses to a spurious maximum near $X\!\approx\!0$ (i.e., $\tau\!\approx\!0$), whereas PI-GS yields a dominant peak at the ground-truth coordinate.}
+  \caption{A 1D slice of the spatial objective evaluated across $X$ for a representative blocked chirp-reference window ($0.5$\,s, centered at $t=1.30$\,s) at $X=0.4$\,m. Both curves are obtained by evaluating the corresponding GCC-PHAT at the predicted lags for each $X$ (with $Y$ fixed): Mic--Mic collapses to a spurious maximum near $X \approx 0$ (i.e., $\tau \approx 0$), whereas PI-GS yields a dominant peak at the ground-truth coordinate.}
   \label{fig:spatial_score}
 \end{figure}
 
@@ -319,7 +349,7 @@ Table~\ref{tab:validation} shows that microphone-only localization can be severe
 
 PI-GS evaluates the correlation at the predicted offsets $\tau_{VL}(\mathbf{p})$ and $\tau_{VR}(\mathbf{p})$ and enforces joint lag consistency across the two LDV--Mic pairs. This geometric operation reduces susceptibility to structural multipath peaks that are inconsistent between the two pairs. In this setup, PI-GS bounds discrete errors to $\le 2.41^\circ$ and achieves $\approx 1.5^\circ$ MAE across the five blocked test angles on both chirp reference and speech slices, suggesting robust zero-shot performance under the coherence conditions exhibited by our recordings.
 
-This contrast is demonstrated in the spatial score projection in Fig.~\ref{fig:spatial_score}. In a representative blocked chirp-reference window, Mic--Mic GCC-PHAT collapses toward a spurious $\tau\!\approx\!0$ solution (peaking near $X\!\approx\!0$) rather than the ground-truth coordinate, whereas PI-GS enforces cross-modal joint consistency and yields a dominant peak near $X=0.4$\,m.
+This contrast is demonstrated in the spatial score projection in Fig.~\ref{fig:spatial_score}. In a representative blocked chirp-reference window, Mic--Mic GCC-PHAT collapses toward a spurious $\tau \approx 0$ solution (peaking near $X \approx 0$) rather than the ground-truth coordinate, whereas PI-GS enforces cross-modal joint consistency and yields a dominant peak near $X=0.4$\,m.
 
 As shown in Table~\ref{tab:validation}, without occlusion, the Mic--Mic baseline achieves a $4.04^\circ$ MAE on the speech segment across all five angles. This control suggests that the blocked-condition failures are driven by barrier-induced distributed re-radiation and the resulting multipath-dominated correlation landscape. In contrast, PI-GS reduces sensitivity to these effects by leveraging an LDV anchor and a joint geometric consistency constraint, improving stability across incidence angles in our experiments.
 
