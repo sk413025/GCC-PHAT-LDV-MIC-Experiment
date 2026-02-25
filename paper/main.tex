@@ -34,7 +34,7 @@
 
 % ============================================================================
 \begin{abstract}
-Acoustic source localization through severe barriers can fail catastrophically with conventional microphone arrays due to strong attenuation, barrier-induced distributed re-radiation, and vulnerability to same-room coherent interference. To address these limitations, we propose a heterogeneous sensing framework that fuses physical microphones with a laser Doppler vibrometer (LDV) probing structure-borne vibration as a reference anchor that can retain a higher effective signal-to-jammer ratio (SJR) in our testbed. Rather than feeding barrier-colored spectrograms into deep learning models, we introduce a zero-shot Physics-Informed Geometric Search (PI-GS) that computes cross-modal Generalized Cross-Correlation (GCC-PHAT) spatial features between the LDV and microphones and performs a joint geometric search. PI-GS is an engineering solver: it does not assume a universal barrier inversion model, and it is effective when the LDV--microphone pairs retain a usable LDV-coherent lag structure in the analysis band after time-frequency aggregation. In experimental evaluations, microphone-only baselines are frequently captured by structural multipath and spurious edge diffractions, while PI-GS localizes the target with a mean absolute error of $1.48^\circ$ across testing sequences without requiring neural network training.
+Acoustic source localization through severe barriers can fail catastrophically with conventional microphone arrays due to strong attenuation, barrier-induced distributed re-radiation, and vulnerability to same-room coherent interference. To address these limitations, we propose a heterogeneous sensing framework that fuses physical microphones with a laser Doppler vibrometer (LDV) probing structure-borne vibration as a reference anchor that can retain a higher effective signal-to-jammer ratio (SJR) in our testbed. Rather than feeding barrier-colored spectrograms into deep learning models, we introduce a zero-shot Physics-Informed Geometric Search (PI-GS) that computes cross-modal Generalized Cross-Correlation (GCC-PHAT) spatial features between the LDV and microphones and performs a joint geometric search. PI-GS is an engineering solver: it does not assume a universal barrier inversion model, and it is effective when the LDV--microphone pairs retain a usable LDV-coherent lag structure in the analysis band after time-frequency aggregation. In experimental evaluations, microphone-only baselines are frequently captured by structural multipath and spurious peaks (including $\tau\!\approx\!0$ collapse), while PI-GS localizes the target with a mean absolute error of $1.48^\circ$ across testing sequences without requiring neural network training.
 \end{abstract}
 
 % ============================================================================
@@ -184,60 +184,51 @@ To connect Eq.~\ref{eq:gcc_vm} to the heterogeneous sensing physics, we separate
 where $U_{\text{ldv}}(f)$ is the (unknown) wall response at $\vec{r}_{\text{ldv}}$ driven by the source and $X_{m,\text{rest}}(f)$ aggregates the dense ``Coherence Trap'' contributions from $S \setminus \vec{r}_{\text{ldv}}$ and jammer terms. The factor $B_m(f)$ collects radiation/geometry effects and is treated as slowly varying over the analysis band. Under Eq.~\ref{eq:cross}, PHAT-GCC does not \emph{guarantee} barrier removal; it provides a useful spatial feature when the LDV-coherent component is non-negligible relative to $X_{m,\text{rest}}$ (e.g., after time-frequency aggregation). In our implementation we search over the full lag range and use a magnitude-based criterion (e.g., $|R_{Vm}(\tau)|$) to reduce sensitivity to residual phase rotations.
 
 % ============================================================================
-% DATA LINEAGE: Coherence Trap Scalograms
-% Script: scripts/generate_freq_x_scalogram.py
-% Input WAVs: 
-%   LDV: 0223-LDV-40-boy(+0.4m)-13-block.wav
-%   MicL: 0223-MIC-LEFT-40-boy(+0.4m)-13-block.wav
-%   MicR: 0223-MIC-RIGHT-40-boy(+0.4m)-13-block.wav
-% Outputs: 
-%   results/freq_x_scalogram_MicMic.dat
-%   results/freq_x_scalogram_PIGS.dat
+% DATA LINEAGE: Coherence Trap Spatial Score (Representative blocked trial)
+% Representative blocked trial at target coordinate X=+0.4 m (same setup as Table 1).
+% Trial WAVs:
+%   LDV:  /home/sbplab/jiawei/0222-block/0223-block/0223-block-2/0223-LDV-40-boy(+0.4m)-15-block.wav
+%   MicL: /home/sbplab/jiawei/0222-block/0223-block/0223-block-2/0223-MIC-LEFT-40-boy(+0.4m)-15-block.wav
+%   MicR: /home/sbplab/jiawei/0222-block/0223-block/0223-block-2/0223-MIC-RIGHT-40-boy(+0.4m)-15-block.wav
+% Segment: 0.5 s frame centered at t=1.30 s (chirp region).
+% GCC-PHAT band: 500–2000 Hz. Scores are normalized to each curve's maximum and plotted in dB.
 % ============================================================================
-% --- Figure X: Empirical Demonstration of the Coherence Trap (Scalogram) ---
+% --- Figure 3: Coherence Trap Spatial Score (1D) ---
 \begin{figure}[t]
   \centering
   \resizebox{\columnwidth}{!}{%
   \begin{tikzpicture}
     \begin{axis}[
-      view={0}{90},
-      scale only axis,
-      width=4cm, height=3.5cm,
-      xlabel={Lag $\tau$ (ms)},
-      ylabel={Freq (Hz)},
-      title={(a) Mic-L vs Mic-R (Coherence Trap)},
-      xmin=-3, xmax=3, ymin=500, ymax=2000,
-      enlargelimits=false,
-      axis on top,
-      colormap/viridis,
-      colorbar,
-      colorbar style={width=0.2cm, font=\scriptsize}
+      xlabel={Physical Barrier Coordinate $X$ (m)},
+      ylabel={Normalized Spatial Score [dB]},
+      xmin=-1.0, xmax=1.0,
+      ymin=-15, ymax=2,
+      legend pos=south east,
+      grid=major,
+      width=8.5cm, height=4.5cm,
+      thick
     ]
-      \addplot3[surf, shader=flat corner, mesh/cols=50] table[x=X, y=Freq, z=Value] {../results/freq_x_scalogram_MicMic.dat};
+    % Mic-Mic GCC-PHAT (Coherence Trap)
+    \addplot[color=red!70, dashed, line width=1.5pt] coordinates {
+      (-1.00, -13.62) (-0.92, -10.94) (-0.83, -13.58) (-0.75, -50.51) (-0.67, -10.51) (-0.58, -8.26) (-0.50, -36.15) (-0.42, -6.72) (-0.33, -8.80) (-0.25, -15.89) (-0.17, -12.47) (-0.08, -14.23) (0.00, -0.00) (0.08, -3.77) (0.17, -5.55) (0.25, -2.97) (0.33, -22.21) (0.42, -30.25) (0.50, -14.64) (0.58, -32.24) (0.67, -9.51) (0.75, -13.65) (0.83, -17.96) (0.92, -13.91) (1.00, -54.12)
+    };
+    \addlegendentry{Mic--Mic GCC-PHAT};
+
+    % PI-GS Objective (LDV-Mic joint)
+    \addplot[color=blue!80, solid, line width=1.5pt] coordinates {
+      (-1.00, -1.67) (-0.92, -5.47) (-0.83, -11.77) (-0.75, -2.38) (-0.67, -5.19) (-0.58, -4.50) (-0.50, -17.00) (-0.42, -13.54) (-0.33, -6.00) (-0.25, -2.14) (-0.17, -4.45) (-0.08, -8.68) (0.00, -10.13) (0.08, -5.61) (0.17, -28.15) (0.25, -3.32) (0.33, -9.57) (0.42, -0.00) (0.50, -3.41) (0.58, -4.04) (0.67, -10.50) (0.75, -17.18) (0.83, -14.16) (0.92, -6.94) (1.00, -1.51)
+    };
+    \addlegendentry{PI-GS Objective};
+
+    % Ground Truth Line
+    \draw[color=black, loosely dashed, line width=1pt] (axis cs:0.4,-15) -- (axis cs:0.4,2);
+    \node[anchor=south west, font=\scriptsize] at (axis cs:0.4,-15) {Target: $X=0.4$\,m};
     \end{axis}
-  \end{tikzpicture}
-  \hskip 0.2cm
-  \begin{tikzpicture}
-    \begin{axis}[
-      view={0}{90},
-      scale only axis,
-      width=4cm, height=3.5cm,
-      xlabel={Lag $\tau$ (ms)},
-      title={(b) LDV vs Mic-L (Anchor Isolation)},
-      xmin=-3, xmax=3, ymin=500, ymax=2000,
-      enlargelimits=false,
-      axis on top,
-      colormap/viridis,
-      colorbar,
-      colorbar style={width=0.2cm, font=\scriptsize}
-    ]
-      \addplot3[surf, shader=flat corner, mesh/cols=50] table[x=X, y=Freq, z=Value] {../results/freq_x_scalogram_PIGS.dat};
-    \end{axis}
-  \end{tikzpicture}
+  \end{tikzpicture}%
   }
   \vspace{-2mm}
-  \caption{Empirical frequency--lag scalograms ($|X_i(f) X_j^*(f)|$) illustrating the ``Coherence Trap.'' (a) The conventional Mic--Mic pair exhibits a broad, multi-peak lag structure under barrier-induced structural multipath. (b) The LDV--Mic cross-spectrum can exhibit a clearer lag structure when the LDV retains a usable target-coherent component in our setup.}
-  \label{fig:scalogram}
+  \caption{A 1D slice of the spatial objective evaluated across barrier coordinate $X$ for a representative blocked chirp frame ($0.5$\,s) at $X=0.4$\,m. Mic--Mic GCC-PHAT collapses to a spurious maximum near $X\!\approx\!0$ (i.e., $\tau\!\approx\!0$), whereas PI-GS yields a dominant peak near the ground-truth coordinate.}
+  \label{fig:spatial_score}
 \end{figure}
 
 To overcome this corrupted landscape, our algorithm acts as a \textit{Physics-Informed Geometric Search} (PI-GS), leveraging geometric consistency between $\tau_{VL}(\mathbf{p})$ and $\tau_{VR}(\mathbf{p})$ as a constraint.
@@ -247,7 +238,9 @@ To overcome this corrupted landscape, our algorithm acts as a \textit{Physics-In
 
 PI-GS uses the LDV as a shared anchor and combines two independent cross-modal features (LDV--MicL and LDV--MicR) with a geometric consistency constraint.
 
-In a near-field scenario, defining the delay purely by target angle ($\theta$) implicitly assumes a known fixed distance. PI-GS instead searches a 2D source coordinate $\mathbf{p} = (X, Y)$ within a physical manifold $\Omega$. For any hypothesized $\mathbf{p}$, we compute a free-space travel-time template to the LDV point and to each microphone, $\tau_V(\mathbf{p})$ and $\tau_m(\mathbf{p})$, using Euclidean distances and sound speed $c$, and form the relative cross-modal delay template $\tau_{Vm}(\mathbf{p}) = \tau_m(\mathbf{p}) - \tau_V(\mathbf{p})$ for $m \in \{L, R\}$. We denote these as $\tau_{VL}(\mathbf{p})$ and $\tau_{VR}(\mathbf{p})$ for notational clarity. Although Eq.~\ref{eq:mics} implies the microphone observation is a distributed re-radiation field, this template provides a practical geometric constraint: PI-GS succeeds when the LDV-coherent component yields a dominant lag that varies consistently with $\mathbf{p}$ across both microphones.
+In a near-field scenario, defining the delay purely by target angle ($\theta$) implicitly assumes a known fixed distance. PI-GS instead searches a 2D source coordinate $\mathbf{p} = (X, Y)$ within a physical manifold $\Omega$, where $X$ is parallel to the barrier and $Y$ is the range (normal) direction. For any hypothesized $\mathbf{p}$, we compute a free-space travel-time template to the LDV point and to each microphone, $\tau_V(\mathbf{p})$ and $\tau_m(\mathbf{p})$, using Euclidean distances and sound speed $c$, and form the relative cross-modal delay template $\tau_{Vm}(\mathbf{p}) = \tau_m(\mathbf{p}) - \tau_V(\mathbf{p})$ for $m \in \{L, R\}$. We denote these as $\tau_{VL}(\mathbf{p})$ and $\tau_{VR}(\mathbf{p})$ for notational clarity. Although Eq.~\ref{eq:mics} implies the microphone observation is a distributed re-radiation field, this template provides a practical geometric constraint: PI-GS succeeds when the LDV-coherent component yields a dominant lag that varies consistently with $\mathbf{p}$ across both microphones.
+
+\textit{Evaluation convention (testbed):} In our cardboard setup, the ground-truth source locations are specified by a lateral coordinate $X=x_s$ along the barrier, with a fixed range in our evaluation. We therefore visualize and evaluate 1D slices of the objective along $X$ (with $Y$ fixed). For reporting DoA in degrees, we use the standard mic-pair convention with spacing $d$ ($d=1.4$\,m in our setup): after obtaining $\hat{\mathbf{p}}$, we compute the implied mic-pair delay $\tau_{LR}(\hat{\mathbf{p}})=\tau_L(\hat{\mathbf{p}})-\tau_R(\hat{\mathbf{p}})$ and map it to an equivalent azimuth angle $\hat{\theta}=\arcsin(c\,\tau_{LR}(\hat{\mathbf{p}})/d)$.
 
 The PI-GS core operation establishes a unified joint scoring objective across the LDV anchor. It extracts the spatially-whitened correlation magnitude of both the left and right sensor pairs at their predicted offsets:
 %
@@ -272,7 +265,7 @@ In the receiving room, two measurement microphones are placed $1.75\text{\,m}$ f
 To evaluate interference robustness, a "jammer" speaker broadcasts continuous babble noise inside the receiving room, $1.0\text{\,m}$ from the microphones. Due to the barrier's significant transmission loss, the \emph{effective} Signal-to-Jammer Ratio (SJR) at the microphones is profoundly negative even at moderate jammer volumes.
 
 \subsection{Implementation Details}
-Signals are acquired at a hardware sample rate of 48\,kHz and processed using 0.5-second frames. To extract spatial features, both LDV and microphone signals are localized via 1024-point GCC-PHAT. PI-GS acts as an immediate post-processor, analytically sweeping the physical coordinate manifold $\Omega$ using simple additive peak interpolation without requiring a single cycle of neural network pre-training.
+Signals are acquired at a hardware sample rate of 48\,kHz. To extract spatial features, we compute GCC-PHAT from STFTs with $n_{\text{fft}}=1024$ and aggregate the resulting correlation features over 0.5-second windows. PI-GS then sweeps the physical coordinate manifold $\Omega$ using the joint objective in Eq.~\ref{eq:obj} without requiring neural network pre-training.
 
 % ============================================================================
 \section{Results and Discussion}
@@ -285,19 +278,19 @@ First, we establish baseline performance without the active jammer, where the on
 % ============================================================================
 % DATA LINEAGE: Table 1 (Paper)
 % Speech columns: results/paper_table1_audit_20260225_034741/table1_values.json (generated by scripts/generate_paper_table1.py)
-% Chirp columns: paper/table1_chirp_override.json (author-verified run results; +0.8m uses re-record #21)
+% Chirp columns: paper/table1_chirp_override.json (author-verified run results from separate chirp reference recordings; +0.8m uses re-record #21)
 % ============================================================================
 % --- Table 1: Cross-Condition Validation (table*) ---
 \begin{table*}[t!]
   \centering
-  \caption{DoA absolute errors ($|err|$) under unblocked and blocked conditions, evaluated on a chirp segment (0--2\,s) and a speech segment (3--8\,s) from the same recordings.}
+  \caption{DoA absolute errors ($|err|$) under unblocked and blocked conditions, evaluated on a chirp reference slice (0--2\,s) and a speech slice (3--8\,s) from separate recordings at the same nominal positions.}
   \label{tab:validation}
   \vspace{-3mm}
   \small
   \setlength{\tabcolsep}{5pt}
   \begin{tabular}{l c ccc c ccc}
     \toprule
-    \multirow{2}{*}{\textbf{Target Azimuth ($\theta$)}} & \multicolumn{3}{c}{\textbf{Chirp Segment Error ($^\circ$)}} & & \multicolumn{3}{c}{\textbf{Speech Segment Error ($^\circ$)}} \\
+    \multirow{2}{*}{\textbf{Target Azimuth ($\theta$)}} & \multicolumn{3}{c}{\textbf{Chirp Reference Error (0--2\,s) ($^\circ$)}} & & \multicolumn{3}{c}{\textbf{Speech Error (3--8\,s) ($^\circ$)}} \\
     \cmidrule{2-4} \cmidrule{6-8}
     & \textbf{Unblock (Mic)} & \textbf{Block (Mic)} & \textbf{Block (PI-GS)} & & \textbf{Unblock (Mic)} & \textbf{Block (Mic)} & \textbf{Block (PI-GS)} \\
     \midrule
@@ -312,49 +305,11 @@ First, we establish baseline performance without the active jammer, where the on
   \end{tabular}
 \end{table*}
 
-Table~\ref{tab:validation} shows that microphone-only localization can be severely misleading in blocked settings on both segments: Mic--Mic GCC-PHAT is often captured by spurious structural peaks, yielding $31.08^\circ$ MAE on the chirp segment and $33.44^\circ$ MAE on the speech segment, with errors up to $79.29^\circ$ (chirp) and $78.52^\circ$ (speech). In contrast, PI-GS anchors both microphones to the LDV reference and enforces joint lag consistency, achieving $1.49^\circ$ MAE (chirp) and $1.48^\circ$ MAE (speech) under the same blocked condition.
+Table~\ref{tab:validation} shows that microphone-only localization can be severely misleading in blocked settings on both the chirp reference and speech slices: Mic--Mic GCC-PHAT is often captured by spurious structural peaks, yielding $31.08^\circ$ MAE on the chirp reference and $33.44^\circ$ MAE on speech, with errors up to $79.29^\circ$ (chirp) and $78.52^\circ$ (speech). In contrast, PI-GS anchors both microphones to the LDV reference and enforces joint lag consistency, achieving $1.49^\circ$ MAE (chirp) and $1.48^\circ$ MAE (speech) under the same blocked condition.
 
-PI-GS evaluates the correlation at the predicted offsets $\tau_{VL}(\mathbf{p})$ and $\tau_{VR}(\mathbf{p})$ and enforces joint lag consistency across the two LDV--Mic pairs. This geometric operation reduces susceptibility to structural multipath peaks that are inconsistent between the two pairs. In this setup, PI-GS bounds discrete errors to $\le 2.41^\circ$ and achieves $\approx 1.5^\circ$ MAE across the five blocked test angles on both segments, suggesting robust zero-shot performance under the coherence conditions exhibited by our recordings.
+PI-GS evaluates the correlation at the predicted offsets $\tau_{VL}(\mathbf{p})$ and $\tau_{VR}(\mathbf{p})$ and enforces joint lag consistency across the two LDV--Mic pairs. This geometric operation reduces susceptibility to structural multipath peaks that are inconsistent between the two pairs. In this setup, PI-GS bounds discrete errors to $\le 2.41^\circ$ and achieves $\approx 1.5^\circ$ MAE across the five blocked test angles on both chirp reference and speech slices, suggesting robust zero-shot performance under the coherence conditions exhibited by our recordings.
 
-% --- Figure 3: True Spatial Score Curve ---
-\begin{figure}[t]
-  \centering
-  \resizebox{\columnwidth}{!}{%
-  \begin{tikzpicture}
-    \begin{axis}[
-      xlabel={Physical Barrier Coordinate $X$ (m)},
-      ylabel={Normalized Spatial Score [dB]},
-      xmin=-1.0, xmax=1.0,
-      ymin=-15, ymax=2,
-      legend pos=south east,
-      grid=major,
-      width=8.5cm, height=4.5cm,
-      thick
-    ]
-    % True Mic-Mic GCC-PHAT (Coherence Trap)
-    \addplot[color=red!70, dashed, line width=1.5pt] coordinates {
-      (-1.00, -6.32) (-0.88, -3.65) (-0.80, -0.20) (-0.72, -3.66) (-0.64, -9.02) (-0.56, -13.01) (-0.48, -3.54) (-0.40, -1.95) (-0.32, -5.83) (-0.24, -13.01) (-0.16, -5.54) (-0.08, -5.13) (0.00, -0.86) (0.08, -5.13) (0.16, -5.54) (0.24, -13.01) (0.32, -5.83) (0.40, -1.95) (0.48, -3.54) (0.56, -13.01) (0.64, -9.02) (0.72, -3.66) (0.80, -0.20) (0.88, -3.65) (1.00, -6.32)
-    };
-    \addlegendentry{Mic-Mic GCC-PHAT};
-
-    % True LDV-Mic S3-joint
-    \addplot[color=blue!80, solid, line width=1.5pt] coordinates {
-      (-1.00, -2.76) (-0.88, -4.29) (-0.80, -2.14) (-0.72, -2.18) (-0.64, -0.66) (-0.56, -1.32) (-0.48, -1.19) (-0.40, -1.02) (-0.32, -1.78) (-0.24, -1.53) (-0.16, -0.97) (-0.08, -2.31) (0.00, -1.97) (0.08, -1.01) (0.16, -1.21) (0.24, -0.87) (0.32, -1.59) (0.40, -0.45) (0.48, -1.66) (0.56, -0.59) (0.64, -0.87) (0.72, -1.66) (0.80, -0.91) (0.88, -0.91) (1.00, -1.80)
-    };
-    \addlegendentry{PI-GS Objective};
-    
-    % Ground Truth Line
-    \draw[color=black, loosely dashed, line width=1pt] (axis cs:0.4,-15) -- (axis cs:0.4,2);
-    \node[anchor=south west, font=\scriptsize] at (axis cs:0.4,-15) {Target: $0.4$\,m};
-    \end{axis}
-  \end{tikzpicture}%
-  }
-  \vspace{-2mm}
-  \caption{A 1D slice of the spatial objective evaluated across the barrier coordinate $X$ for a $25$\,cm near-field target. The conventional Mic--Mic array is strongly distorted by barrier-induced structural multipath, locking onto edge-diffraction-dominated peaks ($\pm 0.8$\,m). Conversely, PI-GS reduces this distortion and yields an objective peak near the ground-truth coordinate ($X = 0.4$\,m) in our trial.}
-  \label{fig:spatial_score}
-\end{figure}
-
-This contrast is demonstrated in the spatial score projection. Fig.~\ref{fig:spatial_score} plots a 1D slice of the objective across the physical coordinates of the cardboard barrier during the ``blocked'' trial. While the Mic--Mic GCC-PHAT yields a distorted response by locking its highest peaks onto edge diffraction points at $\pm 0.8$\,m, PI-GS enforces cross-modal joint consistency and yields an objective peak near the ground-truth coordinate ($X=0.4$\,m) in our trial.
+This contrast is demonstrated in the spatial score projection in Fig.~\ref{fig:spatial_score}. In a representative blocked chirp frame, Mic--Mic GCC-PHAT collapses toward a spurious $\tau\!\approx\!0$ solution (peaking near $X\!\approx\!0$) rather than the ground-truth coordinate, whereas PI-GS enforces cross-modal joint consistency and yields a dominant peak near $X=0.4$\,m.
 
 As shown in Table~\ref{tab:validation}, without occlusion, the Mic--Mic baseline achieves a $4.04^\circ$ MAE on the speech segment across all five angles. This control suggests that the blocked-condition failures are driven by barrier-induced distributed re-radiation and the resulting multipath-dominated correlation landscape. In contrast, PI-GS reduces sensitivity to these effects by leveraging an LDV anchor and a joint geometric consistency constraint, improving stability across incidence angles in our experiments.
 
