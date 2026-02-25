@@ -121,72 +121,59 @@ Contrasting this point measurement against the 2D surface integration of Eq.~\re
 \section{Physics-Informed Geometric Search (PI-GS)}
 \label{sec:method}
 
-% --- Figure 2: Architecture ---
+% --- Figure 2: PI-GS geometric intuition ---
 \begin{figure}[t]
   \centering
   \resizebox{\columnwidth}{!}{%
   \begin{tikzpicture}[
-      axis/.style={-{Stealth[length=4pt]}, thick},
+      x=1.0cm, y=1.0cm,
       wall/.style={line width=1.2pt},
       pt/.style={circle, fill=black, inner sep=1.3pt},
       region/.style={draw, dashed, rounded corners, line width=0.6pt},
       contourA/.style={line width=1.0pt, blue!75!black},
       contourB/.style={line width=1.0pt, red!75!black},
-      contourWrong/.style={line width=0.9pt, gray!70, dashed},
-      box/.style={draw, rounded corners, fill=gray!10, line width=0.6pt, align=left, font=\scriptsize},
+      contourWrong/.style={line width=0.9pt, gray!60, dashed},
       lab/.style={font=\scriptsize},
     ]
-
-    % Axes
-    \draw[axis] (-3.6,-2.0) -- (3.2,-2.0) node[lab, below right] {$x$};
-    \draw[axis] (-3.6,-2.0) -- (-3.6,2.2) node[lab, above left] {$y$};
+    \useasboundingbox (-2.72,-1.32) rectangle (1.18,1.32);
 
     % Barrier (wall) at x = 0
-    \draw[wall] (0,-1.6) -- (0,1.8);
-    \node[lab, rotate=90] at (-0.25,0.1) {barrier};
+    \draw[wall] (0,-1.25) -- (0,1.25);
+    \node[lab, gray!60] at (0.18,1.22) {$x=0$};
 
     % Search region behind the barrier (schematic)
-    \draw[region] (-3.3,-1.5) rectangle (-0.25,1.6);
-    \node[lab] at (-2.9,1.35) {$\Omega$};
+    \draw[region] (-2.7,-1.10) rectangle (-0.25,1.10);
+    \node[lab] at (-2.48,0.92) {$\Omega$};
 
     % Sensor locations
     \node[pt, label={[lab]below left:$V$}] (V) at (0,0) {};
-    \node[pt, label={[lab]above right:$L$}] (L) at (2.3,1.1) {};
-    \node[pt, label={[lab]below right:$R$}] (R) at (2.3,-1.1) {};
+    \node[pt, label={[lab]above right:$L$}] (L) at (0.95,0.75) {};
+    \node[pt, label={[lab]below right:$R$}] (R) at (0.95,-0.75) {};
+    \draw[gray!55, line width=0.6pt] (L) -- (R);
 
-    % Candidate/true location (schematic)
-    \node[pt, label={[lab]below:$\mathbf{p}^\star$}] (P) at (-2.1,0.2) {};
-
-    % Light rays (distance intuition)
-    \draw[gray!55] (P) -- (V);
-    \draw[gray!55] (P) -- (L);
-    \draw[gray!55] (P) -- (R);
+    % Estimated location (schematic)
+    \node[pt, label={[lab]below:$\hat{\mathbf{p}}$}] (P) at (-1.85,0.10) {};
+    \node[lab, gray!55] at (-1.85,-0.30) {joint-consistent};
 
     % Iso-delay contours (schematic hyperbola-like curves), intersecting at p*
     \draw[contourA]
-      plot[smooth] coordinates {(-3.2,1.55) (-2.55,0.95) (-2.1,0.2) (-2.55,-0.55) (-3.2,-1.05)};
-    \node[lab, blue!75!black] at (-3.05,1.65) {$H_L$};
+      plot[smooth] coordinates {(-2.65,1.05) (-2.20,0.65) (-1.85,0.10) (-2.20,-0.55) (-2.65,-0.95)};
+    \node[lab, blue!75!black] at (-2.60,1.12) {$H_L$};
 
     \draw[contourB]
-      plot[smooth] coordinates {(-3.2,0.95) (-2.55,0.55) (-2.1,0.2) (-2.55,-0.10) (-3.2,-0.35)};
-    \node[lab, red!75!black] at (-3.05,0.95) {$H_R$};
+      plot[smooth] coordinates {(-2.65,0.70) (-2.25,0.40) (-1.85,0.10) (-2.25,-0.10) (-2.65,-0.30)};
+    \node[lab, red!75!black] at (-2.60,0.73) {$H_R$};
 
     % A wrong contour illustrating a spurious peak that does not yield joint consistency in Omega
     \draw[contourWrong]
-      plot[smooth] coordinates {(-3.2,0.25) (-2.65,0.55) (-2.25,0.95) (-1.65,1.35) (-0.65,1.55)};
-    \node[lab, gray!70] at (-2.95,0.18) {$H_L'$};
+      plot[smooth] coordinates {(-2.65,0.10) (-2.20,0.35) (-1.85,0.65) (-1.25,0.98) (-0.65,1.06)};
+    \node[lab, gray!70] at (-2.58,0.05) {$H_L'$ (spurious)};
 
-    % Formula box: what PI-GS enforces (joint consistency via LDV anchor)
-    \node[box] at (1.3,-0.15) {%
-      $\tau_{VL}(\mathbf{p}) = \big(\lVert\mathbf{p}-L\rVert - \lVert\mathbf{p}-V\rVert\big)/c$\\
-      $\tau_{VR}(\mathbf{p}) = \big(\lVert\mathbf{p}-R\rVert - \lVert\mathbf{p}-V\rVert\big)/c$\\
-      $S(\mathbf{p}) = |R_{VL}(\tau_{VL}(\mathbf{p}))| + |R_{VR}(\tau_{VR}(\mathbf{p}))|$\\
-      $\hat{\mathbf{p}} = \arg\max_{\mathbf{p}\in\Omega} S(\mathbf{p})$
-    };
+    % (symbols are defined in the caption to avoid covering the geometry)
   \end{tikzpicture}%
   }
   \vspace{-2mm}
-  \caption{Textbook-style geometric interpretation of the Physics-Informed Geometric Search (PI-GS). For each candidate location $\mathbf{p}$ behind the barrier (within $\Omega$), PI-GS uses an LDV point $V$ as a shared anchor to define two relative delay templates $\tau_{VL}(\mathbf{p})$ and $\tau_{VR}(\mathbf{p})$. Iso-delay contours ($H_L$, $H_R$) visualize the joint-consistency principle: only locations whose predicted delays simultaneously agree with salient LDV--mic correlation structure across both pairs can achieve a high joint score, whereas spurious peaks typically fail to admit a consistent $\mathbf{p}$ within $\Omega$ (e.g., $H_L'$).}
+  \caption{Geometric intuition of PI-GS. With the LDV point $V$ as a shared anchor, a lag hypothesis for each LDV--mic pair defines an iso-delay contour over candidate locations $\mathbf{p}\in\Omega$ (e.g., $H_L$ for $\tau_{VL}(\mathbf{p})=\mathrm{const}$ and $H_R$ for $\tau_{VR}(\mathbf{p})=\mathrm{const}$). PI-GS scores each candidate by indexing the two cross-modal GCC-PHAT magnitudes at the predicted delays, $S(\mathbf{p}) = \left|R_{VL}\big(\tau_{VL}(\mathbf{p})\big)\right| + \left|R_{VR}\big(\tau_{VR}(\mathbf{p})\big)\right|$, and selects $\hat{\mathbf{p}}=\arg\max_{\mathbf{p}\in\Omega} S(\mathbf{p})$ (Eq.~\ref{eq:obj}). A spurious peak in one pair often fails to admit a jointly consistent location within $\Omega$ (e.g., $H_L'$).}
   \label{fig:arch}
 \end{figure}
 
@@ -287,7 +274,10 @@ The PI-GS core operation establishes a unified joint scoring objective across th
   \label{eq:obj}
 \end{equation}
 %
+Operationally, each candidate $\mathbf{p}$ defines two predicted delays that \emph{index into} the two correlation functions; Eq.~\ref{eq:obj} selects the location whose indexed correlation magnitudes are jointly large.
 This joint objective acts as a form of spatial focusing. While barrier-induced multipath (Eq.~\ref{eq:cross}) can inject many secondary peaks into $R_{VL}(\tau)$ and $R_{VR}(\tau)$ individually, many of these peaks are not jointly consistent with a single source hypothesis under the shared LDV anchor. Enforcing Eq.~\ref{eq:obj} therefore favors locations whose predicted relative lags align simultaneously across both LDV-microphone pairs, reducing susceptibility to spurious peaks when a usable LDV-coherent component exists in both channels.
+Geometrically, Eq.~\ref{eq:obj} implements this ``joint consistency'' by searching for a location in $\Omega$ where the two relative iso-delay constraints can be satisfied simultaneously (Fig.~\ref{fig:arch}).
+Under the condition that each cross-modal correlation magnitude $|R_{Vm}(\tau)|$ exhibits a salient peak near the true relative delay $\tau_{Vm}(\mathbf{p}^\star)$, the sum in Eq.~\ref{eq:obj} becomes large only when \emph{both} predicted delays hit their respective peaks, so the maximizer tends to concentrate near $\mathbf{p}^\star$.
 
 % ============================================================================
 \section{Experimental Setup}
@@ -359,17 +349,19 @@ Beyond tracking accuracy through passive attenuation, the primary motivation for
 
 % ============================================================================
 % DATA LINEAGE: Jammer Resilience Curve
-% Script: scripts/generate_jammer_curve_msnf.py
-% Core Logic: Sweeps SJR by dynamically mixing a jammer source into the target.
-% Input Target WAVs (Blocked):
-%   LDV: 0223-LDV-40-boy(+0.4m)-13-block.wav
-%   MicL: 0223-MIC-LEFT-40-boy(+0.4m)-13-block.wav
-%   MicR: 0223-MIC-RIGHT-40-boy(+0.4m)-13-block.wav
-% Input Jammer WAVs (Unblocked):
-%   MicL: 0223-unblock-7(high)/0223-MIC-LEFT-40-boy(-0.8m)-20-unblock.wav
-%   MicR: 0223-unblock-7(high)/0223-MIC-RIGHT-40-boy(-0.8m)-20-unblock.wav
-% Algorithm: E_msnf_3 (Weighted Least Squares over tau1, tau2, tau3) from master
-% Output: results/jammer_resilience_curve_msnf.dat
+% Script: scripts/generate_jammer_curve_sim.py
+% Core Logic: Sweeps SJR by mixing a time-shifted jammer signal into the target microphone channels
+% (simulation; LDV channel unchanged), then evaluating Mic--Mic GCC-PHAT vs. PI-GS objective (Eq.~\ref{eq:obj})
+% on the 3--8 s speech segment.
+% Input Target WAVs (Blocked, +0.4 m):
+%   LDV:  /home/sbplab/jiawei/0222-block/0223-block/0223-block-2/0223-LDV-40-boy(+0.4m)-15-block.wav
+%   MicL: /home/sbplab/jiawei/0222-block/0223-block/0223-block-2/0223-MIC-LEFT-40-boy(+0.4m)-15-block.wav
+%   MicR: /home/sbplab/jiawei/0222-block/0223-block/0223-block-2/0223-MIC-RIGHT-40-boy(+0.4m)-15-block.wav
+% Input Jammer WAVs (Unblocked proxy, time-shifted by +5.0 s to reduce unintended waveform coherence):
+%   MicL: /home/sbplab/jiawei/0222-block/0223-block/0223-unblock-7(high)/0223-MIC-LEFT-40-boy(-0.8m)-20-unblock.wav
+%   MicR: /home/sbplab/jiawei/0222-block/0223-block/0223-unblock-7(high)/0223-MIC-RIGHT-40-boy(-0.8m)-20-unblock.wav
+% Features: STFT-GCC-PHAT aggregation with n_fft=1024, hop=256, band=500--2000 Hz.
+% Output: results/jammer_curve_sim_20260225/jammer_resilience_curve_sim.dat
 % ============================================================================
 % --- Figure 4: Jammer Resilience Curve --->
 \begin{figure}[t]
@@ -380,29 +372,29 @@ Beyond tracking accuracy through passive attenuation, the primary motivation for
       xlabel={Signal-to-Jammer Ratio (SJR) [dB]},
       ylabel={Mean Absolute Error ($^\circ$)},
       xmin=-40, xmax=20,
-      ymin=0, ymax=4.0,
+      ymin=0, ymax=36.0,
       legend cell align=left,
       legend style={at={(0.02,0.98)}, anchor=north west, font=\scriptsize, fill=white, fill opacity=0.80, text opacity=1, draw=none},
       grid=major,
       width=8.5cm, height=5cm,
       thick
     ]
-    \addplot[color=red!80!black, mark=square*, line width=1.5pt] table[x=SJR_dB, y=Mic-Mic_MAE] {../results/jammer_resilience_curve_msnf.dat};
+    \addplot[color=red!80!black, mark=square*, line width=1.5pt] table[x=SJR_dB, y=Mic-Mic_MAE] {../results/jammer_curve_sim_20260225/jammer_resilience_curve_sim.dat};
     \addlegendentry{Mic-Mic Baseline};
 
-    \addplot[color=blue!80, mark=*, line width=1.5pt] table[x=SJR_dB, y=PI-GS_MAE] {../results/jammer_resilience_curve_msnf.dat};
+    \addplot[color=blue!80, mark=*, line width=1.5pt] table[x=SJR_dB, y=PI-GS_MAE] {../results/jammer_curve_sim_20260225/jammer_resilience_curve_sim.dat};
     \addlegendentry{PI-GS (LDV-Mic)};
     \end{axis}
   \end{tikzpicture}
   }
   \vspace{-2mm}
-  \caption{Jammer resilience curve showcasing mean absolute error (MAE) as receiving-room interference intensifies. The conventional Mic--Mic spatial field degrades towards the jammer's geometric orientation (saturating at $\sim 3.2^\circ$). The PI-GS fusion leverages the LDV anchor to maintain $\sim 1.6^\circ$ tracking error across the tested range down to $-40$\,dB SJR.}
+  \caption{Simulated jammer resilience curve showcasing mean absolute error (MAE) as receiving-room interference intensifies. We inject a time-shifted jammer recording into the blocked speech trial's microphone channels to match the target SJR (LDV channel unchanged). Mic--Mic GCC-PHAT is captured by the jammer direction in this geometry (MAE $\approx 31$--$34^\circ$), whereas PI-GS leverages the LDV anchor to maintain $\le 1.31^\circ$ tracking error across the tested range down to $-40$\,dB SJR in this simulation.}
   \label{fig:jammer_curve}
 \end{figure}
 
-As the interference intensity dominates the receiving room (SJR $\to -40$\,dB), the pure Microphone-only paradigm suffers severe geometric capture, being dragged away from the attenuated structure target and tending to lock onto the un-attenuated local jammer's orientation (error saturation $> 3.2^\circ$). Because the jammer out-powers the barrier's structural re-radiation, the GCC-PHAT peak is predominantly determined by the interference geometry.
+As the interference intensity dominates the receiving room (SJR $\to -40$\,dB), the microphone-only paradigm suffers geometric capture, being dragged away from the attenuated structure target and tending to lock onto the local jammer's orientation (MAE $\approx 31$--$34^\circ$ in this simulated geometry). Because the jammer out-powers the barrier's structure-borne component in the microphones, the Mic--Mic GCC-PHAT peak is predominantly determined by the interference field.
 
-In stark contrast, the PI-GS estimation error remains solidly anchored between $1.0^\circ$ and $1.9^\circ$ across the entire SJR degradation curve. In our setup, the airborne jammer directly dominates microphone pressure, whereas its coupling into the measured wall vibration is comparatively weaker due to air--structure impedance mismatch and the wall's mechanical dynamics. Thus, by utilizing the LDV as our joint optimization anchor (Eq.~\ref{eq:obj}), PI-GS reduces susceptibility to in-room jammer peaks without requiring explicit signal separation heuristics.
+In contrast, the PI-GS estimation remains anchored below $\approx 1.3^\circ$ across the entire simulated SJR sweep. In this simulation, the airborne jammer directly dominates microphone pressure, while the LDV channel is left unchanged; therefore, the LDV anchor preserves a usable LDV-coherent component in $R_{VL}(\tau)$ and $R_{VR}(\tau)$ under time-frequency aggregation. Thus, by utilizing the LDV as our joint optimization anchor (Eq.~\ref{eq:obj}), PI-GS reduces susceptibility to in-room jammer peaks without requiring explicit signal separation heuristics.
 
 % ============================================================================
 \section{Conclusion}
