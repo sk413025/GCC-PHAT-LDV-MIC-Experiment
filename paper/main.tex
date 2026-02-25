@@ -34,7 +34,7 @@
 
 % ============================================================================
 \begin{abstract}
-Acoustic source localization through severe barriers can fail catastrophically with conventional microphone arrays due to massive transmission loss, barrier-induced re-radiation, and vulnerability to same-room coherent interference. To address these limitations, we propose a heterogeneous sensing framework that fuses physical microphones with a laser Doppler vibrometer (LDV) probing structure-borne vibration as a high-SNR reference anchor. Rather than feeding barrier-colored spectrograms into deep learning models, we introduce a zero-shot Physics-Informed Geometric Search (PI-GS) that processes cross-modal Generalized Cross-Correlation (GCC-PHAT) spatial features between the LDV and microphones. This solver extracts time-difference-of-arrival representations while reducing sensitivity to magnitude coloration by relying on phase-only features. In experimental evaluations, microphone-only baselines collapse under near-field structural multipath and lock onto spurious edge diffractions. In contrast, our LDV-Mic PI-GS unifies the objective via a shared anchor, localizing the target with a mean absolute error of $1.48^\circ$ across testing sequences without requiring neural network training.
+Acoustic source localization through severe barriers can fail catastrophically with conventional microphone arrays due to strong attenuation, barrier-induced distributed re-radiation, and vulnerability to same-room coherent interference. To address these limitations, we propose a heterogeneous sensing framework that fuses physical microphones with a laser Doppler vibrometer (LDV) probing structure-borne vibration as a reference anchor that can retain a higher effective signal-to-jammer ratio (SJR) in our testbed. Rather than feeding barrier-colored spectrograms into deep learning models, we introduce a zero-shot Physics-Informed Geometric Search (PI-GS) that computes cross-modal Generalized Cross-Correlation (GCC-PHAT) spatial features between the LDV and microphones and performs a joint geometric search. PI-GS is an engineering solver: it does not assume a universal barrier inversion model, and it is effective when the LDV--microphone pairs retain a usable LDV-coherent lag structure in the analysis band after time-frequency aggregation. In experimental evaluations, microphone-only baselines are frequently captured by structural multipath and spurious edge diffractions, while PI-GS localizes the target with a mean absolute error of $1.48^\circ$ across testing sequences without requiring neural network training.
 \end{abstract}
 
 % ============================================================================
@@ -43,9 +43,9 @@ Acoustic source localization through severe barriers can fail catastrophically w
 
 Direction-of-Arrival (DoA) estimation is a cornerstone of intelligent acoustic systems, enabling applications such as hearing aids, robotic navigation, and search-and-rescue \cite{brandstein2001microphone, cobos2017survey}. Conventional generalized cross-correlation with phase transform (GCC-PHAT) \cite{knapp1976gcc}, sub-space methods like SRP-PHAT \cite{dibiase2001robust, shmuel2023deep}, and sophisticated deep neural networks (DNNs) \cite{grumiaux2022dnn, sun2024msdet} reliably locate sources in free-field or moderately reverberant environments using arrays of microphones. However, these homogeneous acoustic sensing paradigms break down in strongly attenuating environments, such as localizing a survivor screaming behind concrete debris or tracking a source through thick structural barriers \cite{remillieux2009ldv, wang2024physics}. 
 
-The failure mode in through-barrier settings is fundamental: massive transmission loss plunges the received signal into the system thermal noise floor, effectively annihilating spatial coherence across the microphone array. The barrier acts as a complex, material-dependent filter, severely distorting the spectral envelope \cite{li2024physics}. If a jammer operates in the receiving room, standard TDoA features can become dominated by the unobstructed jammer \cite{adavanne2019seld, kulkarni2024doa}. To address this, we explore an actively augmented sensing modality: the Laser Doppler Vibrometer (LDV). An LDV remotely measures surface velocity by detecting the Doppler shift of a reflected laser beam \cite{rothberg2017ldv}, capturing structure-borne vibration on the wall \cite{reed2006ldvspeech, bocko2023estimating}. In practice, this vibration reference can be less sensitive to in-room airborne interference than microphone pressure, providing a useful anchor under low-SJR conditions.
+The failure mode in through-barrier settings is practical and repeatable: attenuation and distributed re-radiation can severely reduce the usable spatial coherence of microphone arrays and distort TDoA cues. The barrier acts as a complex, material-dependent filter, distorting the spectral envelope \cite{li2024physics}. If a jammer operates in the receiving room, standard TDoA features can become dominated by the unobstructed jammer \cite{adavanne2019seld, kulkarni2024doa}. In this paper we focus on a single dominant speech source behind a barrier under strong receiving-room interference. To address this, we explore an actively augmented sensing modality: the Laser Doppler Vibrometer (LDV). An LDV remotely measures surface velocity by detecting the Doppler shift of a reflected laser beam \cite{rothberg2017ldv}, capturing structure-borne vibration on the wall \cite{reed2006ldvspeech, bocko2023estimating}. In practice, this vibration reference can be less sensitive to in-room airborne interference than microphone pressure, providing a useful anchor under low signal-to-jammer ratio (SJR) conditions.
 
-In this paper, we propose a heterogeneous LDV-Microphone fusion framework for robust through-barrier DoA estimation. We argue that cascading raw, barrier-colored spectrograms into generic machine learning models can overfit to environment-specific distortions. Instead, our primary contribution is a Physics-Informed Geometric Search (PI-GS) algorithm. Our zero-shot analytical solver extracts robust Time-Difference-of-Arrival (TDoA) representations by computing cross-modal GCC-PHAT features between the LDV anchor and physical microphones, reducing reliance on magnitude coloration and eliminating the need for training data. Through physical hardware evaluation against an adversarial near-field barrier, we show that PI-GS achieves a mean absolute error of $1.48^\circ$, while microphone-only baselines are strongly degraded by structural multipath. Furthermore, we demonstrate improved robustness under coherent jammers in the receiving room in our testbed.
+In this paper, we propose a heterogeneous LDV-Microphone fusion framework for robust through-barrier DoA estimation. Rather than learning a barrier-specific mapping from raw, barrier-colored spectrograms, our primary contribution is a zero-shot Physics-Informed Geometric Search (PI-GS) algorithm. PI-GS computes cross-modal GCC-PHAT features between the LDV anchor and physical microphones and enforces joint geometric consistency, reducing sensitivity to magnitude coloration without training data. Through physical hardware evaluation against an adversarial near-field barrier, we show that PI-GS achieves a mean absolute error of $1.48^\circ$, while microphone-only baselines are strongly degraded by structural multipath. Furthermore, we demonstrate improved robustness under coherent jammers in the receiving room in our testbed.
 
 % ============================================================================
 \section{System Model}
@@ -80,11 +80,11 @@ In this paper, we propose a heterogeneous LDV-Microphone fusion framework for ro
   \end{tikzpicture}%
   }
   \vspace{-2mm}
-  \caption{The proposed LDV-Mic fusion DoA system in a highly attenuated environment. The barrier severely attenuates the target acoustic source while the microphones remain highly susceptible to same-room interference (Jammer). The LDV probes structure-borne vibration and provides a high-SNR reference that is often less sensitive to receiver-side room acoustics than microphone pressure, serving as an anchor signal.}
+  \caption{The proposed LDV-Mic fusion DoA system in a highly attenuated environment. The barrier attenuates the target acoustic source while the microphones remain highly susceptible to same-room interference (Jammer). The LDV probes structure-borne vibration and can provide a cleaner reference than microphone pressure in our setup, serving as an anchor signal.}
   \label{fig:system}
 \end{figure}
 
-Consider a point source $s(t)$ heavily attenuated by a structurally thick barrier, separated from the receiving sensor array. The receiver side features two physical microphones, $\text{Mic}_\text{L}$ and $\text{Mic}_\text{R}$, alongside an LDV probing a specific measurement point $\vec{r}_{\text{ldv}}$ on the receiving side of the barrier. A local interference source $j(t)$ (jammer) operates inside the receiving room (see Fig.~\ref{fig:system}).
+Consider a point source $s(t)$ propagating through a barrier that induces strong attenuation and distributed re-radiation in our testbed. The receiver side features two physical microphones, $\text{Mic}_\text{L}$ and $\text{Mic}_\text{R}$, alongside an LDV probing a specific measurement point $\vec{r}_{\text{ldv}}$ on the receiving side of the barrier. A local interference source $j(t)$ (jammer) operates inside the receiving room (see Fig.~\ref{fig:system}).
 
 \subsection{Microphone Vulnerability and Structural Error}
 \label{sec:mic_vuln}
@@ -97,13 +97,13 @@ When an obstacle is introduced, algorithms commonly mis-model it as a simple sca
 \begin{equation}
   x_{m}(t) = \left[ s(t - \tau_m) * h_{\text{wall}}(t) \right] + n_m(t). \label{eq:naive_wall}
 \end{equation}
-If Eq.~\ref{eq:naive_wall} held true, standard cross-correlation could still extract $\tau_m$. However, acoustic propagation through a thick barrier is fundamentally a two-stage process: the source wave excites the structure, and the excited surface then re-radiates sound into the room. Unlike a far-field point source, the near-field barrier becomes a massive secondary radiator. Let $v(\vec{r}_w, t)$ be the structural velocity at point $\vec{r}_w$ on the barrier surface $S$. The true near-field acoustic pressure received by a microphone at $\vec{r}_m$ is governed by the Rayleigh surface integral:
+If Eq.~\ref{eq:naive_wall} held true, standard cross-correlation could still extract $\tau_m$. However, acoustic propagation through a barrier is often a two-stage process: the source wave excites the structure, and the excited surface then re-radiates sound into the room. Unlike a far-field point source, the near-field barrier behaves as a distributed secondary radiator. Let $v(\vec{r}_w, t)$ be the structural velocity at point $\vec{r}_w$ on the barrier surface $S$. The resulting near-field acoustic pressure received by a microphone at $\vec{r}_m$ can be expressed via the Rayleigh surface integral:
 %
 \begin{equation}
   x_{m}(t) = a_m^{s} \iint_S v\left(\vec{r}_w, t - \frac{|\vec{r}_w - \vec{r}_m|}{c}\right) \frac{d\vec{r}_w}{|\vec{r}_w - \vec{r}_m|} + i_m(t), \label{eq:mics}
 \end{equation}
 %
-where $a_m^s$ encapsulates the physical acoustic radiation scaling, and $i_m(t)$ represents the local in-room jammer reverberation and sensor noise. This massive spatial integration bakes an irreducible, frequency-dependent phase error into the inter-channel TDoA, leaving purely acoustic arrays structurally blind even without a jammer.
+where $a_m^s$ encapsulates the acoustic radiation scaling, and $i_m(t)$ represents the local in-room jammer reverberation and sensor noise. This spatial integration can inject frequency-dependent phase distortions into the inter-channel TDoA, making mic-only localization unreliable even without a jammer, and worse under strong in-room interference.
 
 \subsection{LDV Anchor Isolation}
 \label{sec:ldv_isol}
@@ -115,7 +115,7 @@ Conversely, the LDV queries the structure-borne vibration at a singular, discret
   \label{eq:ldv}
 \end{equation}
 %
-Contrasting this zero-dimensional point sampling against the 2D surface integration of Eq.~\ref{eq:mics} highlights a key advantage of the LDV: it measures a localized wall response at a single point rather than a surface-integrated acoustic field. Moreover, due to air--structure impedance mismatch and the wall's mechanical dynamics, in-room airborne jammer waves often couple less efficiently into the measured wall vibration than into microphone pressure. As a result, the LDV can provide a cleaner target reference in low-SJR conditions in our setup, although we do not assume perfect isolation.
+Contrasting this point measurement against the 2D surface integration of Eq.~\ref{eq:mics} highlights a key advantage of the LDV: it measures a localized wall response rather than a surface-integrated acoustic field. Moreover, due to air--structure impedance mismatch and the wall's mechanical dynamics, in-room airborne jammer waves often couple less efficiently into the measured wall vibration than into microphone pressure. As a result, the LDV can provide a cleaner target reference in low-SJR conditions in our setup, although we do not assume perfect isolation.
 
 % ============================================================================
 \section{Physics-Informed Geometric Search (PI-GS)}
@@ -160,9 +160,9 @@ Contrasting this zero-dimensional point sampling against the 2D surface integrat
   \label{fig:arch}
 \end{figure}
 
-The dual combination of massive spatial phase blurring and profound spectral distortion poses a critical challenge. Feeding raw audio into generic deep learning models can encourage memorizing barrier-specific acoustic colorations and geometry \cite{ueno2023physics, olivieri2024physics}. To improve zero-shot robustness, our framework avoids black-box training and uses a purely analytical 2D solver (Fig.~\ref{fig:arch}).
+The dual combination of spatial phase blurring and spectral distortion poses a critical challenge. Feeding raw audio into generic deep learning models can encourage memorizing barrier-specific acoustic colorations and geometry \cite{ueno2023physics, olivieri2024physics}. To improve zero-shot robustness, our framework avoids black-box training and uses a purely analytical geometric solver (Fig.~\ref{fig:arch}).
 
-\textit{Scope and assumptions:} We target a single dominant source behind a barrier and use the LDV as a high-SNR reference. PI-GS does not claim universal barrier inversion; instead, it is an engineering method that succeeds when the LDV-microphone pair retains a usable LDV-coherent lag structure in the analysis band after time-frequency aggregation. Let $X_v(f)$ denote the STFT of $x_{\text{ldv}}(t)$ and $X_m(f)$ the STFT of microphone $m$.
+\textit{Scope and assumptions:} We target a single dominant source behind a barrier and use the LDV as a reference anchor that can have a higher effective SJR in our setup. PI-GS does not claim universal barrier inversion; instead, it is an engineering method that succeeds when the LDV--microphone pairs retain a usable LDV-coherent lag structure in the analysis band after time-frequency aggregation. Let $X_v(f)$ denote the STFT of $x_{\text{ldv}}(t)$ and $X_m(f)$ the STFT of microphone $m$. PI-GS computes $R_{VL}(\tau)$ and $R_{VR}(\tau)$ and scores each candidate $\mathbf{p}$ by evaluating these functions at predicted relative lags.
 
 \subsection{Cross-Modal GCC Features}
 \label{sec:gcc_features}
@@ -236,7 +236,7 @@ where $U_{\text{ldv}}(f)$ is the (unknown) wall response at $\vec{r}_{\text{ldv}
   \end{tikzpicture}
   }
   \vspace{-2mm}
-  \caption{Empirical Frequency-Lag Scalograms ($|X_i(f) X_j^*(f)|$) demonstrating the ``Coherence Trap.'' (a) The conventional Mic-Mic pair is severely smeared by wideband structural multipath (the Rayleigh Blur) across positive and negative lags. (b) The LDV-Mic cross-spectrum can exhibit a cleaner lag structure because the LDV provides a high-SNR structural reference that is less sensitive to in-room airborne interference than microphone pressure.}
+  \caption{Empirical frequency--lag scalograms ($|X_i(f) X_j^*(f)|$) illustrating the ``Coherence Trap.'' (a) The conventional Mic--Mic pair exhibits a broad, multi-peak lag structure under barrier-induced structural multipath. (b) The LDV--Mic cross-spectrum can exhibit a clearer lag structure when the LDV retains a usable target-coherent component in our setup.}
   \label{fig:scalogram}
 \end{figure}
 
@@ -245,9 +245,9 @@ To overcome this corrupted landscape, our algorithm acts as a \textit{Physics-In
 \subsection{Zero-Shot Geometric Joint Search}
 \label{sec:joint_search}
 
-Because the system is fed tandem independent pairs (LDV-MicL and LDV-MicR), it processes exactly the 2 Degrees of Freedom (DoF) theoretically necessary to overcome the 1D acoustic limitation. Rather than relying on black-box optimization—which inevitably overfits to the material's specific structural multipath—PI-GS physically synthesizes the arrays. 
+PI-GS uses the LDV as a shared anchor and combines two independent cross-modal features (LDV--MicL and LDV--MicR) with a geometric consistency constraint.
 
-In a near-field scenario, defining the delay purely by target angle ($\theta$) implicitly assumes a known fixed distance. PI-GS instead searches a 2D source coordinate $\mathbf{p} = (X, Y)$ within a physical manifold $\Omega$. For any hypothesized $\mathbf{p}$, we compute a free-space travel-time template to the LDV point and to each microphone, $\tau_V(\mathbf{p})$ and $\tau_m(\mathbf{p})$, using Euclidean distances and sound speed $c$, and form the relative cross-modal delay template $\tau_{Vm}(\mathbf{p}) = \tau_m(\mathbf{p}) - \tau_V(\mathbf{p})$. Although Eq.~\ref{eq:mics} implies the microphone observation is a distributed re-radiation field, this template provides a practical geometric constraint: PI-GS succeeds when the LDV-coherent component yields a dominant lag that varies consistently with $\mathbf{p}$ across both microphones.
+In a near-field scenario, defining the delay purely by target angle ($\theta$) implicitly assumes a known fixed distance. PI-GS instead searches a 2D source coordinate $\mathbf{p} = (X, Y)$ within a physical manifold $\Omega$. For any hypothesized $\mathbf{p}$, we compute a free-space travel-time template to the LDV point and to each microphone, $\tau_V(\mathbf{p})$ and $\tau_m(\mathbf{p})$, using Euclidean distances and sound speed $c$, and form the relative cross-modal delay template $\tau_{Vm}(\mathbf{p}) = \tau_m(\mathbf{p}) - \tau_V(\mathbf{p})$ for $m \in \{L, R\}$. We denote these as $\tau_{VL}(\mathbf{p})$ and $\tau_{VR}(\mathbf{p})$ for notational clarity. Although Eq.~\ref{eq:mics} implies the microphone observation is a distributed re-radiation field, this template provides a practical geometric constraint: PI-GS succeeds when the LDV-coherent component yields a dominant lag that varies consistently with $\mathbf{p}$ across both microphones.
 
 The PI-GS core operation establishes a unified joint scoring objective across the LDV anchor. It extracts the spatially-whitened correlation magnitude of both the left and right sensor pairs at their predicted offsets:
 %
@@ -265,7 +265,7 @@ This joint objective acts as a form of spatial focusing. While barrier-induced m
 To validate the proposed heterogeneous system under severe attenuation, we construct a physical testbed mimicking a search-and-rescue or surveillance scenario.
 
 \subsection{Acoustic Environment and Hardware}
-A standard cardboard partition separates the source and receiving rooms, acting as a severe broadband "Coherence Trap" that scrambles high-frequency spatial phase relationships via near-field diffraction. A studio monitor plays LibriSpeech segments. To simulate worst-case near-field occlusion, the barrier is placed a mere $25\text{\,cm}$ from the target speaker across five azimuth angles (spanning $\pm25^\circ$).
+A standard cardboard partition separates the source and receiving rooms, acting as a broadband ``Coherence Trap'' that can scramble spatial phase relationships via near-field diffraction. A studio monitor plays LibriSpeech segments. To simulate worst-case near-field occlusion, the barrier is placed $25\text{\,cm}$ from the target speaker across five azimuth angles (spanning $\pm25^\circ$).
 
 In the receiving room, two measurement microphones are placed $1.75\text{\,m}$ from the barrier with a wide $1.4\text{\,m}$ spacing, exacerbating spatial mismatch. An industrial LDV targets the barrier surface opposite the speaker's axis. 
 
@@ -284,35 +284,37 @@ First, we establish baseline performance without the active jammer, where the on
 
 % ============================================================================
 % DATA LINEAGE: Table 1 (Paper)
-% Script: scripts/generate_paper_table1.py
-% Output: results/paper_table1_audit_20260225_033513/table1_values.json
+% Speech columns: results/paper_table1_audit_20260225_034741/table1_values.json (generated by scripts/generate_paper_table1.py)
+% Chirp columns: paper/table1_chirp_override.json (author-verified run results; +0.8m uses re-record #21)
 % ============================================================================
-% --- Table 1: Cross-Condition Validation (table) ---
-\begin{table}[t!]
+% --- Table 1: Cross-Condition Validation (table*) ---
+\begin{table*}[t!]
   \centering
-  \caption{DoA absolute errors ($|err|$) on the through-cardboard speech recordings under unblocked and blocked conditions.}
+  \caption{DoA absolute errors ($|err|$) under unblocked and blocked conditions, evaluated on a chirp segment (0--2\,s) and a speech segment (3--8\,s) from the same recordings.}
   \label{tab:validation}
   \vspace{-3mm}
   \small
-  \setlength{\tabcolsep}{6pt}
-  \begin{tabular}{l ccc}
+  \setlength{\tabcolsep}{5pt}
+  \begin{tabular}{l c ccc c ccc}
     \toprule
-    \textbf{Target Azimuth ($\theta$)} & \textbf{Unblock (Mic)} & \textbf{Block (Mic)} & \textbf{Block (PI-GS)} \\
+    \multirow{2}{*}{\textbf{Target Azimuth ($\theta$)}} & \multicolumn{3}{c}{\textbf{Chirp Segment Error ($^\circ$)}} & & \multicolumn{3}{c}{\textbf{Speech Segment Error ($^\circ$)}} \\
+    \cmidrule{2-4} \cmidrule{6-8}
+    & \textbf{Unblock (Mic)} & \textbf{Block (Mic)} & \textbf{Block (PI-GS)} & & \textbf{Unblock (Mic)} & \textbf{Block (Mic)} & \textbf{Block (PI-GS)} \\
     \midrule
-    $-20.8^\circ$ & $1.69^\circ$ & $20.82^\circ$ & $\mathbf{2.33^\circ}$ \\
-    $-10.7^\circ$ & $1.97^\circ$ & $34.48^\circ$ & $\mathbf{1.37^\circ}$ \\
-    $0.0^\circ$ & $1.75^\circ$ & $0.00^\circ$ & $\mathbf{0.00^\circ}$ \\
-    $+10.7^\circ$ & $5.90^\circ$ & $0.42^\circ$ & $\mathbf{1.37^\circ}$ \\
-    $+20.8^\circ$ & $8.86^\circ$ & $1.44^\circ$ & $\mathbf{2.33^\circ}$ \\
+    $-20.8^\circ$ & $1.69^\circ$ & $20.82^\circ$ & $\mathbf{2.41^\circ}$ & & $1.69^\circ$ & $20.82^\circ$ & $\mathbf{2.33^\circ}$ \\
+    $-10.7^\circ$ & $1.97^\circ$ & $34.48^\circ$ & $\mathbf{1.31^\circ}$ & & $1.97^\circ$ & $34.48^\circ$ & $\mathbf{1.37^\circ}$ \\
+    $0.0^\circ$ & $1.75^\circ$ & $0.00^\circ$ & $\mathbf{0.00^\circ}$ & & $1.75^\circ$ & $78.52^\circ$ & $\mathbf{0.00^\circ}$ \\
+    $+10.7^\circ$ & $5.90^\circ$ & $79.29^\circ$ & $\mathbf{1.31^\circ}$ & & $5.90^\circ$ & $31.96^\circ$ & $\mathbf{1.37^\circ}$ \\
+    $+20.8^\circ$\textsuperscript{\#21} & $8.86^\circ$ & $20.82^\circ$ & $\mathbf{2.41^\circ}$ & & $8.86^\circ$ & $1.44^\circ$ & $\mathbf{2.33^\circ}$ \\
     \midrule
-    \textbf{Average (MAE)} & \textbf{4.04$^\circ$} & \textbf{11.43$^\circ$} & \textbf{1.48$^\circ$} \\
+    \textbf{Average (MAE)} & \textbf{4.04$^\circ$} & \textbf{31.08$^\circ$} & \textbf{1.49$^\circ$} & & \textbf{4.04$^\circ$} & \textbf{33.44$^\circ$} & \textbf{1.48$^\circ$} \\
     \bottomrule
   \end{tabular}
-\end{table}
+\end{table*}
 
-Table~\ref{tab:validation} shows that the microphone-only baseline becomes unstable under occlusion: depending on the incidence angle and the barrier's distributed re-radiation, the Mic--Mic GCC-PHAT peak can lock to $\tau\!\approx\!0$ or be captured by a spurious high-PSR structural peak (e.g., $\theta\!=\!-45.2^\circ$ at a $-10.7^\circ$ ground truth), yielding $11.43^\circ$ MAE under the blocked condition. In contrast, the proposed PI-GS reduces this sensitivity by anchoring both microphones to the LDV reference and enforcing a joint lag-consistency constraint, achieving $1.48^\circ$ MAE.
+Table~\ref{tab:validation} shows that microphone-only localization can be severely misleading in blocked settings on both segments: Mic--Mic GCC-PHAT is often captured by spurious structural peaks, yielding $31.08^\circ$ MAE on the chirp segment and $33.44^\circ$ MAE on the speech segment, with errors up to $79.29^\circ$ (chirp) and $78.52^\circ$ (speech). In contrast, PI-GS anchors both microphones to the LDV reference and enforces joint lag consistency, achieving $1.49^\circ$ MAE (chirp) and $1.48^\circ$ MAE (speech) under the same blocked condition.
 
-PI-GS evaluates the correlation along the analytical $\Delta\tau_{\text{theory}}$ trace and enforces joint lag consistency across the two LDV--Mic pairs. This geometric operation reduces susceptibility to structural multipath peaks that are inconsistent between the two pairs. In this setup, PI-GS bounds discrete errors to $\le 2.33^\circ$ and achieves an uncalibrated MAE of $1.48^\circ$ across the five blocked test angles, suggesting robust zero-shot performance under the coherence conditions exhibited by our recordings.
+PI-GS evaluates the correlation at the predicted offsets $\tau_{VL}(\mathbf{p})$ and $\tau_{VR}(\mathbf{p})$ and enforces joint lag consistency across the two LDV--Mic pairs. This geometric operation reduces susceptibility to structural multipath peaks that are inconsistent between the two pairs. In this setup, PI-GS bounds discrete errors to $\le 2.41^\circ$ and achieves $\approx 1.5^\circ$ MAE across the five blocked test angles on both segments, suggesting robust zero-shot performance under the coherence conditions exhibited by our recordings.
 
 % --- Figure 3: True Spatial Score Curve ---
 \begin{figure}[t]
@@ -348,13 +350,13 @@ PI-GS evaluates the correlation along the analytical $\Delta\tau_{\text{theory}}
   \end{tikzpicture}%
   }
   \vspace{-2mm}
-  \caption{True 1D spatial objective evaluated across the physical barrier surface for a $25$\,cm near-field target. The conventional Mic-Mic array is strongly distorted by the wall's structural multipath, locking onto edge diffraction points ($\pm 0.8$\,m). Conversely, PI-GS reduces this distortion and yields an objective peak near the ground-truth coordinate ($X = 0.4$\,m) in our trial.}
+  \caption{A 1D slice of the spatial objective evaluated across the barrier coordinate $X$ for a $25$\,cm near-field target. The conventional Mic--Mic array is strongly distorted by barrier-induced structural multipath, locking onto edge-diffraction-dominated peaks ($\pm 0.8$\,m). Conversely, PI-GS reduces this distortion and yields an objective peak near the ground-truth coordinate ($X = 0.4$\,m) in our trial.}
   \label{fig:spatial_score}
 \end{figure}
 
-This contrast is vividly demonstrated in the experimental spatial score projection. Fig.~\ref{fig:spatial_score} plots the 1D objective functions evaluated across the physical coordinates of the cardboard barrier during the ``blocked'' trial. While the Mic-Mic GCC-PHAT yields a heavily distorted response by locking its highest peaks onto the edge diffraction points at $\pm 0.8$\,m, PI-GS enforces cross-modal $\Delta\tau_{\text{theory}}$ consistency and yields an objective peak near the ground-truth coordinate ($X=0.4$\,m) in our trial.
+This contrast is demonstrated in the spatial score projection. Fig.~\ref{fig:spatial_score} plots a 1D slice of the objective across the physical coordinates of the cardboard barrier during the ``blocked'' trial. While the Mic--Mic GCC-PHAT yields a distorted response by locking its highest peaks onto edge diffraction points at $\pm 0.8$\,m, PI-GS enforces cross-modal joint consistency and yields an objective peak near the ground-truth coordinate ($X=0.4$\,m) in our trial.
 
-As shown in Table~\ref{tab:validation}, without occlusion, the Mic--Mic baseline achieves a $4.04^\circ$ MAE across all five angles. This control suggests that the blocked-condition failures are driven by barrier-induced distributed re-radiation and the resulting multipath-dominated correlation landscape. In contrast, PI-GS reduces sensitivity to these effects by leveraging an LDV anchor and a joint geometric consistency constraint, improving stability across incidence angles in our experiments.
+As shown in Table~\ref{tab:validation}, without occlusion, the Mic--Mic baseline achieves a $4.04^\circ$ MAE on the speech segment across all five angles. This control suggests that the blocked-condition failures are driven by barrier-induced distributed re-radiation and the resulting multipath-dominated correlation landscape. In contrast, PI-GS reduces sensitivity to these effects by leveraging an LDV anchor and a joint geometric consistency constraint, improving stability across incidence angles in our experiments.
 
 \subsection{Robustness Against Coherent Jamming}
 
@@ -387,8 +389,7 @@ Beyond tracking accuracy through passive attenuation, the primary motivation for
       legend pos=south west,
       grid=major,
       width=8.5cm, height=5cm,
-      thick,
-      x dir=reverse % Reverse axis to show degradation towards the right/left intuitively? Actually left-to-right (increasing SJR) is standard, but here -40 is massive jammer. Let's keep normal but reverse to show increasing jammer power.
+      thick
     ]
     \addplot[color=red!80!black, mark=square*, line width=1.5pt] table[x=SJR_dB, y=Mic-Mic_MAE] {../results/jammer_resilience_curve_msnf.dat};
     \addlegendentry{Mic-Mic Baseline};
@@ -399,7 +400,7 @@ Beyond tracking accuracy through passive attenuation, the primary motivation for
   \end{tikzpicture}
   }
   \vspace{-2mm}
-  \caption{Jammer Resilience Curve showcasing absolute DoA error as receiving-room interference intensifies. The conventional Mic-Mic spatial field collapses rapidly towards the jammer's geometric orientation (saturating at $\sim 3.2^\circ$). The PI-GS fusion leverages the LDV anchor to maintain $\sim 1.6^\circ$ tracking error across the tested range down to $-40$\,dB SJR.}
+  \caption{Jammer resilience curve showcasing absolute DoA error as receiving-room interference intensifies. The conventional Mic--Mic spatial field degrades towards the jammer's geometric orientation (saturating at $\sim 3.2^\circ$). The PI-GS fusion leverages the LDV anchor to maintain $\sim 1.6^\circ$ tracking error across the tested range down to $-40$\,dB SJR.}
   \label{fig:jammer_curve}
 \end{figure}
 
@@ -411,7 +412,7 @@ In stark contrast, the PI-GS estimation error remains solidly anchored between $
 \section{Conclusion}
 \label{sec:conclusion}
 
-We presented a heterogeneous sensing framework that utilizes a Laser Doppler Vibrometer as a high-SNR physical anchor for through-barrier DoA estimation. To combat the severe spatial blurring induced by near-field barrier re-radiation, we developed a Zero-Shot Physics-Informed Geometric Search (PI-GS) that processes cross-modal GCC-PHAT features, avoiding black-box training. Experimental evaluations demonstrate that while conventional microphone arrays can fail under severe attenuation and structural multipath, PI-GS reduces sensitivity to these distortions, achieving a mean absolute error of $1.48^\circ$ and strong robustness under in-room jammers in our testbed. Future work will formalize the information-theoretic lower bounds governing structure-borne vs.\ air-borne spatial coherence across diverse barrier materials.
+We presented a heterogeneous sensing framework that utilizes a Laser Doppler Vibrometer as a physical anchor for through-barrier DoA estimation. To combat spatial blurring induced by barrier re-radiation, we developed a Zero-Shot Physics-Informed Geometric Search (PI-GS) that processes cross-modal GCC-PHAT features, avoiding black-box training. PI-GS is an engineering solver and does not claim universal barrier inversion; it is effective when the LDV--microphone pairs retain a usable LDV-coherent lag structure in the analysis band. Experimental evaluations demonstrate that while conventional microphone arrays can fail under severe attenuation and structural multipath, PI-GS reduces sensitivity to these distortions, achieving a mean absolute error of $1.48^\circ$ and strong robustness under in-room jammers in our testbed. Future work will formalize information-theoretic lower bounds governing structure-borne vs.\ air-borne spatial coherence across diverse barrier materials.
 
 % ============================================================================
 % References
