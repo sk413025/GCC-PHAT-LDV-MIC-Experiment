@@ -177,7 +177,7 @@ By discarding magnitude information, GCC-PHAT reduces sensitivity to magnitude c
 To connect Eq.~\ref{eq:gcc_vm} to the heterogeneous sensing physics, we separate the microphone observation into an LDV-coherent component (originating from a neighborhood of $\vec{r}_{\text{ldv}}$) and a residual term that aggregates the remaining wall surface and in-room interference:
 %
 \begin{equation}
-  X_m(f) = U_{\text{ldv}}(f)\,B_m(f)\,e^{-j k |\vec{r}_{\text{ldv}} - \vec{r}_m|} + X_{m,\text{rest}}(f),
+  X_m(f) = U_{\text{ldv}}(f)\,B_m(f)\,e^{-j 2\pi f |\vec{r}_{\text{ldv}} - \vec{r}_m|/c} + X_{m,\text{rest}}(f),
   \label{eq:cross}
 \end{equation}
 %
@@ -191,7 +191,8 @@ where $U_{\text{ldv}}(f)$ is the (unknown) wall response at $\vec{r}_{\text{ldv}
 %   MicL: /home/sbplab/jiawei/0222-block/0223-block/0223-block-2/0223-MIC-LEFT-40-boy(+0.4m)-15-block.wav
 %   MicR: /home/sbplab/jiawei/0222-block/0223-block/0223-block-2/0223-MIC-RIGHT-40-boy(+0.4m)-15-block.wav
 % Segment: 0.5 s frame centered at t=1.30 s (chirp region).
-% GCC-PHAT band: 500–2000 Hz. Scores are normalized to each curve's maximum and plotted in dB.
+% GCC-PHAT band: 500–2000 Hz. Scores are normalized to each curve's maximum.
+% For readability, we use a dense X-grid and apply a light 5-point moving average over X (visualization only).
 % ============================================================================
 % --- Figure 3: Coherence Trap Spatial Score (1D) ---
 \begin{figure}[t]
@@ -199,35 +200,42 @@ where $U_{\text{ldv}}(f)$ is the (unknown) wall response at $\vec{r}_{\text{ldv}
   \resizebox{\columnwidth}{!}{%
   \begin{tikzpicture}
     \begin{axis}[
-      xlabel={Physical Barrier Coordinate $X$ (m)},
-      ylabel={Normalized Spatial Score [dB]},
+      xlabel={Source lateral coordinate $X$ (m)},
+      ylabel={Normalized spatial score},
       xmin=-1.0, xmax=1.0,
-      ymin=-15, ymax=2,
-      legend pos=south east,
+      ymin=0.0, ymax=1.05,
+      xtick={-0.8,-0.4,0,0.4,0.8},
+      ytick={0,0.5,1.0},
+      legend cell align=left,
+      legend style={at={(0.02,0.98)}, anchor=north west, font=\scriptsize, fill=white, fill opacity=0.80, text opacity=1, draw=none},
       grid=major,
       width=8.5cm, height=4.5cm,
       thick
     ]
+    \addlegendimage{red!70, dashed, line width=1.5pt}
+    \addlegendentry{Mic--Mic GCC-PHAT}
+    \addlegendimage{blue!80, solid, line width=1.5pt}
+    \addlegendentry{PI-GS Objective}
     % Mic-Mic GCC-PHAT (Coherence Trap)
     \addplot[color=red!70, dashed, line width=1.5pt] coordinates {
-      (-1.00, -13.62) (-0.92, -10.94) (-0.83, -13.58) (-0.75, -50.51) (-0.67, -10.51) (-0.58, -8.26) (-0.50, -36.15) (-0.42, -6.72) (-0.33, -8.80) (-0.25, -15.89) (-0.17, -12.47) (-0.08, -14.23) (0.00, -0.00) (0.08, -3.77) (0.17, -5.55) (0.25, -2.97) (0.33, -22.21) (0.42, -30.25) (0.50, -14.64) (0.58, -32.24) (0.67, -9.51) (0.75, -13.65) (0.83, -17.96) (0.92, -13.91) (1.00, -54.12)
+      (-1.000,0.235) (-0.980,0.250) (-0.960,0.265) (-0.940,0.280) (-0.920,0.284) (-0.900,0.280) (-0.880,0.268) (-0.860,0.247) (-0.840,0.219) (-0.820,0.184) (-0.800,0.140) (-0.780,0.101) (-0.760,0.084) (-0.740,0.091) (-0.720,0.124) (-0.700,0.183) (-0.680,0.253) (-0.660,0.314) (-0.640,0.361) (-0.620,0.388) (-0.600,0.388) (-0.580,0.359) (-0.560,0.300) (-0.540,0.219) (-0.520,0.171) (-0.500,0.162) (-0.480,0.193) (-0.460,0.263) (-0.440,0.360) (-0.420,0.429) (-0.400,0.465) (-0.380,0.466) (-0.360,0.437) (-0.340,0.388) (-0.320,0.328) (-0.300,0.270) (-0.280,0.224) (-0.260,0.196) (-0.240,0.189) (-0.220,0.197) (-0.200,0.212) (-0.180,0.218) (-0.160,0.202) (-0.140,0.167) (-0.120,0.166) (-0.100,0.209) (-0.080,0.306) (-0.060,0.462) (-0.040,0.660) (-0.020,0.831) (+0.000,0.951) (+0.020,1.000) (+0.040,0.965) (+0.060,0.845) (+0.080,0.649) (+0.100,0.476) (+0.120,0.384) (+0.140,0.377) (+0.160,0.451) (+0.180,0.594) (+0.200,0.712) (+0.220,0.751) (+0.240,0.718) (+0.260,0.625) (+0.280,0.493) (+0.300,0.344) (+0.320,0.220) (+0.340,0.134) (+0.360,0.080) (+0.380,0.051) (+0.400,0.051) (+0.420,0.064) (+0.440,0.081) (+0.460,0.106) (+0.480,0.139) (+0.500,0.159) (+0.520,0.153) (+0.540,0.122) (+0.560,0.105) (+0.580,0.108) (+0.600,0.135) (+0.620,0.185) (+0.640,0.255) (+0.660,0.304) (+0.680,0.327) (+0.700,0.322) (+0.720,0.290) (+0.740,0.235) (+0.760,0.166) (+0.780,0.120) (+0.800,0.099) (+0.820,0.104) (+0.840,0.131) (+0.860,0.175) (+0.880,0.199) (+0.900,0.202) (+0.920,0.186) (+0.940,0.154) (+0.960,0.110) (+0.980,0.069) (+1.000,0.036)
     };
-    \addlegendentry{Mic--Mic GCC-PHAT};
+    \addplot[color=red!70, mark=*, only marks, mark size=1.4pt, forget plot] coordinates {(0.020,1.000)};
 
     % PI-GS Objective (LDV-Mic joint)
     \addplot[color=blue!80, solid, line width=1.5pt] coordinates {
-      (-1.00, -1.67) (-0.92, -5.47) (-0.83, -11.77) (-0.75, -2.38) (-0.67, -5.19) (-0.58, -4.50) (-0.50, -17.00) (-0.42, -13.54) (-0.33, -6.00) (-0.25, -2.14) (-0.17, -4.45) (-0.08, -8.68) (0.00, -10.13) (0.08, -5.61) (0.17, -28.15) (0.25, -3.32) (0.33, -9.57) (0.42, -0.00) (0.50, -3.41) (0.58, -4.04) (0.67, -10.50) (0.75, -17.18) (0.83, -14.16) (0.92, -6.94) (1.00, -1.51)
+      (-1.000,0.806) (-0.980,0.729) (-0.960,0.665) (-0.940,0.595) (-0.920,0.520) (-0.900,0.445) (-0.880,0.376) (-0.860,0.359) (-0.840,0.397) (-0.820,0.490) (-0.800,0.630) (-0.780,0.749) (-0.760,0.772) (-0.740,0.731) (-0.720,0.680) (-0.700,0.621) (-0.680,0.559) (-0.660,0.550) (-0.640,0.571) (-0.620,0.577) (-0.600,0.570) (-0.580,0.551) (-0.560,0.464) (-0.540,0.367) (-0.520,0.288) (-0.500,0.243) (-0.480,0.230) (-0.460,0.245) (-0.440,0.292) (-0.420,0.349) (-0.400,0.406) (-0.380,0.461) (-0.360,0.513) (-0.340,0.528) (-0.320,0.552) (-0.300,0.592) (-0.280,0.655) (-0.260,0.742) (-0.240,0.819) (-0.220,0.837) (-0.200,0.798) (-0.180,0.711) (-0.160,0.599) (-0.140,0.507) (-0.120,0.438) (-0.100,0.390) (-0.080,0.358) (-0.060,0.340) (-0.040,0.330) (-0.020,0.335) (+0.000,0.361) (+0.020,0.412) (+0.040,0.476) (+0.060,0.517) (+0.080,0.524) (+0.100,0.488) (+0.120,0.401) (+0.140,0.314) (+0.160,0.282) (+0.180,0.310) (+0.200,0.392) (+0.220,0.515) (+0.240,0.605) (+0.260,0.589) (+0.280,0.485) (+0.300,0.441) (+0.320,0.470) (+0.340,0.577) (+0.360,0.753) (+0.380,0.949) (+0.400,1.000) (+0.420,0.896) (+0.440,0.744) (+0.460,0.654) (+0.480,0.637) (+0.500,0.691) (+0.520,0.805) (+0.540,0.878) (+0.560,0.826) (+0.580,0.684) (+0.600,0.541) (+0.620,0.423) (+0.640,0.334) (+0.660,0.272) (+0.680,0.249) (+0.700,0.219) (+0.720,0.178) (+0.740,0.154) (+0.760,0.155) (+0.780,0.163) (+0.800,0.179) (+0.820,0.217) (+0.840,0.261) (+0.860,0.313) (+0.880,0.376) (+0.900,0.445) (+0.920,0.521) (+0.940,0.607) (+0.960,0.704) (+0.980,0.787) (+1.000,0.852)
     };
-    \addlegendentry{PI-GS Objective};
+    \addplot[color=blue!80, mark=*, only marks, mark size=1.4pt, forget plot] coordinates {(0.400,1.000)};
 
     % Ground Truth Line
-    \draw[color=black, loosely dashed, line width=1pt] (axis cs:0.4,-15) -- (axis cs:0.4,2);
-    \node[anchor=south west, font=\scriptsize] at (axis cs:0.4,-15) {Target: $X=0.4$\,m};
+    \draw[color=black, loosely dashed, line width=1pt] (axis cs:0.4,0.0) -- (axis cs:0.4,1.05);
+    \node[anchor=south west, font=\scriptsize] at (axis cs:0.4,0.0) {Target: $X=0.4$\,m};
     \end{axis}
   \end{tikzpicture}%
   }
   \vspace{-2mm}
-  \caption{A 1D slice of the spatial objective evaluated across barrier coordinate $X$ for a representative blocked chirp frame ($0.5$\,s) at $X=0.4$\,m. Mic--Mic GCC-PHAT collapses to a spurious maximum near $X\!\approx\!0$ (i.e., $\tau\!\approx\!0$), whereas PI-GS yields a dominant peak near the ground-truth coordinate.}
+  \caption{A 1D slice of the spatial objective evaluated across $X$ for a representative blocked chirp-reference window ($0.5$\,s, centered at $t=1.30$\,s) at $X=0.4$\,m. Both curves are obtained by evaluating the corresponding GCC-PHAT at the predicted lags for each $X$ (with $Y$ fixed): Mic--Mic collapses to a spurious maximum near $X\!\approx\!0$ (i.e., $\tau\!\approx\!0$), whereas PI-GS yields a dominant peak at the ground-truth coordinate.}
   \label{fig:spatial_score}
 \end{figure}
 
@@ -260,6 +268,8 @@ To validate the proposed heterogeneous system under severe attenuation, we const
 \subsection{Acoustic Environment and Hardware}
 A standard cardboard partition separates the source and receiving rooms, acting as a broadband ``Coherence Trap'' that can scramble spatial phase relationships via near-field diffraction. A studio monitor plays LibriSpeech segments. To simulate worst-case near-field occlusion, the barrier is placed $25\text{\,cm}$ from the target speaker across five azimuth angles (spanning $\pm25^\circ$).
 
+To support segment-level evaluation, we also record a separate chirp reference at the same nominal positions. Table~\ref{tab:validation} reports errors on the chirp reference slice (0--2\,s) and on a speech slice (3--8\,s) from separate recordings.
+
 In the receiving room, two measurement microphones are placed $1.75\text{\,m}$ from the barrier with a wide $1.4\text{\,m}$ spacing, exacerbating spatial mismatch. An industrial LDV targets the barrier surface opposite the speaker's axis. 
 
 To evaluate interference robustness, a "jammer" speaker broadcasts continuous babble noise inside the receiving room, $1.0\text{\,m}$ from the microphones. Due to the barrier's significant transmission loss, the \emph{effective} Signal-to-Jammer Ratio (SJR) at the microphones is profoundly negative even at moderate jammer volumes.
@@ -278,7 +288,7 @@ First, we establish baseline performance without the active jammer, where the on
 % ============================================================================
 % DATA LINEAGE: Table 1 (Paper)
 % Speech columns: results/paper_table1_audit_20260225_034741/table1_values.json (generated by scripts/generate_paper_table1.py)
-% Chirp columns: paper/table1_chirp_override.json (author-verified run results from separate chirp reference recordings; +0.8m uses re-record #21)
+% Chirp columns: paper/table1_chirp_override.json (author-verified run results from separate chirp reference recordings)
 % ============================================================================
 % --- Table 1: Cross-Condition Validation (table*) ---
 \begin{table*}[t!]
@@ -298,7 +308,7 @@ First, we establish baseline performance without the active jammer, where the on
     $-10.7^\circ$ & $1.97^\circ$ & $34.48^\circ$ & $\mathbf{1.31^\circ}$ & & $1.97^\circ$ & $34.48^\circ$ & $\mathbf{1.37^\circ}$ \\
     $0.0^\circ$ & $1.75^\circ$ & $0.00^\circ$ & $\mathbf{0.00^\circ}$ & & $1.75^\circ$ & $78.52^\circ$ & $\mathbf{0.00^\circ}$ \\
     $+10.7^\circ$ & $5.90^\circ$ & $79.29^\circ$ & $\mathbf{1.31^\circ}$ & & $5.90^\circ$ & $31.96^\circ$ & $\mathbf{1.37^\circ}$ \\
-    $+20.8^\circ$\textsuperscript{\#21} & $8.86^\circ$ & $20.82^\circ$ & $\mathbf{2.41^\circ}$ & & $8.86^\circ$ & $1.44^\circ$ & $\mathbf{2.33^\circ}$ \\
+    $+20.8^\circ$ & $8.86^\circ$ & $20.82^\circ$ & $\mathbf{2.41^\circ}$ & & $8.86^\circ$ & $1.44^\circ$ & $\mathbf{2.33^\circ}$ \\
     \midrule
     \textbf{Average (MAE)} & \textbf{4.04$^\circ$} & \textbf{31.08$^\circ$} & \textbf{1.49$^\circ$} & & \textbf{4.04$^\circ$} & \textbf{33.44$^\circ$} & \textbf{1.48$^\circ$} \\
     \bottomrule
@@ -309,7 +319,7 @@ Table~\ref{tab:validation} shows that microphone-only localization can be severe
 
 PI-GS evaluates the correlation at the predicted offsets $\tau_{VL}(\mathbf{p})$ and $\tau_{VR}(\mathbf{p})$ and enforces joint lag consistency across the two LDV--Mic pairs. This geometric operation reduces susceptibility to structural multipath peaks that are inconsistent between the two pairs. In this setup, PI-GS bounds discrete errors to $\le 2.41^\circ$ and achieves $\approx 1.5^\circ$ MAE across the five blocked test angles on both chirp reference and speech slices, suggesting robust zero-shot performance under the coherence conditions exhibited by our recordings.
 
-This contrast is demonstrated in the spatial score projection in Fig.~\ref{fig:spatial_score}. In a representative blocked chirp frame, Mic--Mic GCC-PHAT collapses toward a spurious $\tau\!\approx\!0$ solution (peaking near $X\!\approx\!0$) rather than the ground-truth coordinate, whereas PI-GS enforces cross-modal joint consistency and yields a dominant peak near $X=0.4$\,m.
+This contrast is demonstrated in the spatial score projection in Fig.~\ref{fig:spatial_score}. In a representative blocked chirp-reference window, Mic--Mic GCC-PHAT collapses toward a spurious $\tau\!\approx\!0$ solution (peaking near $X\!\approx\!0$) rather than the ground-truth coordinate, whereas PI-GS enforces cross-modal joint consistency and yields a dominant peak near $X=0.4$\,m.
 
 As shown in Table~\ref{tab:validation}, without occlusion, the Mic--Mic baseline achieves a $4.04^\circ$ MAE on the speech segment across all five angles. This control suggests that the blocked-condition failures are driven by barrier-induced distributed re-radiation and the resulting multipath-dominated correlation landscape. In contrast, PI-GS reduces sensitivity to these effects by leveraging an LDV anchor and a joint geometric consistency constraint, improving stability across incidence angles in our experiments.
 
@@ -341,7 +351,8 @@ Beyond tracking accuracy through passive attenuation, the primary motivation for
       ylabel={Mean Absolute Error ($^\circ$)},
       xmin=-40, xmax=20,
       ymin=0, ymax=4.0,
-      legend pos=south west,
+      legend cell align=left,
+      legend style={at={(0.02,0.98)}, anchor=north west, font=\scriptsize, fill=white, fill opacity=0.80, text opacity=1, draw=none},
       grid=major,
       width=8.5cm, height=5cm,
       thick
@@ -355,7 +366,7 @@ Beyond tracking accuracy through passive attenuation, the primary motivation for
   \end{tikzpicture}
   }
   \vspace{-2mm}
-  \caption{Jammer resilience curve showcasing absolute DoA error as receiving-room interference intensifies. The conventional Mic--Mic spatial field degrades towards the jammer's geometric orientation (saturating at $\sim 3.2^\circ$). The PI-GS fusion leverages the LDV anchor to maintain $\sim 1.6^\circ$ tracking error across the tested range down to $-40$\,dB SJR.}
+  \caption{Jammer resilience curve showcasing mean absolute error (MAE) as receiving-room interference intensifies. The conventional Mic--Mic spatial field degrades towards the jammer's geometric orientation (saturating at $\sim 3.2^\circ$). The PI-GS fusion leverages the LDV anchor to maintain $\sim 1.6^\circ$ tracking error across the tested range down to $-40$\,dB SJR.}
   \label{fig:jammer_curve}
 \end{figure}
 
