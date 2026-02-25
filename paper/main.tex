@@ -140,6 +140,7 @@ Contrasting this point measurement against the 2D surface integration of Eq.~\re
       lead/.style={gray!55, line width=0.4pt},
       leadarr/.style={-{Stealth[length=3pt]}, gray!55, line width=0.4pt},
       score/.style={gray!30!black, densely dotted, line width=0.6pt, opacity=0.85},
+      reglab/.style={font=\tiny, fill=white, inner sep=1.0pt},
     ]
     \useasboundingbox (-2.72,-1.32) rectangle (1.18,1.32);
 
@@ -173,12 +174,15 @@ Contrasting this point measurement against the 2D surface integration of Eq.~\re
 
     % Search region behind the barrier (schematic)
     \draw[region] (-2.7,-1.10) rectangle (-0.25,1.10);
-    \node[lab] at (-2.48,0.92) {$\Omega$};
+    \node[reglab] at (-2.55,0.96) {$\Omega$};
 
     % Sensor locations
-    \node[pt, label={[lab]below left:$V$}] (V) at (0,0) {};
-    \node[pt, label={[lab]above right:$L$}] (L) at (0.95,0.75) {};
-    \node[pt, label={[lab]below right:$R$}] (R) at (0.95,-0.75) {};
+    \node[pt] (V) at (0,0) {};
+    \node[pt] (L) at (0.95,0.75) {};
+    \node[pt] (R) at (0.95,-0.75) {};
+    \node[lab, anchor=north east, align=right] at (-0.04,-0.02) {$V$\\$\vec{r}_{\text{ldv}}$};
+    \node[lab, anchor=south west, align=left] at (0.98,0.78) {$L$\\$\vec{r}_{L}$};
+    \node[lab, anchor=north west, align=left] at (0.98,-0.78) {$R$\\$\vec{r}_{R}$};
     \draw[gray!55, line width=0.6pt] (L) -- (R);
 
     % Estimated location (schematic)
@@ -214,7 +218,7 @@ Contrasting this point measurement against the 2D surface integration of Eq.~\re
   \end{tikzpicture}%
   }
   \vspace{-2mm}
-  \caption{Geometric intuition of PI-GS (Eq.~\ref{eq:obj}). Faint contours show the iso-delay families $\tau_{VL}(\mathbf{p})$ and $\tau_{VR}(\mathbf{p})$ over candidate region $\Omega$. The GCC-PHAT correlation scores ``light up'' specific level sets into dominant ridges ($H_L$, $H_R$); their intersection locates the jointly consistent maximizer $\hat{\mathbf{p}}$. A spurious peak ($H_L'$) admits no such joint match and remains dim.}
+  \caption{Geometric intuition of PI-GS (Eq.~\ref{eq:obj}). The LDV anchor is the point $V$ at $\vec{r}_{\text{ldv}}$, and microphones are at $\vec{r}_L$ and $\vec{r}_R$. Faint contours show the iso-delay families $\tau_{VL}(\mathbf{p})$ and $\tau_{VR}(\mathbf{p})$ over candidate region $\Omega$. The GCC-PHAT correlation scores ``light up'' specific level sets into dominant ridges ($H_L$, $H_R$); their intersection locates the jointly consistent maximizer $\hat{\mathbf{p}}$. A spurious peak ($H_L'$) admits no such joint match and remains dim.}
   \label{fig:arch}
 \end{figure}
 
