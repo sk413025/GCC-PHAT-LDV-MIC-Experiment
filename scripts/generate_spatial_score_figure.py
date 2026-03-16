@@ -27,6 +27,7 @@ MIC_HALF_SPACING_M = 0.7
 
 def _parse_args() -> argparse.Namespace:
     ap = argparse.ArgumentParser(description="Generate the paper's spatial-score plot data.")
+    ap.add_argument("--data_root", type=str, default="", help="Optional dataset root used for relative-path metadata.")
     ap.add_argument("--ldv_wav", type=str, required=True)
     ap.add_argument("--micl_wav", type=str, required=True)
     ap.add_argument("--micr_wav", type=str, required=True)
@@ -124,6 +125,7 @@ def main() -> None:
     ldv_path = Path(args.ldv_wav).expanduser().resolve()
     micl_path = Path(args.micl_wav).expanduser().resolve()
     micr_path = Path(args.micr_wav).expanduser().resolve()
+    data_root = Path(args.data_root).expanduser().resolve() if args.data_root else None
     for path in (ldv_path, micl_path, micr_path):
         if not path.exists():
             raise FileNotFoundError(f"Missing WAV: {path}")
@@ -186,7 +188,7 @@ def main() -> None:
             "mic_mic_x_m": float(x_values[peak_idx_mic]),
             "pi_gs_x_m": float(x_values[peak_idx_pigs]),
         },
-        "input_files": build_file_manifest([ldv_path, micl_path, micr_path]),
+        "input_files": build_file_manifest([ldv_path, micl_path, micr_path], root=data_root),
         "git": git_state(repo_root),
     }
     write_json(out_dir / "spatial_score_meta.json", meta)

@@ -44,8 +44,9 @@ def git_state(repo_root: Path) -> dict[str, Any]:
 
 def build_file_manifest(paths: Iterable[Path], *, root: Path | None = None) -> list[dict[str, Any]]:
     items: list[dict[str, Any]] = []
+    resolved_root = root.resolve() if root else None
     for path in sorted({p.resolve() for p in paths}):
-        rel_path = path.relative_to(root).as_posix() if root and path.is_relative_to(root) else str(path)
+        rel_path = path.relative_to(resolved_root).as_posix() if resolved_root and path.is_relative_to(resolved_root) else str(path)
         items.append(
             {
                 "path": str(path),

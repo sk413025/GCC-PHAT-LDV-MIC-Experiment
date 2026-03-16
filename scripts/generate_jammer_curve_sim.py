@@ -52,6 +52,7 @@ def _parse_args() -> argparse.Namespace:
     )
 
     # Target trial (blocked)
+    p.add_argument("--data_root", type=str, default="", help="Optional dataset root used for relative-path metadata.")
     p.add_argument("--target_ldv_wav", type=str, required=True)
     p.add_argument("--target_micl_wav", type=str, required=True)
     p.add_argument("--target_micr_wav", type=str, required=True)
@@ -522,6 +523,7 @@ def main() -> None:
             "meta_json": str(out_meta),
         },
     }
+    data_root = Path(args.data_root).expanduser().resolve() if args.data_root else None
     meta["input_files"] = build_file_manifest(
         [
             Path(args.target_ldv_wav).expanduser().resolve(),
@@ -529,7 +531,8 @@ def main() -> None:
             Path(args.target_micr_wav).expanduser().resolve(),
             Path(args.jammer_micl_wav).expanduser().resolve(),
             Path(args.jammer_micr_wav).expanduser().resolve(),
-        ]
+        ],
+        root=data_root,
     )
     meta["git"] = git_state(Path(__file__).resolve().parent.parent)
     write_json(out_meta, meta)

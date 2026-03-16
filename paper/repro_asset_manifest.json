@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "description": "Source-of-truth manifest for cross-machine reproduction of the current paper assets.",
+  "description": "Source-of-truth manifest for cross-machine reproduction of the current paper assets. Paths are relative to the canonical dataset root dataset/0223/.",
   "assets": {
     "table1": {
       "description": "Table 1 (blocked/unblocked chirp and speech errors).",

@@ -14,8 +14,14 @@ from paper_repro_helpers import build_file_manifest, git_state, write_json
 
 
 def _parse_args() -> argparse.Namespace:
+    repo_root = Path(__file__).resolve().parent.parent
     ap = argparse.ArgumentParser(description="Reproduce the current paper bundle end-to-end.")
-    ap.add_argument("--data_root", type=str, required=True, help="Dataset root containing the 0223 WAV folders.")
+    ap.add_argument(
+        "--data_root",
+        type=str,
+        default=str(repo_root / "dataset" / "0223"),
+        help="Dataset root containing the canonical 0223 WAV folders.",
+    )
     ap.add_argument("--out_dir", type=str, default="", help="Output directory (defaults to results/paper_repro_<timestamp>/).")
     ap.add_argument(
         "--only",
@@ -135,6 +141,8 @@ def main() -> None:
         cmd = [
             "python",
             "scripts/generate_spatial_score_figure.py",
+            "--data_root",
+            str(data_root),
             "--ldv_wav",
             str(spatial_files[0]),
             "--micl_wav",
@@ -162,6 +170,8 @@ def main() -> None:
         cmd = [
             "python",
             "scripts/generate_jammer_curve_sim.py",
+            "--data_root",
+            str(data_root),
             "--target_ldv_wav",
             str(jammer_files[0]),
             "--target_micl_wav",

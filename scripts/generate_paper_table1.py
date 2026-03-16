@@ -299,8 +299,8 @@ def main() -> None:
     ap.add_argument(
         "--data_root",
         type=str,
-        default="/home/sbplab/jiawei/0222-block",
-        help="Root directory containing the 0223 block/unblock WAV folders.",
+        default=str(Path(__file__).resolve().parent.parent / "dataset" / "0223"),
+        help="Root directory containing the canonical 0223 block/unblock WAV folders.",
     )
     ap.add_argument(
         "--out_dir",
