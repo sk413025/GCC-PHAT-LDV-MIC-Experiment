@@ -132,6 +132,8 @@ worktree/manuscript-interspeech-2026/
 *.fls
 *.fdb_latexmk
 *.synctex.gz
+paper/generated/*
+!paper/generated/README.md
 
 # Claude Code config
 .claude/

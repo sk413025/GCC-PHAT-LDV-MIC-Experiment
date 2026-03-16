@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "description": "Source-of-truth manifest for cross-machine reproduction of the current paper assets.",
+  "assets": {
+    "table1": {
+      "description": "Table 1 (blocked/unblocked chirp and speech errors).",
+      "repo_files": [
+        "paper/table1_chirp_override.json"
+      ],
+      "data_files": [
+        "0223-block/0223-unblock-7(high)/0223-MIC-LEFT-40-boy(-0.8m)-20-unblock.wav",
+        "0223-block/0223-unblock-7(high)/0223-MIC-RIGHT-40-boy(-0.8m)-20-unblock.wav",
+        "0223-block/0223-block-7(high)/0223-MIC-LEFT-40-boy(-0.8m)-20-block.wav",
+        "0223-block/0223-block-7(high)/0223-MIC-RIGHT-40-boy(-0.8m)-20-block.wav",
+        "0223-block/0223-block-7(high)/0223-LDV-40-boy(-0.8m)-20-block.wav",
+        "0223-unblock-6(high)/0223-MIC-LEFT-40-boy(-0.4m)-19-unblock.wav",
+        "0223-unblock-6(high)/0223-MIC-RIGHT-40-boy(-0.4m)-19-unblock.wav",
+        "0223-block-6(high)/0223-MIC-LEFT-40-boy(-0.4m)-19-block.wav",
+        "0223-block-6(high)/0223-MIC-RIGHT-40-boy(-0.4m)-19-block.wav",
+        "0223-block-6(high)/0223-LDV-40-boy(-0.4m)-19-block.wav",
+        "0223-unblock-5(high)/0223-MIC-LEFT-40-boy(+0.0m)-18-unblock.wav",
+        "0223-unblock-5(high)/0223-MIC-RIGHT-40-boy(+0.0m)-18-unblock.wav",
+        "0223-block/0223-block-5(high)/0223-MIC-LEFT-40-boy(+0.0m)-18-block.wav",
+        "0223-block/0223-block-5(high)/0223-MIC-RIGHT-40-boy(+0.0m)-18-block.wav",
+        "0223-block/0223-block-5(high)/0223-LDV-40-boy(+0.0m)-18-block.wav",
+        "0223-unblock-3(high)/0223-MIC-LEFT-40-boy(+0.4m)-14-unblock.wav",
+        "0223-unblock-3(high)/0223-MIC-RIGHT-40-boy(+0.4m)-14-unblock.wav",
+        "0223-block/0223-block-3(high)/0223-MIC-LEFT-40-boy(+0.4m)-16-block.wav",
+        "0223-block/0223-block-3(high)/0223-MIC-RIGHT-40-boy(+0.4m)-16-block.wav",
+        "0223-block/0223-block-3(high)/0223-LDV-40-boy(+0.4m)-16-block.wav",
+        "0223-unblock-4(high)/0223-MIC-LEFT-40-boy(+0.8m)-17-unblock.wav",
+        "0223-unblock-4(high)/0223-MIC-RIGHT-40-boy(+0.8m)-17-unblock.wav",
+        "0223-block/0223-block-4(high)/0223-MIC-LEFT-40-boy(+0.8m)-17-block.wav",
+        "0223-block/0223-block-4(high)/0223-MIC-RIGHT-40-boy(+0.8m)-17-block.wav",
+        "0223-block/0223-block-4(high)/0223-LDV-40-boy(+0.8m)-17-block.wav"
+      ]
+    },
+    "spatial_score": {
+      "description": "Representative blocked spatial score slice (Fig. 3).",
+      "data_files": [
+        "0223-block/0223-block-2/0223-LDV-40-boy(+0.4m)-15-block.wav",
+        "0223-block/0223-block-2/0223-MIC-LEFT-40-boy(+0.4m)-15-block.wav",
+        "0223-block/0223-block-2/0223-MIC-RIGHT-40-boy(+0.4m)-15-block.wav"
+      ]
+    },
+    "jammer_curve": {
+      "description": "Simulated jammer-resilience curve for Fig. 4.",
+      "params": {
+        "speaker_key": "19"
+      },
+      "data_files": [
+        "0223-block/0223-block-2/0223-LDV-40-boy(+0.4m)-15-block.wav",
+        "0223-block/0223-block-2/0223-MIC-LEFT-40-boy(+0.4m)-15-block.wav",
+        "0223-block/0223-block-2/0223-MIC-RIGHT-40-boy(+0.4m)-15-block.wav",
+        "0223-block/0223-unblock-7(high)/0223-MIC-LEFT-40-boy(-0.8m)-20-unblock.wav",
+        "0223-block/0223-unblock-7(high)/0223-MIC-RIGHT-40-boy(-0.8m)-20-unblock.wav"
+      ]
+    }
+  }
+}
