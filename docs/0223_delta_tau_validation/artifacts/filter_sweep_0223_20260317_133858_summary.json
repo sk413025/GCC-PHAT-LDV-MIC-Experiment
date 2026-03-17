@@ -1,0 +1,1468 @@
+{
+  "generated_at": "2026-03-17T13:39:06",
+  "data_root": "C:\\Users\\Jenner\\Documents\\SBP Lab\\LDVReorientation\\worktree\\doc-interspeech-2026-repro\\dataset\\0223",
+  "slice_sec": 5.0,
+  "guided_radius_ms": 0.75,
+  "max_lag_ms": 10.0,
+  "cases": [
+    {
+      "case_id": "block4_p08_17",
+      "rel_dir": "0223-block/0223-block-4(high)",
+      "ldv_name": "0223-LDV-40-boy(+0.8m)-17-block.wav",
+      "mic_left_name": "0223-MIC-LEFT-40-boy(+0.8m)-17-block.wav",
+      "mic_right_name": "0223-MIC-RIGHT-40-boy(+0.8m)-17-block.wav",
+      "speaker_x_m": 0.8,
+      "v_x_m": 0.18,
+      "note": "High-point session; report uses v=(+0.18,0.50)."
+    },
+    {
+      "case_id": "block5_p00_18",
+      "rel_dir": "0223-block/0223-block-5(high)",
+      "ldv_name": "0223-LDV-40-boy(+0.0m)-18-block.wav",
+      "mic_left_name": "0223-MIC-LEFT-40-boy(+0.0m)-18-block.wav",
+      "mic_right_name": "0223-MIC-RIGHT-40-boy(+0.0m)-18-block.wav",
+      "speaker_x_m": 0.0,
+      "v_x_m": 0.18,
+      "note": "High-point session; report uses v=(+0.18,0.50)."
+    },
+    {
+      "case_id": "block6_n04_19",
+      "rel_dir": "0223-block-6(high)",
+      "ldv_name": "0223-LDV-40-boy(-0.4m)-19-block.wav",
+      "mic_left_name": "0223-MIC-LEFT-40-boy(-0.4m)-19-block.wav",
+      "mic_right_name": "0223-MIC-RIGHT-40-boy(-0.4m)-19-block.wav",
+      "speaker_x_m": -0.4,
+      "v_x_m": -0.21,
+      "note": "Report scan-best v_x for block-6 is -0.21."
+    },
+    {
+      "case_id": "block7_n08_20",
+      "rel_dir": "0223-block/0223-block-7(high)",
+      "ldv_name": "0223-LDV-40-boy(-0.8m)-20-block.wav",
+      "mic_left_name": "0223-MIC-LEFT-40-boy(-0.8m)-20-block.wav",
+      "mic_right_name": "0223-MIC-RIGHT-40-boy(-0.8m)-20-block.wav",
+      "speaker_x_m": -0.8,
+      "v_x_m": 0.12,
+      "note": "Report scan-best v_x for block-7 is +0.12."
+    }
+  ],
+  "variants": [
+    {
+      "name": "raw_fullband",
+      "bandpass": null,
+      "ldv_ops": [],
+      "mic_ops": []
+    },
+    {
+      "name": "bp_300_3000",
+      "bandpass": [
+        300.0,
+        3000.0
+      ],
+      "ldv_ops": [],
+      "mic_ops": []
+    },
+    {
+      "name": "bp_500_2000",
+      "bandpass": [
+        500.0,
+        2000.0
+      ],
+      "ldv_ops": [],
+      "mic_ops": []
+    },
+    {
+      "name": "bp_1000_3000",
+      "bandpass": [
+        1000.0,
+        3000.0
+      ],
+      "ldv_ops": [],
+      "mic_ops": []
+    },
+    {
+      "name": "ldv_preemph_bp500_2000",
+      "bandpass": [
+        500.0,
+        2000.0
+      ],
+      "ldv_ops": [
+        "preemphasis"
+      ],
+      "mic_ops": []
+    },
+    {
+      "name": "ldv_diff_bp500_2000",
+      "bandpass": [
+        500.0,
+        2000.0
+      ],
+      "ldv_ops": [
+        "diff"
+      ],
+      "mic_ops": []
+    },
+    {
+      "name": "both_flatten_bp500_2000",
+      "bandpass": [
+        500.0,
+        2000.0
+      ],
+      "ldv_ops": [
+        "spectral_flatten"
+      ],
+      "mic_ops": [
+        "spectral_flatten"
+      ]
+    }
+  ],
+  "results": [
+    {
+      "case_id": "block4_p08_17",
+      "case_note": "High-point session; report uses v=(+0.18,0.50).",
+      "variant": "raw_fullband",
+      "bandpass": null,
+      "ldv_ops": [],
+      "mic_ops": [],
+      "reference": {
+        "tau_vl_ms": 5.07020471331274,
+        "tau_vr_ms": 4.628503702032917,
+        "delta_tau_ms": -0.44170101127982253,
+        "theta_v_deg": -6.212529078474218
+      },
+      "global": {
+        "tau_vl_ms": -7.568900498100462,
+        "tau_vr_ms": -8.856093943305005,
+        "delta_tau_ms": -1.2871934452045428,
+        "theta_v_deg": -18.382692573401314,
+        "tau_vl_abs_err_ms": 12.639105211413202,
+        "tau_vr_abs_err_ms": 13.484597645337923,
+        "delta_tau_abs_err_ms": 0.8454924339247203,
+        "theta_v_abs_err_deg": 12.170163494927095,
+        "physical_positive_lags": false,
+        "physical_small_delta": false,
+        "vl_psr": 0.16649845939535615,
+        "vr_psr": 2.2307111519529266
+      },
+      "guided": {
+        "tau_vl_ms": 4.7210643025658685,
+        "tau_vr_ms": 4.355042416053726,
+        "delta_tau_ms": -0.36602188651214274,
+        "theta_v_deg": -5.1449311972272636,
+        "tau_vl_abs_err_ms": 0.3491404107468714,
+        "tau_vr_abs_err_ms": 0.2734612859791916,
+        "delta_tau_abs_err_ms": 0.0756791247676798,
+        "theta_v_abs_err_deg": 1.0675978812469546,
+        "physical_positive_lags": true,
+        "physical_small_delta": true,
+        "vl_psr": -11.993080243413573,
+        "vr_psr": -12.80829186449118
+      }
+    },
+    {
+      "case_id": "block5_p00_18",
+      "case_note": "High-point session; report uses v=(+0.18,0.50).",
+      "variant": "raw_fullband",
+      "bandpass": null,
+      "ldv_ops": [],
+      "mic_ops": [],
+      "reference": {
+        "tau_vl_ms": 5.07020471331274,
+        "tau_vr_ms": 4.628503702032917,
+        "delta_tau_ms": -0.44170101127982253,
+        "theta_v_deg": -6.212529078474218
+      },
+      "global": {
+        "tau_vl_ms": -3.3343656817583054,
+        "tau_vr_ms": -6.471769643923956,
+        "delta_tau_ms": -3.1374039621656507,
+        "theta_v_deg": -50.234065718767795,
+        "tau_vl_abs_err_ms": 8.404570395071046,
+        "tau_vr_abs_err_ms": 11.100273345956873,
+        "delta_tau_abs_err_ms": 2.695702950885828,
+        "theta_v_abs_err_deg": 44.021536640293576,
+        "physical_positive_lags": false,
+        "physical_small_delta": false,
+        "vl_psr": 1.6668736929237644,
+        "vr_psr": 1.6553150425646959
+      },
+      "guided": {
+        "tau_vl_ms": 5.646313809691777,
+        "tau_vr_ms": 4.285492553550762,
+        "delta_tau_ms": -1.3608212561410147,
+        "theta_v_deg": -19.47534550728864,
+        "tau_vl_abs_err_ms": 0.576109096379037,
+        "tau_vr_abs_err_ms": 0.3430111484821552,
+        "delta_tau_abs_err_ms": 0.9191202448611921,
+        "theta_v_abs_err_deg": 13.262816428814421,
+        "physical_positive_lags": true,
+        "physical_small_delta": false,
+        "vl_psr": -11.1831660888436,
+        "vr_psr": -9.363733373762159
+      }
+    },
+    {
+      "case_id": "block6_n04_19",
+      "case_note": "Report scan-best v_x for block-6 is -0.21.",
+      "variant": "raw_fullband",
+      "bandpass": null,
+      "ldv_ops": [],
+      "mic_ops": [],
+      "reference": {
+        "tau_vl_ms": 4.600597870846496,
+        "tau_vr_ms": 5.115018895722478,
+        "delta_tau_ms": 0.5144210248759817,
+        "theta_v_deg": 7.240422857301756
+      },
+      "global": {
+        "tau_vl_ms": -2.6435264994517023,
+        "tau_vr_ms": -8.316017211164436,
+        "delta_tau_ms": -5.672490711712733,
+        "theta_v_deg": -90.0,
+        "tau_vl_abs_err_ms": 7.244124370298199,
+        "tau_vr_abs_err_ms": 13.431036106886914,
+        "delta_tau_abs_err_ms": 6.186911736588715,
+        "theta_v_abs_err_deg": 97.24042285730175,
+        "physical_positive_lags": false,
+        "physical_small_delta": false,
+        "vl_psr": 3.190699845817042,
+        "vr_psr": 0.06751671236355834
+      },
+      "guided": {
+        "tau_vl_ms": 4.986826590154373,
+        "tau_vr_ms": 5.777302068396281,
+        "delta_tau_ms": 0.7904754782419081,
+        "theta_v_deg": 11.166834300070846,
+        "tau_vl_abs_err_ms": 0.3862287193078773,
+        "tau_vr_abs_err_ms": 0.6622831726738037,
+        "delta_tau_abs_err_ms": 0.2760544533659264,
+        "theta_v_abs_err_deg": 3.9264114427690897,
+        "physical_positive_lags": true,
+        "physical_small_delta": true,
+        "vl_psr": -11.768303887406814,
+        "vr_psr": -9.546139695547463
+      }
+    },
+    {
+      "case_id": "block7_n08_20",
+      "case_note": "Report scan-best v_x for block-7 is +0.12.",
+      "variant": "raw_fullband",
+      "bandpass": null,
+      "ldv_ops": [],
+      "mic_ops": [],
+      "reference": {
+        "tau_vl_ms": 4.983973328596641,
+        "tau_vr_ms": 4.688713817603411,
+        "delta_tau_ms": -0.29525951099323056,
+        "theta_v_deg": -4.14831865514363
+      },
+      "global": {
+        "tau_vl_ms": -2.0625903256013784,
+        "tau_vr_ms": -6.195862515725258,
+        "delta_tau_ms": -4.133272190123879,
+        "theta_v_deg": -90.0,
+        "tau_vl_abs_err_ms": 7.046563654198019,
+        "tau_vr_abs_err_ms": 10.884576333328669,
+        "delta_tau_abs_err_ms": 3.8380126791306486,
+        "theta_v_abs_err_deg": 85.85168134485637,
+        "physical_positive_lags": false,
+        "physical_small_delta": false,
+        "vl_psr": 4.416460650374764,
+        "vr_psr": 1.3170747485829792
+      },
+      "guided": {
+        "tau_vl_ms": 5.5481819909648165,
+        "tau_vr_ms": 4.764877039741137,
+        "delta_tau_ms": -0.7833049512236796,
+        "theta_v_deg": -11.06425388982592,
+        "tau_vl_abs_err_ms": 0.5642086623681752,
+        "tau_vr_abs_err_ms": 0.0761632221377262,
+        "delta_tau_abs_err_ms": 0.48804544023044905,
+        "theta_v_abs_err_deg": 6.915935234682291,
+        "physical_positive_lags": true,
+        "physical_small_delta": true,
+        "vl_psr": -11.187597852919954,
+        "vr_psr": -13.33834950708045
+      }
+    },
+    {
+      "case_id": "block4_p08_17",
+      "case_note": "High-point session; report uses v=(+0.18,0.50).",
+      "variant": "bp_300_3000",
+      "bandpass": [
+        300.0,
+        3000.0
+      ],
+      "ldv_ops": [],
+      "mic_ops": [],
+      "reference": {
+        "tau_vl_ms": 5.07020471331274,
+        "tau_vr_ms": 4.628503702032917,
+        "delta_tau_ms": -0.44170101127982253,
+        "theta_v_deg": -6.212529078474218
+      },
+      "global": {
+        "tau_vl_ms": 0.002215943340673481,
+        "tau_vr_ms": -0.0007703224443372312,
+        "delta_tau_ms": -0.002986265785010712,
+        "theta_v_deg": -0.04191960810628971,
+        "tau_vl_abs_err_ms": 5.067988769972066,
+        "tau_vr_abs_err_ms": 4.629274024477255,
+        "delta_tau_abs_err_ms": 0.4387147454948118,
+        "theta_v_abs_err_deg": 6.170609470367928,
+        "physical_positive_lags": false,
+        "physical_small_delta": true,
+        "vl_psr": 23.336783004855466,
+        "vr_psr": 26.33105598343441
+      },
+      "guided": {
+        "tau_vl_ms": 5.661711912980916,
+        "tau_vr_ms": 4.147453019919509,
+        "delta_tau_ms": -1.514258893061407,
+        "theta_v_deg": -21.7768976575672,
+        "tau_vl_abs_err_ms": 0.5915071996681762,
+        "tau_vr_abs_err_ms": 0.4810506821134082,
+        "delta_tau_abs_err_ms": 1.0725578817815844,
+        "theta_v_abs_err_deg": 15.564368579092982,
+        "physical_positive_lags": true,
+        "physical_small_delta": false,
+        "vl_psr": -37.4350198868973,
+        "vr_psr": -41.397287127873916
+      }
+    },
+    {
+      "case_id": "block5_p00_18",
+      "case_note": "High-point session; report uses v=(+0.18,0.50).",
+      "variant": "bp_300_3000",
+      "bandpass": [
+        300.0,
+        3000.0
+      ],
+      "ldv_ops": [],
+      "mic_ops": [],
+      "reference": {
+        "tau_vl_ms": 5.07020471331274,
+        "tau_vr_ms": 4.628503702032917,
+        "delta_tau_ms": -0.44170101127982253,
+        "theta_v_deg": -6.212529078474218
+      },
+      "global": {
+        "tau_vl_ms": -0.006000019745013515,
+        "tau_vr_ms": -0.00813308291731862,
+        "delta_tau_ms": -0.0021330631723051052,
+        "theta_v_deg": -0.029942803078880843,
+        "tau_vl_abs_err_ms": 5.076204733057754,
+        "tau_vr_abs_err_ms": 4.636636784950236,
+        "delta_tau_abs_err_ms": 0.4395679481075174,
+        "theta_v_abs_err_deg": 6.182586275395337,
+        "physical_positive_lags": false,
+        "physical_small_delta": true,
+        "vl_psr": 24.481067965462096,
+        "vr_psr": 22.605678699663635
+      },
+      "guided": {
+        "tau_vl_ms": 4.201443319737908,
+        "tau_vr_ms": 4.029972676029096,
+        "delta_tau_ms": -0.1714706437088127,
+        "theta_v_deg": -2.4077218999492453,
+        "tau_vl_abs_err_ms": 0.8687613935748315,
+        "tau_vr_abs_err_ms": 0.5985310260038217,
+        "delta_tau_abs_err_ms": 0.2702303675710098,
+        "theta_v_abs_err_deg": 3.804807178524973,
+        "physical_positive_lags": true,
+        "physical_small_delta": true,
+        "vl_psr": -37.19235278653974,
+        "vr_psr": -34.05925833193902
+      }
+    },
+    {
+      "case_id": "block6_n04_19",
+      "case_note": "Report scan-best v_x for block-6 is -0.21.",
+      "variant": "bp_300_3000",
+      "bandpass": [
+        300.0,
+        3000.0
+      ],
+      "ldv_ops": [],
+      "mic_ops": [],
+      "reference": {
+        "tau_vl_ms": 4.600597870846496,
+        "tau_vr_ms": 5.115018895722478,
+        "delta_tau_ms": 0.5144210248759817,
+        "theta_v_deg": 7.240422857301756
+      },
+      "global": {
+        "tau_vl_ms": 0.0013891642449418192,
+        "tau_vr_ms": 0.004639823445454723,
+        "delta_tau_ms": 0.0032506592005129035,
+        "theta_v_deg": 0.04563102276580826,
+        "tau_vl_abs_err_ms": 4.599208706601554,
+        "tau_vr_abs_err_ms": 5.110379072277023,
+        "delta_tau_abs_err_ms": 0.5111703656754688,
+        "theta_v_abs_err_deg": 7.194791834535948,
+        "physical_positive_lags": true,
+        "physical_small_delta": true,
+        "vl_psr": 30.784125617615206,
+        "vr_psr": 28.587535293655407
+      },
+      "guided": {
+        "tau_vl_ms": 4.1596394861576,
+        "tau_vr_ms": 5.209424025235827,
+        "delta_tau_ms": 1.0497845390782272,
+        "theta_v_deg": 14.90381938773279,
+        "tau_vl_abs_err_ms": 0.44095838468889603,
+        "tau_vr_abs_err_ms": 0.09440512951334945,
+        "delta_tau_abs_err_ms": 0.5353635142022455,
+        "theta_v_abs_err_deg": 7.663396530431034,
+        "physical_positive_lags": true,
+        "physical_small_delta": false,
+        "vl_psr": -38.687885715126285,
+        "vr_psr": -39.08953043084891
+      }
+    },
+    {
+      "case_id": "block7_n08_20",
+      "case_note": "Report scan-best v_x for block-7 is +0.12.",
+      "variant": "bp_300_3000",
+      "bandpass": [
+        300.0,
+        3000.0
+      ],
+      "ldv_ops": [],
+      "mic_ops": [],
+      "reference": {
+        "tau_vl_ms": 4.983973328596641,
+        "tau_vr_ms": 4.688713817603411,
+        "delta_tau_ms": -0.29525951099323056,
+        "theta_v_deg": -4.14831865514363
+      },
+      "global": {
+        "tau_vl_ms": 0.0001652117759430665,
+        "tau_vr_ms": 0.005897476953752879,
+        "delta_tau_ms": 0.005732265177809812,
+        "theta_v_deg": 0.08046650387729685,
+        "tau_vl_abs_err_ms": 4.983808116820698,
+        "tau_vr_abs_err_ms": 4.682816340649658,
+        "delta_tau_abs_err_ms": 0.3009917761710404,
+        "theta_v_abs_err_deg": 4.228785159020926,
+        "physical_positive_lags": true,
+        "physical_small_delta": true,
+        "vl_psr": 28.12008696751773,
+        "vr_psr": 23.065269878128834
+      },
+      "guided": {
+        "tau_vl_ms": 5.596519017023051,
+        "tau_vr_ms": 4.022544539676295,
+        "delta_tau_ms": -1.5739744773467566,
+        "theta_v_deg": -22.682468692704084,
+        "tau_vl_abs_err_ms": 0.61254568842641,
+        "tau_vr_abs_err_ms": 0.666169277927116,
+        "delta_tau_abs_err_ms": 1.278714966353526,
+        "theta_v_abs_err_deg": 18.534150037560455,
+        "physical_positive_lags": true,
+        "physical_small_delta": false,
+        "vl_psr": -35.63492395450592,
+        "vr_psr": -38.2912216821307
+      }
+    },
+    {
+      "case_id": "block4_p08_17",
+      "case_note": "High-point session; report uses v=(+0.18,0.50).",
+      "variant": "bp_500_2000",
+      "bandpass": [
+        500.0,
+        2000.0
+      ],
+      "ldv_ops": [],
+      "mic_ops": [],
+      "reference": {
+        "tau_vl_ms": 5.07020471331274,
+        "tau_vr_ms": 4.628503702032917,
+        "delta_tau_ms": -0.44170101127982253,
+        "theta_v_deg": -6.212529078474218
+      },
+      "global": {
+        "tau_vl_ms": 0.02241278083054661,
+        "tau_vr_ms": -0.0010058154322336093,
+        "delta_tau_ms": -0.02341859626278022,
+        "theta_v_deg": -0.32873955203114685,
+        "tau_vl_abs_err_ms": 5.047791932482193,
+        "tau_vr_abs_err_ms": 4.629509517465151,
+        "delta_tau_abs_err_ms": 0.41828241501704233,
+        "theta_v_abs_err_deg": 5.8837895264430715,
+        "physical_positive_lags": false,
+        "physical_small_delta": true,
+        "vl_psr": 12.659156753303936,
+        "vr_psr": 29.250799665340477
+      },
+      "guided": {
+        "tau_vl_ms": 5.006344889562212,
+        "tau_vr_ms": 4.596765613988827,
+        "delta_tau_ms": -0.40957927557338447,
+        "theta_v_deg": -5.759148161309612,
+        "tau_vl_abs_err_ms": 0.06385982375052812,
+        "tau_vr_abs_err_ms": 0.03173808804409006,
+        "delta_tau_abs_err_ms": 0.03212173570643806,
+        "theta_v_abs_err_deg": 0.4533809171646066,
+        "physical_positive_lags": true,
+        "physical_small_delta": true,
+        "vl_psr": -26.49157171067341,
+        "vr_psr": -41.78558705579817
+      }
+    },
+    {
+      "case_id": "block5_p00_18",
+      "case_note": "High-point session; report uses v=(+0.18,0.50).",
+      "variant": "bp_500_2000",
+      "bandpass": [
+        500.0,
+        2000.0
+      ],
+      "ldv_ops": [],
+      "mic_ops": [],
+      "reference": {
+        "tau_vl_ms": 5.07020471331274,
+        "tau_vr_ms": 4.628503702032917,
+        "delta_tau_ms": -0.44170101127982253,
+        "theta_v_deg": -6.212529078474218
+      },
+      "global": {
+        "tau_vl_ms": 8.204298857067454e-05,
+        "tau_vr_ms": 0.018503808189723938,
+        "delta_tau_ms": 0.018421765201153264,
+        "theta_v_deg": 0.25859578026079627,
+        "tau_vl_abs_err_ms": 5.070122670324169,
+        "tau_vr_abs_err_ms": 4.609999893843193,
+        "delta_tau_abs_err_ms": 0.46012277648097577,
+        "theta_v_abs_err_deg": 6.471124858735014,
+        "physical_positive_lags": true,
+        "physical_small_delta": true,
+        "vl_psr": 28.35929294844691,
+        "vr_psr": 24.094530061972282
+      },
+      "guided": {
+        "tau_vl_ms": 4.544717535342345,
+        "tau_vr_ms": 4.104684282396081,
+        "delta_tau_ms": -0.4400332529462636,
+        "theta_v_deg": -6.188980205733674,
+        "tau_vl_abs_err_ms": 0.5254871779703949,
+        "tau_vr_abs_err_ms": 0.523819419636836,
+        "delta_tau_abs_err_ms": 0.0016677583335589219,
+        "theta_v_abs_err_deg": 0.023548872740544624,
+        "physical_positive_lags": true,
+        "physical_small_delta": true,
+        "vl_psr": -41.20784051167882,
+        "vr_psr": -34.060025968910416
+      }
+    },
+    {
+      "case_id": "block6_n04_19",
+      "case_note": "Report scan-best v_x for block-6 is -0.21.",
+      "variant": "bp_500_2000",
+      "bandpass": [
+        500.0,
+        2000.0
+      ],
+      "ldv_ops": [],
+      "mic_ops": [],
+      "reference": {
+        "tau_vl_ms": 4.600597870846496,
+        "tau_vr_ms": 5.115018895722478,
+        "delta_tau_ms": 0.5144210248759817,
+        "theta_v_deg": 7.240422857301756
+      },
+      "global": {
+        "tau_vl_ms": -0.0010734759790943106,
+        "tau_vr_ms": 0.01602360915819738,
+        "delta_tau_ms": 0.01709708513729169,
+        "theta_v_deg": 0.24000045282584412,
+        "tau_vl_abs_err_ms": 4.60167134682559,
+        "tau_vr_abs_err_ms": 5.09899528656428,
+        "delta_tau_abs_err_ms": 0.49732393973869005,
+        "theta_v_abs_err_deg": 7.000422404475913,
+        "physical_positive_lags": false,
+        "physical_small_delta": true,
+        "vl_psr": 32.72909666732481,
+        "vr_psr": 16.56939150325685
+      },
+      "guided": {
+        "tau_vl_ms": 4.023270511866865,
+        "tau_vr_ms": 5.692647688690115,
+        "delta_tau_ms": 1.6693771768232502,
+        "theta_v_deg": 24.141869107369537,
+        "tau_vl_abs_err_ms": 0.5773273589796313,
+        "tau_vr_abs_err_ms": 0.5776287929676371,
+        "delta_tau_abs_err_ms": 1.1549561519472684,
+        "theta_v_abs_err_deg": 16.90144625006778,
+        "physical_positive_lags": true,
+        "physical_small_delta": false,
+        "vl_psr": -46.65360904185201,
+        "vr_psr": -27.144987061645875
+      }
+    },
+    {
+      "case_id": "block7_n08_20",
+      "case_note": "Report scan-best v_x for block-7 is +0.12.",
+      "variant": "bp_500_2000",
+      "bandpass": [
+        500.0,
+        2000.0
+      ],
+      "ldv_ops": [],
+      "mic_ops": [],
+      "reference": {
+        "tau_vl_ms": 4.983973328596641,
+        "tau_vr_ms": 4.688713817603411,
+        "delta_tau_ms": -0.29525951099323056,
+        "theta_v_deg": -4.14831865514363
+      },
+      "global": {
+        "tau_vl_ms": 0.000911574647155596,
+        "tau_vr_ms": 0.014350905117408195,
+        "delta_tau_ms": 0.013439330470252598,
+        "theta_v_deg": 0.188654485162084,
+        "tau_vl_abs_err_ms": 4.983061753949485,
+        "tau_vr_abs_err_ms": 4.674362912486003,
+        "delta_tau_abs_err_ms": 0.30869884146348314,
+        "theta_v_abs_err_deg": 4.336973140305714,
+        "physical_positive_lags": true,
+        "physical_small_delta": true,
+        "vl_psr": 30.634849899907486,
+        "vr_psr": 24.035713719521688
+      },
+      "guided": {
+        "tau_vl_ms": 5.569588508132939,
+        "tau_vr_ms": 3.9911866091473045,
+        "delta_tau_ms": -1.5784018989856343,
+        "theta_v_deg": -22.749844901201318,
+        "tau_vl_abs_err_ms": 0.5856151795362976,
+        "tau_vr_abs_err_ms": 0.6975272084561062,
+        "delta_tau_abs_err_ms": 1.2831423879924038,
+        "theta_v_abs_err_deg": 18.601526246057688,
+        "physical_positive_lags": true,
+        "physical_small_delta": false,
+        "vl_psr": -42.87065788707323,
+        "vr_psr": -37.03070816073195
+      }
+    },
+    {
+      "case_id": "block4_p08_17",
+      "case_note": "High-point session; report uses v=(+0.18,0.50).",
+      "variant": "bp_1000_3000",
+      "bandpass": [
+        1000.0,
+        3000.0
+      ],
+      "ldv_ops": [],
+      "mic_ops": [],
+      "reference": {
+        "tau_vl_ms": 5.07020471331274,
+        "tau_vr_ms": 4.628503702032917,
+        "delta_tau_ms": -0.44170101127982253,
+        "theta_v_deg": -6.212529078474218
+      },
+      "global": {
+        "tau_vl_ms": -0.018153411795693776,
+        "tau_vr_ms": -0.02002577837690439,
+        "delta_tau_ms": -0.0018723665812106147,
+        "theta_v_deg": -0.026283283108965164,
+        "tau_vl_abs_err_ms": 5.088358125108433,
+        "tau_vr_abs_err_ms": 4.648529480409822,
+        "delta_tau_abs_err_ms": 0.43982864469861194,
+        "theta_v_abs_err_deg": 6.186245795365253,
+        "physical_positive_lags": false,
+        "physical_small_delta": true,
+        "vl_psr": 25.901159615635624,
+        "vr_psr": 28.105664738773903
+      },
+      "guided": {
+        "tau_vl_ms": 4.969490767226217,
+        "tau_vr_ms": 5.008022772658994,
+        "delta_tau_ms": 0.038532005432776906,
+        "theta_v_deg": 0.5408997498021206,
+        "tau_vl_abs_err_ms": 0.10071394608652273,
+        "tau_vr_abs_err_ms": 0.3795190706260767,
+        "delta_tau_abs_err_ms": 0.48023301671259944,
+        "theta_v_abs_err_deg": 6.753428828276339,
+        "physical_positive_lags": true,
+        "physical_small_delta": true,
+        "vl_psr": -39.32580893585715,
+        "vr_psr": -42.955158326326774
+      }
+    },
+    {
+      "case_id": "block5_p00_18",
+      "case_note": "High-point session; report uses v=(+0.18,0.50).",
+      "variant": "bp_1000_3000",
+      "bandpass": [
+        1000.0,
+        3000.0
+      ],
+      "ldv_ops": [],
+      "mic_ops": [],
+      "reference": {
+        "tau_vl_ms": 5.07020471331274,
+        "tau_vr_ms": 4.628503702032917,
+        "delta_tau_ms": -0.44170101127982253,
+        "theta_v_deg": -6.212529078474218
+      },
+      "global": {
+        "tau_vl_ms": -0.019350552494724765,
+        "tau_vr_ms": -0.017818384122869756,
+        "delta_tau_ms": 0.001532168371855009,
+        "theta_v_deg": 0.02150776190174081,
+        "tau_vl_abs_err_ms": 5.089555265807465,
+        "tau_vr_abs_err_ms": 4.646322086155787,
+        "delta_tau_abs_err_ms": 0.4432331796516775,
+        "theta_v_abs_err_deg": 6.234036840375959,
+        "physical_positive_lags": false,
+        "physical_small_delta": true,
+        "vl_psr": 27.253087419727233,
+        "vr_psr": 26.951806803874984
+      },
+      "guided": {
+        "tau_vl_ms": 4.25615668065157,
+        "tau_vr_ms": 5.173871468112361,
+        "delta_tau_ms": 0.9177147874607918,
+        "theta_v_deg": 12.993476997430147,
+        "tau_vl_abs_err_ms": 0.8140480326611703,
+        "tau_vr_abs_err_ms": 0.545367766079444,
+        "delta_tau_abs_err_ms": 1.3594157987406144,
+        "theta_v_abs_err_deg": 19.206006075904366,
+        "physical_positive_lags": true,
+        "physical_small_delta": true,
+        "vl_psr": -41.02939537270737,
+        "vr_psr": -38.50856633161944
+      }
+    },
+    {
+      "case_id": "block6_n04_19",
+      "case_note": "Report scan-best v_x for block-6 is -0.21.",
+      "variant": "bp_1000_3000",
+      "bandpass": [
+        1000.0,
+        3000.0
+      ],
+      "ldv_ops": [],
+      "mic_ops": [],
+      "reference": {
+        "tau_vl_ms": 4.600597870846496,
+        "tau_vr_ms": 5.115018895722478,
+        "delta_tau_ms": 0.5144210248759817,
+        "theta_v_deg": 7.240422857301756
+      },
+      "global": {
+        "tau_vl_ms": -0.00021928131959404076,
+        "tau_vr_ms": 0.018279103635902492,
+        "delta_tau_ms": 0.018498384955496532,
+        "theta_v_deg": 0.2596713384561735,
+        "tau_vl_abs_err_ms": 4.60081715216609,
+        "tau_vr_abs_err_ms": 5.096739792086575,
+        "delta_tau_abs_err_ms": 0.4959226399204852,
+        "theta_v_abs_err_deg": 6.980751518845583,
+        "physical_positive_lags": false,
+        "physical_small_delta": true,
+        "vl_psr": 32.912800301530496,
+        "vr_psr": 30.83328909182604
+      },
+      "guided": {
+        "tau_vl_ms": 4.180108422538526,
+        "tau_vr_ms": 5.23913455667666,
+        "delta_tau_ms": 1.0590261341381346,
+        "theta_v_deg": 15.03810610510902,
+        "tau_vl_abs_err_ms": 0.4204894483079702,
+        "tau_vr_abs_err_ms": 0.1241156609541827,
+        "delta_tau_abs_err_ms": 0.5446051092621529,
+        "theta_v_abs_err_deg": 7.797683247807263,
+        "physical_positive_lags": true,
+        "physical_small_delta": false,
+        "vl_psr": -41.324060964789446,
+        "vr_psr": -39.97242723556563
+      }
+    },
+    {
+      "case_id": "block7_n08_20",
+      "case_note": "Report scan-best v_x for block-7 is +0.12.",
+      "variant": "bp_1000_3000",
+      "bandpass": [
+        1000.0,
+        3000.0
+      ],
+      "ldv_ops": [],
+      "mic_ops": [],
+      "reference": {
+        "tau_vl_ms": 4.983973328596641,
+        "tau_vr_ms": 4.688713817603411,
+        "delta_tau_ms": -0.29525951099323056,
+        "theta_v_deg": -4.14831865514363
+      },
+      "global": {
+        "tau_vl_ms": 0.0008652584368504867,
+        "tau_vr_ms": -0.01839004508716802,
+        "delta_tau_ms": -0.019255303524018507,
+        "theta_v_deg": -0.27029667076053876,
+        "tau_vl_abs_err_ms": 4.9831080701597905,
+        "tau_vr_abs_err_ms": 4.707103862690579,
+        "delta_tau_abs_err_ms": 0.27600420746921206,
+        "theta_v_abs_err_deg": 3.878021984383091,
+        "physical_positive_lags": false,
+        "physical_small_delta": true,
+        "vl_psr": 27.066224472699375,
+        "vr_psr": 22.523016063842096
+      },
+      "guided": {
+        "tau_vl_ms": 5.602805629583618,
+        "tau_vr_ms": 4.041290549689483,
+        "delta_tau_ms": -1.5615150798941348,
+        "theta_v_deg": -22.49303957959357,
+        "tau_vl_abs_err_ms": 0.618832300986977,
+        "tau_vr_abs_err_ms": 0.6474232679139273,
+        "delta_tau_abs_err_ms": 1.2662555689009043,
+        "theta_v_abs_err_deg": 18.34472092444994,
+        "physical_positive_lags": true,
+        "physical_small_delta": false,
+        "vl_psr": -39.865537509546236,
+        "vr_psr": -35.47404815014385
+      }
+    },
+    {
+      "case_id": "block4_p08_17",
+      "case_note": "High-point session; report uses v=(+0.18,0.50).",
+      "variant": "ldv_preemph_bp500_2000",
+      "bandpass": [
+        500.0,
+        2000.0
+      ],
+      "ldv_ops": [
+        "preemphasis"
+      ],
+      "mic_ops": [],
+      "reference": {
+        "tau_vl_ms": 5.07020471331274,
+        "tau_vr_ms": 4.628503702032917,
+        "delta_tau_ms": -0.44170101127982253,
+        "theta_v_deg": -6.212529078474218
+      },
+      "global": {
+        "tau_vl_ms": 0.01490758677873589,
+        "tau_vr_ms": -0.0002911064485429799,
+        "delta_tau_ms": -0.01519869322727887,
+        "theta_v_deg": -0.21335163217924824,
+        "tau_vl_abs_err_ms": 5.055297126534004,
+        "tau_vr_abs_err_ms": 4.6287948084814605,
+        "delta_tau_abs_err_ms": 0.4265023180525437,
+        "theta_v_abs_err_deg": 5.99917744629497,
+        "physical_positive_lags": false,
+        "physical_small_delta": true,
+        "vl_psr": 23.586459352241867,
+        "vr_psr": 34.162670138770956
+      },
+      "guided": {
+        "tau_vl_ms": 4.697834295392398,
+        "tau_vr_ms": 4.49847444875478,
+        "delta_tau_ms": -0.19935984663761808,
+        "theta_v_deg": -2.7996209731751445,
+        "tau_vl_abs_err_ms": 0.372370417920342,
+        "tau_vr_abs_err_ms": 0.13002925327813752,
+        "delta_tau_abs_err_ms": 0.24234116464220445,
+        "theta_v_abs_err_deg": 3.4129081052990737,
+        "physical_positive_lags": true,
+        "physical_small_delta": true,
+        "vl_psr": -35.397257819810704,
+        "vr_psr": -47.442725735616385
+      }
+    },
+    {
+      "case_id": "block5_p00_18",
+      "case_note": "High-point session; report uses v=(+0.18,0.50).",
+      "variant": "ldv_preemph_bp500_2000",
+      "bandpass": [
+        500.0,
+        2000.0
+      ],
+      "ldv_ops": [
+        "preemphasis"
+      ],
+      "mic_ops": [],
+      "reference": {
+        "tau_vl_ms": 5.07020471331274,
+        "tau_vr_ms": 4.628503702032917,
+        "delta_tau_ms": -0.44170101127982253,
+        "theta_v_deg": -6.212529078474218
+      },
+      "global": {
+        "tau_vl_ms": -0.001310365706178494,
+        "tau_vr_ms": 0.015909128780923043,
+        "delta_tau_ms": 0.017219494487101538,
+        "theta_v_deg": 0.241718785092642,
+        "tau_vl_abs_err_ms": 5.071515079018918,
+        "tau_vr_abs_err_ms": 4.612594573251994,
+        "delta_tau_abs_err_ms": 0.45892050576692406,
+        "theta_v_abs_err_deg": 6.45424786356686,
+        "physical_positive_lags": false,
+        "physical_small_delta": true,
+        "vl_psr": 29.794236400077256,
+        "vr_psr": 28.155914225822755
+      },
+      "guided": {
+        "tau_vl_ms": 4.39425026444859,
+        "tau_vr_ms": 3.980170001061923,
+        "delta_tau_ms": -0.4140802633866665,
+        "theta_v_deg": -5.822654718068726,
+        "tau_vl_abs_err_ms": 0.6759544488641502,
+        "tau_vr_abs_err_ms": 0.6483337009709942,
+        "delta_tau_abs_err_ms": 0.02762074789315605,
+        "theta_v_abs_err_deg": 0.38987436040549195,
+        "physical_positive_lags": true,
+        "physical_small_delta": true,
+        "vl_psr": -39.05500682180002,
+        "vr_psr": -37.152709027406104
+      }
+    },
+    {
+      "case_id": "block6_n04_19",
+      "case_note": "Report scan-best v_x for block-6 is -0.21.",
+      "variant": "ldv_preemph_bp500_2000",
+      "bandpass": [
+        500.0,
+        2000.0
+      ],
+      "ldv_ops": [
+        "preemphasis"
+      ],
+      "mic_ops": [],
+      "reference": {
+        "tau_vl_ms": 4.600597870846496,
+        "tau_vr_ms": 5.115018895722478,
+        "delta_tau_ms": 0.5144210248759817,
+        "theta_v_deg": 7.240422857301756
+      },
+      "global": {
+        "tau_vl_ms": -0.0006218912513242435,
+        "tau_vr_ms": -0.023241664270826454,
+        "delta_tau_ms": -0.02261977301950221,
+        "theta_v_deg": -0.3175259195780952,
+        "tau_vl_abs_err_ms": 4.60121976209782,
+        "tau_vr_abs_err_ms": 5.138260559993304,
+        "delta_tau_abs_err_ms": 0.537040797895484,
+        "theta_v_abs_err_deg": 7.557948776879852,
+        "physical_positive_lags": false,
+        "physical_small_delta": true,
+        "vl_psr": 42.85440116862861,
+        "vr_psr": 24.75134502569074
+      },
+      "guided": {
+        "tau_vl_ms": 3.805978281922245,
+        "tau_vr_ms": 4.870769360479585,
+        "delta_tau_ms": 1.0647910785573398,
+        "theta_v_deg": 15.121917498589255,
+        "tau_vl_abs_err_ms": 0.7946195889242507,
+        "tau_vr_abs_err_ms": 0.2442495352428926,
+        "delta_tau_abs_err_ms": 0.550370053681358,
+        "theta_v_abs_err_deg": 7.881494641287499,
+        "physical_positive_lags": true,
+        "physical_small_delta": false,
+        "vl_psr": -49.36943407652825,
+        "vr_psr": -38.27514651687665
+      }
+    },
+    {
+      "case_id": "block7_n08_20",
+      "case_note": "Report scan-best v_x for block-7 is +0.12.",
+      "variant": "ldv_preemph_bp500_2000",
+      "bandpass": [
+        500.0,
+        2000.0
+      ],
+      "ldv_ops": [
+        "preemphasis"
+      ],
+      "mic_ops": [],
+      "reference": {
+        "tau_vl_ms": 4.983973328596641,
+        "tau_vr_ms": 4.688713817603411,
+        "delta_tau_ms": -0.29525951099323056,
+        "theta_v_deg": -4.14831865514363
+      },
+      "global": {
+        "tau_vl_ms": 0.0006195116569372107,
+        "tau_vr_ms": 0.01276881983043641,
+        "delta_tau_ms": 0.012149308173499199,
+        "theta_v_deg": 0.17054575201535266,
+        "tau_vl_abs_err_ms": 4.983353816939704,
+        "tau_vr_abs_err_ms": 4.675944997772974,
+        "delta_tau_abs_err_ms": 0.30740881916672974,
+        "theta_v_abs_err_deg": 4.318864407158983,
+        "physical_positive_lags": true,
+        "physical_small_delta": true,
+        "vl_psr": 31.043970470311653,
+        "vr_psr": 25.421970843110515
+      },
+      "guided": {
+        "tau_vl_ms": 5.461367086768538,
+        "tau_vr_ms": 3.8552252839331427,
+        "delta_tau_ms": -1.6061418028353955,
+        "theta_v_deg": -23.17275121222976,
+        "tau_vl_abs_err_ms": 0.477393758171897,
+        "tau_vr_abs_err_ms": 0.833488533670268,
+        "delta_tau_abs_err_ms": 1.310882291842165,
+        "theta_v_abs_err_deg": 19.02443255708613,
+        "physical_positive_lags": true,
+        "physical_small_delta": false,
+        "vl_psr": -42.309747058073945,
+        "vr_psr": -37.4115591413147
+      }
+    },
+    {
+      "case_id": "block4_p08_17",
+      "case_note": "High-point session; report uses v=(+0.18,0.50).",
+      "variant": "ldv_diff_bp500_2000",
+      "bandpass": [
+        500.0,
+        2000.0
+      ],
+      "ldv_ops": [
+        "diff"
+      ],
+      "mic_ops": [],
+      "reference": {
+        "tau_vl_ms": 5.07020471331274,
+        "tau_vr_ms": 4.628503702032917,
+        "delta_tau_ms": -0.44170101127982253,
+        "theta_v_deg": -6.212529078474218
+      },
+      "global": {
+        "tau_vl_ms": 0.0018424028642083099,
+        "tau_vr_ms": -0.020673607672752163,
+        "delta_tau_ms": -0.022516010536960472,
+        "theta_v_deg": -0.3160693349942781,
+        "tau_vl_abs_err_ms": 5.068362310448531,
+        "tau_vr_abs_err_ms": 4.64917730970567,
+        "delta_tau_abs_err_ms": 0.4191850007428621,
+        "theta_v_abs_err_deg": 5.89645974347994,
+        "physical_positive_lags": false,
+        "physical_small_delta": true,
+        "vl_psr": 24.14945612402475,
+        "vr_psr": 17.87369272583949
+      },
+      "guided": {
+        "tau_vl_ms": 5.162309097013852,
+        "tau_vr_ms": 5.15490237696136,
+        "delta_tau_ms": -0.0074067200524918775,
+        "theta_v_deg": -0.10397163782760342,
+        "tau_vl_abs_err_ms": 0.09210438370111174,
+        "tau_vr_abs_err_ms": 0.5263986749284424,
+        "delta_tau_abs_err_ms": 0.43429429122733065,
+        "theta_v_abs_err_deg": 6.1085574406466145,
+        "physical_positive_lags": true,
+        "physical_small_delta": true,
+        "vl_psr": -40.83251893721111,
+        "vr_psr": -33.138827601152244
+      }
+    },
+    {
+      "case_id": "block5_p00_18",
+      "case_note": "High-point session; report uses v=(+0.18,0.50).",
+      "variant": "ldv_diff_bp500_2000",
+      "bandpass": [
+        500.0,
+        2000.0
+      ],
+      "ldv_ops": [
+        "diff"
+      ],
+      "mic_ops": [],
+      "reference": {
+        "tau_vl_ms": 5.07020471331274,
+        "tau_vr_ms": 4.628503702032917,
+        "delta_tau_ms": -0.44170101127982253,
+        "theta_v_deg": -6.212529078474218
+      },
+      "global": {
+        "tau_vl_ms": -0.0021973120743099313,
+        "tau_vr_ms": 0.018928676276756654,
+        "delta_tau_ms": 0.021125988351066584,
+        "theta_v_deg": 0.296556666902704,
+        "tau_vl_abs_err_ms": 5.07240202538705,
+        "tau_vr_abs_err_ms": 4.60957502575616,
+        "delta_tau_abs_err_ms": 0.46282699963088914,
+        "theta_v_abs_err_deg": 6.509085745376922,
+        "physical_positive_lags": false,
+        "physical_small_delta": true,
+        "vl_psr": 24.404532220825455,
+        "vr_psr": 19.88734811471898
+      },
+      "guided": {
+        "tau_vl_ms": 4.409193292870655,
+        "tau_vr_ms": 4.2547787881722705,
+        "delta_tau_ms": -0.15441450469838447,
+        "theta_v_deg": -2.1681057415551233,
+        "tau_vl_abs_err_ms": 0.6610114204420849,
+        "tau_vr_abs_err_ms": 0.3737249138606469,
+        "delta_tau_abs_err_ms": 0.28728650658143806,
+        "theta_v_abs_err_deg": 4.044423336919095,
+        "physical_positive_lags": true,
+        "physical_small_delta": true,
+        "vl_psr": -35.21458558577068,
+        "vr_psr": -28.302852452696825
+      }
+    },
+    {
+      "case_id": "block6_n04_19",
+      "case_note": "Report scan-best v_x for block-6 is -0.21.",
+      "variant": "ldv_diff_bp500_2000",
+      "bandpass": [
+        500.0,
+        2000.0
+      ],
+      "ldv_ops": [
+        "diff"
+      ],
+      "mic_ops": [],
+      "reference": {
+        "tau_vl_ms": 4.600597870846496,
+        "tau_vr_ms": 5.115018895722478,
+        "delta_tau_ms": 0.5144210248759817,
+        "theta_v_deg": 7.240422857301756
+      },
+      "global": {
+        "tau_vl_ms": -0.015649051405319078,
+        "tau_vr_ms": -0.001851273351337864,
+        "delta_tau_ms": 0.013797778053981214,
+        "theta_v_deg": 0.19368620893416297,
+        "tau_vl_abs_err_ms": 4.616246922251815,
+        "tau_vr_abs_err_ms": 5.116870169073816,
+        "delta_tau_abs_err_ms": 0.5006232468220005,
+        "theta_v_abs_err_deg": 7.0467366483675935,
+        "physical_positive_lags": false,
+        "physical_small_delta": true,
+        "vl_psr": 9.743429350222307,
+        "vr_psr": 29.08459712384549
+      },
+      "guided": {
+        "tau_vl_ms": 4.429665689678028,
+        "tau_vr_ms": 5.407578248002937,
+        "delta_tau_ms": 0.9779125583249089,
+        "theta_v_deg": 13.86225911236358,
+        "tau_vl_abs_err_ms": 0.17093218116846742,
+        "tau_vr_abs_err_ms": 0.2925593522804597,
+        "delta_tau_abs_err_ms": 0.46349153344892713,
+        "theta_v_abs_err_deg": 6.621836255061823,
+        "physical_positive_lags": true,
+        "physical_small_delta": true,
+        "vl_psr": -21.739563290997445,
+        "vr_psr": -38.07059553015059
+      }
+    },
+    {
+      "case_id": "block7_n08_20",
+      "case_note": "Report scan-best v_x for block-7 is +0.12.",
+      "variant": "ldv_diff_bp500_2000",
+      "bandpass": [
+        500.0,
+        2000.0
+      ],
+      "ldv_ops": [
+        "diff"
+      ],
+      "mic_ops": [],
+      "reference": {
+        "tau_vl_ms": 4.983973328596641,
+        "tau_vr_ms": 4.688713817603411,
+        "delta_tau_ms": -0.29525951099323056,
+        "theta_v_deg": -4.14831865514363
+      },
+      "global": {
+        "tau_vl_ms": -0.0008068978423659354,
+        "tau_vr_ms": 0.004405874279498529,
+        "delta_tau_ms": 0.005212772121864465,
+        "theta_v_deg": 0.07317413121773646,
+        "tau_vl_abs_err_ms": 4.984780226439007,
+        "tau_vr_abs_err_ms": 4.684307943323912,
+        "delta_tau_abs_err_ms": 0.300472283115095,
+        "theta_v_abs_err_deg": 4.221492786361366,
+        "physical_positive_lags": false,
+        "physical_small_delta": true,
+        "vl_psr": 29.368641709876325,
+        "vr_psr": 24.649131449612312
+      },
+      "guided": {
+        "tau_vl_ms": 5.428960370998813,
+        "tau_vr_ms": 4.138241092328351,
+        "delta_tau_ms": -1.290719278670462,
+        "theta_v_deg": -18.434855648925343,
+        "tau_vl_abs_err_ms": 0.4449870424021718,
+        "tau_vr_abs_err_ms": 0.5504727252750596,
+        "delta_tau_abs_err_ms": 0.9954597676772314,
+        "theta_v_abs_err_deg": 14.286536993781713,
+        "physical_positive_lags": true,
+        "physical_small_delta": false,
+        "vl_psr": -42.27347481227134,
+        "vr_psr": -39.98646563551654
+      }
+    },
+    {
+      "case_id": "block4_p08_17",
+      "case_note": "High-point session; report uses v=(+0.18,0.50).",
+      "variant": "both_flatten_bp500_2000",
+      "bandpass": [
+        500.0,
+        2000.0
+      ],
+      "ldv_ops": [
+        "spectral_flatten"
+      ],
+      "mic_ops": [
+        "spectral_flatten"
+      ],
+      "reference": {
+        "tau_vl_ms": 5.07020471331274,
+        "tau_vr_ms": 4.628503702032917,
+        "delta_tau_ms": -0.44170101127982253,
+        "theta_v_deg": -6.212529078474218
+      },
+      "global": {
+        "tau_vl_ms": 0.00866888010760515,
+        "tau_vr_ms": 0.04275201368632464,
+        "delta_tau_ms": 0.03408313357871949,
+        "theta_v_deg": 0.47844638847304977,
+        "tau_vl_abs_err_ms": 5.061535833205134,
+        "tau_vr_abs_err_ms": 4.585751688346592,
+        "delta_tau_abs_err_ms": 0.47578414485854204,
+        "theta_v_abs_err_deg": 6.690975466947268,
+        "physical_positive_lags": true,
+        "physical_small_delta": true,
+        "vl_psr": 32.21792233745604,
+        "vr_psr": 18.365610008147332
+      },
+      "guided": {
+        "tau_vl_ms": 5.291734695039126,
+        "tau_vr_ms": 4.26123451164917,
+        "delta_tau_ms": -1.0305001833899556,
+        "theta_v_deg": -14.623873029817604,
+        "tau_vl_abs_err_ms": 0.22152998172638583,
+        "tau_vr_abs_err_ms": 0.3672691903837473,
+        "delta_tau_abs_err_ms": 0.5887991721101331,
+        "theta_v_abs_err_deg": 8.411343951343387,
+        "physical_positive_lags": true,
+        "physical_small_delta": false,
+        "vl_psr": -52.54141444215642,
+        "vr_psr": -31.324886285140394
+      }
+    },
+    {
+      "case_id": "block5_p00_18",
+      "case_note": "High-point session; report uses v=(+0.18,0.50).",
+      "variant": "both_flatten_bp500_2000",
+      "bandpass": [
+        500.0,
+        2000.0
+      ],
+      "ldv_ops": [
+        "spectral_flatten"
+      ],
+      "mic_ops": [
+        "spectral_flatten"
+      ],
+      "reference": {
+        "tau_vl_ms": 5.07020471331274,
+        "tau_vr_ms": 4.628503702032917,
+        "delta_tau_ms": -0.44170101127982253,
+        "theta_v_deg": -6.212529078474218
+      },
+      "global": {
+        "tau_vl_ms": 0.007088115222325957,
+        "tau_vr_ms": -0.0008366945486932048,
+        "delta_tau_ms": -0.007924809771019161,
+        "theta_v_deg": -0.11124431745776092,
+        "tau_vl_abs_err_ms": 5.063116598090414,
+        "tau_vr_abs_err_ms": 4.62934039658161,
+        "delta_tau_abs_err_ms": 0.43377620150880336,
+        "theta_v_abs_err_deg": 6.101284761016458,
+        "physical_positive_lags": false,
+        "physical_small_delta": true,
+        "vl_psr": 25.86008305387892,
+        "vr_psr": 31.47058869827322
+      },
+      "guided": {
+        "tau_vl_ms": 5.78522984238169,
+        "tau_vr_ms": 4.137968235176369,
+        "delta_tau_ms": -1.647261607205321,
+        "theta_v_deg": -23.802116448365293,
+        "tau_vl_abs_err_ms": 0.71502512906895,
+        "tau_vr_abs_err_ms": 0.4905354668565485,
+        "delta_tau_abs_err_ms": 1.2055605959254985,
+        "theta_v_abs_err_deg": 17.589587369891074,
+        "physical_positive_lags": true,
+        "physical_small_delta": false,
+        "vl_psr": -34.908598892947786,
+        "vr_psr": -41.30069814568696
+      }
+    },
+    {
+      "case_id": "block6_n04_19",
+      "case_note": "Report scan-best v_x for block-6 is -0.21.",
+      "variant": "both_flatten_bp500_2000",
+      "bandpass": [
+        500.0,
+        2000.0
+      ],
+      "ldv_ops": [
+        "spectral_flatten"
+      ],
+      "mic_ops": [
+        "spectral_flatten"
+      ],
+      "reference": {
+        "tau_vl_ms": 4.600597870846496,
+        "tau_vr_ms": 5.115018895722478,
+        "delta_tau_ms": 0.5144210248759817,
+        "theta_v_deg": 7.240422857301756
+      },
+      "global": {
+        "tau_vl_ms": -0.020041062643927923,
+        "tau_vr_ms": 0.0015094567606482063,
+        "delta_tau_ms": 0.02155051940457613,
+        "theta_v_deg": 0.30251608856476725,
+        "tau_vl_abs_err_ms": 4.620638933490424,
+        "tau_vr_abs_err_ms": 5.113509438961829,
+        "delta_tau_abs_err_ms": 0.4928705054714056,
+        "theta_v_abs_err_deg": 6.9379067687369895,
+        "physical_positive_lags": false,
+        "physical_small_delta": true,
+        "vl_psr": 31.792265893221163,
+        "vr_psr": 39.63938470757543
+      },
+      "guided": {
+        "tau_vl_ms": 4.079699153775653,
+        "tau_vr_ms": 5.302338034726564,
+        "delta_tau_ms": 1.2226388809509103,
+        "theta_v_deg": 17.430368458250868,
+        "tau_vl_abs_err_ms": 0.5208987170708426,
+        "tau_vr_abs_err_ms": 0.18731913900408603,
+        "delta_tau_abs_err_ms": 0.7082178560749286,
+        "theta_v_abs_err_deg": 10.189945600949113,
+        "physical_positive_lags": true,
+        "physical_small_delta": false,
+        "vl_psr": -45.237547823857966,
+        "vr_psr": -47.11962722506084
+      }
+    },
+    {
+      "case_id": "block7_n08_20",
+      "case_note": "Report scan-best v_x for block-7 is +0.12.",
+      "variant": "both_flatten_bp500_2000",
+      "bandpass": [
+        500.0,
+        2000.0
+      ],
+      "ldv_ops": [
+        "spectral_flatten"
+      ],
+      "mic_ops": [
+        "spectral_flatten"
+      ],
+      "reference": {
+        "tau_vl_ms": 4.983973328596641,
+        "tau_vr_ms": 4.688713817603411,
+        "delta_tau_ms": -0.29525951099323056,
+        "theta_v_deg": -4.14831865514363
+      },
+      "global": {
+        "tau_vl_ms": 0.006837795938828761,
+        "tau_vr_ms": 0.014799878790037704,
+        "delta_tau_ms": 0.007962082851208942,
+        "theta_v_deg": 0.11176753804376702,
+        "tau_vl_abs_err_ms": 4.977135532657813,
+        "tau_vr_abs_err_ms": 4.673913938813373,
+        "delta_tau_abs_err_ms": 0.3032215938444395,
+        "theta_v_abs_err_deg": 4.260086193187397,
+        "physical_positive_lags": true,
+        "physical_small_delta": true,
+        "vl_psr": 28.964831871741616,
+        "vr_psr": 16.308088669982496
+      },
+      "guided": {
+        "tau_vl_ms": 5.5405224562863165,
+        "tau_vr_ms": 4.012162268166187,
+        "delta_tau_ms": -1.5283601881201294,
+        "theta_v_deg": -21.990215187078807,
+        "tau_vl_abs_err_ms": 0.5565491276896752,
+        "tau_vr_abs_err_ms": 0.6765515494372236,
+        "delta_tau_abs_err_ms": 1.2331006771268989,
+        "theta_v_abs_err_deg": 17.841896531935177,
+        "physical_positive_lags": true,
+        "physical_small_delta": false,
+        "vl_psr": -39.23146103439504,
+        "vr_psr": -30.442976759171735
+      }
+    }
+  ],
+  "summary": {
+    "variants": [
+      {
+        "variant": "bp_1000_3000",
+        "n_cases": 4,
+        "global_delta_tau_mae_ms": 0.41374716793499666,
+        "global_theta_mae_deg": 5.819764034742471,
+        "guided_delta_tau_mae_ms": 0.9126273734040677,
+        "guided_theta_mae_deg": 13.025459769109478,
+        "global_physical_count": 0
+      },
+      {
+        "variant": "ldv_diff_bp500_2000",
+        "n_cases": 4,
+        "global_delta_tau_mae_ms": 0.42077688257771173,
+        "global_theta_mae_deg": 5.918443730896456,
+        "guided_delta_tau_mae_ms": 0.5451330247337318,
+        "guided_theta_mae_deg": 7.765338506602311,
+        "global_physical_count": 0
+      },
+      {
+        "variant": "bp_500_2000",
+        "n_cases": 4,
+        "global_delta_tau_mae_ms": 0.42110699317504785,
+        "global_theta_mae_deg": 5.923077482489928,
+        "guided_delta_tau_mae_ms": 0.6179720084949173,
+        "guided_theta_mae_deg": 8.994975571507656,
+        "global_physical_count": 2
+      },
+      {
+        "variant": "bp_300_3000",
+        "n_cases": 4,
+        "global_delta_tau_mae_ms": 0.4226112088622096,
+        "global_theta_mae_deg": 5.944193184830035,
+        "guided_delta_tau_mae_ms": 0.7892166824770914,
+        "guided_theta_mae_deg": 11.39168058140236,
+        "global_physical_count": 2
+      },
+      {
+        "variant": "both_flatten_bp500_2000",
+        "n_cases": 4,
+        "global_delta_tau_mae_ms": 0.42641311142079763,
+        "global_theta_mae_deg": 5.997563297472029,
+        "guided_delta_tau_mae_ms": 0.9339195753093648,
+        "guided_theta_mae_deg": 13.508193363529688,
+        "global_physical_count": 2
+      },
+      {
+        "variant": "ldv_preemph_bp500_2000",
+        "n_cases": 4,
+        "global_delta_tau_mae_ms": 0.4324681102204203,
+        "global_theta_mae_deg": 6.082559623475166,
+        "guided_delta_tau_mae_ms": 0.5328035645147209,
+        "guided_theta_mae_deg": 7.677177416019548,
+        "global_physical_count": 1
+      },
+      {
+        "variant": "raw_fullband",
+        "n_cases": 4,
+        "global_delta_tau_mae_ms": 3.391529950132478,
+        "global_theta_mae_deg": 59.8209510843447,
+        "guided_delta_tau_mae_ms": 0.43972481580631184,
+        "guided_theta_mae_deg": 6.293190246878189,
+        "global_physical_count": 0
+      }
+    ]
+  }
+}
