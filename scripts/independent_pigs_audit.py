@@ -83,6 +83,9 @@ class Config:
     basin_gate: float = 0.10
     basin_power: float = 0.25
     candidate_agreement_gate_m: float | None = None
+    subband_weight_mode: str = "none"
+    lr_weight: float = 0.0
+    lr_gate: float = 0.0
 
 
 def default_trials(data_root: Path) -> list[Trial]:
@@ -322,6 +325,12 @@ def tau_templates(xs: np.ndarray, cfg: Config) -> tuple[np.ndarray, np.ndarray]:
     raise ValueError(f"Unknown geometry: {cfg.geometry}")
 
 
+def tau_lr_template(xs: np.ndarray) -> np.ndarray:
+    d_l = np.sqrt((xs - MIC_LEFT_X_M) ** 2 + MIC_Y_M**2)
+    d_r = np.sqrt((xs - MIC_RIGHT_X_M) ** 2 + MIC_Y_M**2)
+    return (d_r - d_l) / C_MPS
+
+
 def local_peak_tau(curve: np.ndarray, lags: np.ndarray, center_tau: float, radius_ms: float) -> tuple[float, float]:
     radius = radius_ms / 1000.0
     mask = (lags >= center_tau - radius) & (lags <= center_tau + radius)
@@ -381,15 +390,19 @@ def compute_trial_curves(
             for band in bands:
                 vl, lags_vl = stft_gcc_abs(ldv[start:end], mic_l[start:end], fs_v, cfg, band)
                 vr, lags_vr = stft_gcc_abs(ldv[start:end], mic_r[start:end], fs_v, cfg, band)
+                lr, lags_lr = stft_gcc_abs(mic_l[start:end], mic_r[start:end], fs_v, cfg, band)
                 vl = robust_normalize(vl)
                 vr = robust_normalize(vr)
+                lr = robust_normalize(lr)
                 subband_items.append(
                     {
                         "band_hz": band,
                         "vl": vl,
                         "vr": vr,
+                        "lr": lr,
                         "lags_vl": lags_vl,
                         "lags_vr": lags_vr,
+                        "lags_lr": lags_lr,
                         "reliability": window_reliability(vl, vr),
                     }
                 )
@@ -397,16 +410,20 @@ def compute_trial_curves(
             continue
         vl = np.mean([np.asarray(s["vl"]) for s in subband_items], axis=0)
         vr = np.mean([np.asarray(s["vr"]) for s in subband_items], axis=0)
+        lr = np.mean([np.asarray(s["lr"]) for s in subband_items], axis=0)
         lags_vl = subband_items[0]["lags_vl"]
         lags_vr = subband_items[0]["lags_vr"]
+        lags_lr = subband_items[0]["lags_lr"]
         items.append(
             {
                 "start": start,
                 "end": end,
                 "vl": vl,
                 "vr": vr,
+                "lr": lr,
                 "lags_vl": lags_vl,
                 "lags_vr": lags_vr,
+                "lags_lr": lags_lr,
                 "reliability": window_reliability(vl, vr),
                 "subbands": subband_items,
             }
@@ -430,8 +447,10 @@ def estimate_offsets(
     offset_model: str,
 ) -> dict[str, float]:
     tau_vl_grid, tau_vr_grid = tau_templates(xs_grid, cfg)
+    tau_lr_grid = tau_lr_template(xs_grid)
     residuals_vl: list[tuple[float, float]] = []
     residuals_vr: list[tuple[float, float]] = []
+    residuals_lr: list[tuple[float, float]] = []
     per_trial: dict[str, dict[str, list[float]]] = {}
 
     for trial in trials:
@@ -439,6 +458,7 @@ def estimate_offsets(
         idx = int(np.argmin(np.abs(xs_grid - trial.x_m)))
         pred_vl = float(tau_vl_grid[idx])
         pred_vr = float(tau_vr_grid[idx])
+        pred_lr = float(tau_lr_grid[idx])
         for item in curves["windows"]:  # type: ignore[index]
             peak_vl, _ = local_peak_tau(
                 item["vl"],  # type: ignore[index]
@@ -452,13 +472,22 @@ def estimate_offsets(
                 pred_vr,
                 cfg.local_peak_radius_ms,
             )
+            peak_lr, _ = local_peak_tau(
+                item["lr"],  # type: ignore[index]
+                item["lags_lr"],  # type: ignore[index]
+                pred_lr,
+                cfg.local_peak_radius_ms,
+            )
             res_vl = peak_vl - pred_vl
             res_vr = peak_vr - pred_vr
+            res_lr = peak_lr - pred_lr
             residuals_vl.append((trial.x_m, res_vl))
             residuals_vr.append((trial.x_m, res_vr))
-            per_trial.setdefault(trial.label, {"vl": [], "vr": []})
+            residuals_lr.append((trial.x_m, res_lr))
+            per_trial.setdefault(trial.label, {"vl": [], "vr": [], "lr": []})
             per_trial[trial.label]["vl"].append(res_vl)
             per_trial[trial.label]["vr"].append(res_vr)
+            per_trial[trial.label]["lr"].append(res_lr)
 
     def fit_residuals(points: list[tuple[float, float]], prefix: str) -> dict[str, float]:
         if not points:
@@ -481,6 +510,7 @@ def estimate_offsets(
         "model": offset_model,
         **fit_residuals(residuals_vl, "vl"),
         **fit_residuals(residuals_vr, "vr"),
+        **fit_residuals(residuals_lr, "lr"),
         "num_residuals": int(min(len(residuals_vl), len(residuals_vr))),
     }
     if offset_model == "per_trial":
@@ -488,6 +518,7 @@ def estimate_offsets(
             label: {
                 "vl_sec": float(np.median(values["vl"])) if values["vl"] else 0.0,
                 "vr_sec": float(np.median(values["vr"])) if values["vr"] else 0.0,
+                "lr_sec": float(np.median(values["lr"])) if values["lr"] else 0.0,
             }
             for label, values in per_trial.items()
         }
@@ -500,18 +531,56 @@ def offset_values(xs: np.ndarray, offsets: dict[str, float], prefix: str) -> np.
     return np.full_like(xs, float(offsets.get(f"{prefix}_sec", 0.0)), dtype=np.float64)
 
 
+def estimate_chirp_subband_weights(
+    data_root: Path,
+    trials: list[Trial],
+    segment: SegmentSpec,
+    cfg: Config,
+    xs_grid: np.ndarray,
+    offsets: dict[str, object],
+) -> dict[str, float]:
+    if cfg.subbands is None:
+        return {}
+
+    band_scores: dict[str, list[float]] = {band_key(band): [] for band in cfg.subbands}
+    tau_vl_base, tau_vr_base = tau_templates(xs_grid, cfg)
+    tau_vl = tau_vl_base + offset_values(xs_grid, offsets, "vl")  # type: ignore[arg-type]
+    tau_vr = tau_vr_base + offset_values(xs_grid, offsets, "vr")  # type: ignore[arg-type]
+    curve_cfg = Config(**{**asdict(cfg), "top_k_windows": max(1, cfg.top_k_windows), "subband_weight_mode": "none"})
+
+    for trial in trials:
+        curves = compute_trial_curves(data_root, trial, segment, curve_cfg)
+        for item in curves["windows"]:  # type: ignore[index]
+            for source in item.get("subbands", []):  # type: ignore[union-attr]
+                cand = candidate_from_curves(source, xs_grid, tau_vl, tau_vr, cfg)
+                err_m = abs(float(cand["x_hat"]) - trial.x_m)
+                agreement_m = float(cand["agreement_m"])
+                evidence = (
+                    math.exp(-((err_m / 0.35) ** 2))
+                    * math.exp(-((agreement_m / 0.45) ** 2))
+                    * math.log1p(max(float(cand["weight"]), 0.0))
+                )
+                band_scores.setdefault(band_key(source.get("band_hz")), []).append(evidence)
+
+    raw = {band: (float(np.median(values)) if values else 1.0) for band, values in band_scores.items()}
+    mean = float(np.mean(list(raw.values()))) if raw else 1.0
+    return {band: float(np.clip(value / max(mean, 1e-12), 0.25, 2.0)) for band, value in raw.items()}
+
+
 def score_windows(
     windows: list[dict[str, object]],
     xs_grid: np.ndarray,
     tau_vl: np.ndarray,
     tau_vr: np.ndarray,
     cfg: Config,
+    subband_weights: dict[str, float] | None = None,
+    tau_lr: np.ndarray | None = None,
 ) -> tuple[np.ndarray, list[dict[str, float]]]:
     scores = np.zeros_like(xs_grid, dtype=np.float64)
     weights = []
     rows: list[dict[str, float]] = []
     for rank, item in enumerate(windows, start=1):
-        score = aggregate_window_score(item, xs_grid, tau_vl, tau_vr, cfg)
+        score = aggregate_window_score(item, xs_grid, tau_vl, tau_vr, cfg, subband_weights, tau_lr)
         weight = max(float(item["reliability"]), 1e-6)
         scores += weight * score
         weights.append(weight)
@@ -568,12 +637,20 @@ def select_window_prefix(prefix_rows: list[dict[str, float]], cfg: Config) -> tu
     }
 
 
+def score_margin(score: np.ndarray) -> float:
+    peak = float(np.max(score))
+    background = float(np.percentile(score, 75))
+    spread = float(np.median(np.abs(score - np.median(score))) + 1e-12)
+    return max((peak - background) / spread, 0.0)
+
+
 def basin_prior_from_windows(
     windows: list[dict[str, object]],
     xs_grid: np.ndarray,
     tau_vl: np.ndarray,
     tau_vr: np.ndarray,
     cfg: Config,
+    subband_weights: dict[str, float] | None = None,
 ) -> tuple[np.ndarray, dict[str, float | str]]:
     prior = np.zeros_like(xs_grid, dtype=np.float64)
     candidate_xs: list[float] = []
@@ -586,12 +663,12 @@ def basin_prior_from_windows(
             cand = candidate_from_curves(source, xs_grid, tau_vl, tau_vr, cfg)
             if cfg.candidate_agreement_gate_m is not None and cand["agreement_m"] > cfg.candidate_agreement_gate_m:
                 continue
-            weight = max(float(cand["weight"]), 1e-12)
+            weight = max(float(cand["weight"]) * source_subband_weight(source, subband_weights), 1e-12)
             prior += weight * np.exp(-0.5 * ((xs_grid - cand["x_hat"]) / max(cfg.basin_sigma_m, 1e-6)) ** 2)
             candidate_xs.append(cand["x_hat"])
             candidate_weights.append(weight)
             band = source.get("band_hz") if isinstance(source, dict) else None
-            band_name = "wide" if band is None else f"{band[0]:.0f}-{band[1]:.0f}"
+            band_name = band_key(band)
             subband_candidates.setdefault(band_name, []).append(cand["x_hat"])
 
     if float(np.max(prior)) > 0.0:
@@ -615,6 +692,51 @@ def basin_prior_from_windows(
     }
 
 
+def pair_overlap_prior_from_windows(
+    windows: list[dict[str, object]],
+    xs_grid: np.ndarray,
+    tau_vl: np.ndarray,
+    tau_vr: np.ndarray,
+    cfg: Config,
+    subband_weights: dict[str, float] | None = None,
+) -> tuple[np.ndarray, dict[str, float | str]]:
+    left = np.zeros_like(xs_grid, dtype=np.float64)
+    right = np.zeros_like(xs_grid, dtype=np.float64)
+    pair_gaps: list[float] = []
+    pair_weights: list[float] = []
+
+    for item in windows:
+        sources = item.get("subbands", []) if cfg.subbands is not None else [item]
+        for source in sources:  # type: ignore[assignment]
+            cand = candidate_from_curves(source, xs_grid, tau_vl, tau_vr, cfg)
+            weight = max(float(cand["weight"]) * source_subband_weight(source, subband_weights), 1e-12)
+            sigma = max(cfg.basin_sigma_m, 1e-6)
+            left += weight * np.exp(-0.5 * ((xs_grid - cand["x_vl"]) / sigma) ** 2)
+            right += weight * np.exp(-0.5 * ((xs_grid - cand["x_vr"]) / sigma) ** 2)
+            pair_gaps.append(float(cand["agreement_m"]))
+            pair_weights.append(weight)
+
+    if float(np.max(left)) > 0.0:
+        left = left / float(np.max(left))
+    if float(np.max(right)) > 0.0:
+        right = right / float(np.max(right))
+    prior = np.sqrt(left * right)
+    if float(np.max(prior)) > 0.0:
+        prior = prior / float(np.max(prior))
+
+    peak_idx = int(np.argmax(prior)) if len(prior) else 0
+    weights = np.asarray(pair_weights, dtype=np.float64)
+    gaps = np.asarray(pair_gaps, dtype=np.float64)
+    if len(gaps) and float(np.sum(weights)) > 0.0:
+        mean_gap = float(np.sum(weights * gaps) / float(np.sum(weights)))
+    else:
+        mean_gap = 0.0
+    return prior, {
+        "pair_overlap_peak_x_m": float(xs_grid[peak_idx]) if len(xs_grid) else 0.0,
+        "pair_overlap_mean_gap_m": mean_gap,
+    }
+
+
 def apply_basin_validation(
     score: np.ndarray,
     windows: list[dict[str, object]],
@@ -622,12 +744,16 @@ def apply_basin_validation(
     tau_vl: np.ndarray,
     tau_vr: np.ndarray,
     cfg: Config,
+    subband_weights: dict[str, float] | None = None,
 ) -> tuple[np.ndarray, dict[str, float | str]]:
     meta: dict[str, float | str] = {"basin_mode": cfg.basin_mode}
     if cfg.basin_mode == "none":
         return score, meta
 
-    prior, prior_meta = basin_prior_from_windows(windows, xs_grid, tau_vl, tau_vr, cfg)
+    if cfg.basin_mode.startswith("pair_overlap"):
+        prior, prior_meta = pair_overlap_prior_from_windows(windows, xs_grid, tau_vl, tau_vr, cfg, subband_weights)
+    else:
+        prior, prior_meta = basin_prior_from_windows(windows, xs_grid, tau_vl, tau_vr, cfg, subband_weights)
     meta.update(prior_meta)
     if float(np.max(prior)) <= 0.0:
         meta["basin_reason"] = "empty_prior"
@@ -635,12 +761,12 @@ def apply_basin_validation(
 
     normalized = score - float(np.min(score))
     normalized /= max(float(np.max(normalized)), 1e-12)
-    if cfg.basin_mode == "basin_gate":
+    if cfg.basin_mode in ("basin_gate", "pair_overlap_gate"):
         final = np.where(prior >= cfg.basin_gate, normalized, 0.0)
         if float(np.max(final)) <= 0.0:
             meta["basin_reason"] = "gate_rejected_all_fallback"
             final = normalized
-    elif cfg.basin_mode == "basin_mul":
+    elif cfg.basin_mode in ("basin_mul", "pair_overlap_mul"):
         final = normalized * np.power(prior + 1e-6, cfg.basin_power)
     else:
         raise ValueError(f"Unknown basin_mode: {cfg.basin_mode}")
@@ -648,6 +774,146 @@ def apply_basin_validation(
     meta["basin_prior_at_selected"] = float(prior[int(np.argmax(final))])
     meta["basin_changed"] = float(xs_grid[int(np.argmax(final))] != xs_grid[int(np.argmax(score))])
     return final, meta
+
+
+def confidence_prefix_rows(
+    windows: list[dict[str, object]],
+    xs_grid: np.ndarray,
+    tau_vl: np.ndarray,
+    tau_vr: np.ndarray,
+    cfg: Config,
+    subband_weights: dict[str, float] | None = None,
+    tau_lr: np.ndarray | None = None,
+) -> list[dict[str, float]]:
+    rows: list[dict[str, float]] = []
+    min_k = max(1, min(int(cfg.adaptive_min_k), len(windows)))
+    for k in range(min_k, len(windows) + 1):
+        score, _ = score_windows(windows[:k], xs_grid, tau_vl, tau_vr, cfg, subband_weights, tau_lr)
+        best_idx = int(np.argmax(score))
+        x_hat = float(xs_grid[best_idx])
+        margin = score_margin(score)
+        basin_prior, basin_meta = basin_prior_from_windows(windows[:k], xs_grid, tau_vl, tau_vr, cfg, subband_weights)
+        pair_prior, pair_meta = pair_overlap_prior_from_windows(windows[:k], xs_grid, tau_vl, tau_vr, cfg, subband_weights)
+        basin_at = float(basin_prior[best_idx]) if len(basin_prior) else 0.0
+        pair_at = float(pair_prior[best_idx]) if len(pair_prior) else 0.0
+        candidate_spread = float(basin_meta.get("candidate_basin_spread_m", 0.0))
+        subband_spread = float(basin_meta.get("subband_median_spread_m", 0.0))
+        confidence = (
+            math.tanh(margin / 6.0)
+            * (0.25 + 0.75 * basin_at)
+            * (0.25 + 0.75 * pair_at)
+            * math.exp(-((candidate_spread / 0.45) ** 2))
+            * math.exp(-((subband_spread / 0.75) ** 2))
+        )
+        rows.append(
+            {
+                "window_rank": float(k),
+                "x_hat_m": x_hat,
+                "score_margin": margin,
+                "basin_prior_at_x": basin_at,
+                "pair_prior_at_x": pair_at,
+                "candidate_basin_spread_m": candidate_spread,
+                "subband_median_spread_m": subband_spread,
+                "pair_overlap_mean_gap_m": float(pair_meta.get("pair_overlap_mean_gap_m", 0.0)),
+                "confidence": float(confidence),
+            }
+        )
+    return rows
+
+
+def select_confidence_prefix(
+    windows: list[dict[str, object]],
+    xs_grid: np.ndarray,
+    tau_vl: np.ndarray,
+    tau_vr: np.ndarray,
+    cfg: Config,
+    subband_weights: dict[str, float] | None = None,
+    tau_lr: np.ndarray | None = None,
+) -> tuple[int, dict[str, float | str], list[dict[str, float]]]:
+    rows = confidence_prefix_rows(windows, xs_grid, tau_vl, tau_vr, cfg, subband_weights, tau_lr)
+    if not rows:
+        return 0, {"window_selector": cfg.window_selector, "selected_k": 0, "selection_reason": "empty"}, rows
+
+    best = max(rows, key=lambda row: (float(row["confidence"]), -float(row["window_rank"])))
+    selected_k = int(best["window_rank"])
+    return selected_k, {
+        "window_selector": cfg.window_selector,
+        "selected_k": selected_k,
+        "selection_reason": "max_confidence",
+        "prefix_confidence": float(best["confidence"]),
+        "prefix_score_margin": float(best["score_margin"]),
+        "prefix_basin_prior_at_x": float(best["basin_prior_at_x"]),
+        "prefix_pair_prior_at_x": float(best["pair_prior_at_x"]),
+        "prefix_candidate_basin_spread_m": float(best["candidate_basin_spread_m"]),
+        "prefix_subband_median_spread_m": float(best["subband_median_spread_m"]),
+        "prefix_pair_overlap_mean_gap_m": float(best["pair_overlap_mean_gap_m"]),
+        "adaptive_min_k": int(cfg.adaptive_min_k),
+    }, rows
+
+
+def select_hysteresis_prefix(
+    prefix_rows: list[dict[str, float]],
+    windows: list[dict[str, object]],
+    xs_grid: np.ndarray,
+    tau_vl: np.ndarray,
+    tau_vr: np.ndarray,
+    cfg: Config,
+    subband_weights: dict[str, float] | None = None,
+    tau_lr: np.ndarray | None = None,
+) -> tuple[int, dict[str, float | str], list[dict[str, float]]]:
+    stable_cfg = Config(**{**asdict(cfg), "window_selector": "stable_prefix", "adaptive_min_k": max(8, int(cfg.adaptive_min_k))})
+    stable_k, stable_meta = select_window_prefix(prefix_rows, stable_cfg)
+    rows = confidence_prefix_rows(windows, xs_grid, tau_vl, tau_vr, cfg, subband_weights, tau_lr)
+    if not rows:
+        return stable_k, {**stable_meta, "window_selector": cfg.window_selector, "selection_reason": "stable_empty_confidence"}, rows
+
+    global_best = max(rows, key=lambda row: (float(row["confidence"]), -float(row["window_rank"])))
+    max_conf = max(float(global_best["confidence"]), 1e-12)
+
+    rollback_row: dict[str, float] | None = None
+    best_before_jump: dict[str, float] | None = None
+    for prev, cur in zip(rows, rows[1:]):
+        if best_before_jump is None or float(prev["confidence"]) > float(best_before_jump["confidence"]):
+            best_before_jump = prev
+        jump_m = abs(float(cur["x_hat_m"]) - float(prev["x_hat_m"]))
+        if (
+            jump_m >= 0.25
+            and best_before_jump is not None
+            and float(best_before_jump["confidence"]) >= 0.55 * max_conf
+            and float(best_before_jump["pair_prior_at_x"]) >= 0.50
+        ):
+            rollback_row = best_before_jump
+            break
+
+    stable_row = next((row for row in rows if int(row["window_rank"]) == int(stable_k)), None)
+    selected = global_best
+    reason = "max_confidence"
+    if rollback_row is not None:
+        selected = rollback_row
+        reason = "rollback_before_jump"
+    elif stable_row is not None:
+        stable_gap = abs(float(global_best["x_hat_m"]) - float(stable_row["x_hat_m"]))
+        confidence_gain = float(global_best["confidence"]) / max(float(stable_row["confidence"]), 1e-12)
+        if stable_gap >= 0.08 and confidence_gain < 10.0:
+            selected = stable_row
+            reason = "stable_guardrail"
+
+    selected_k = int(selected["window_rank"])
+    return selected_k, {
+        "window_selector": cfg.window_selector,
+        "selected_k": selected_k,
+        "selection_reason": reason,
+        "stable_guardrail_k": int(stable_k),
+        "global_confidence_k": int(global_best["window_rank"]),
+        "prefix_confidence": float(selected["confidence"]),
+        "prefix_score_margin": float(selected["score_margin"]),
+        "prefix_basin_prior_at_x": float(selected["basin_prior_at_x"]),
+        "prefix_pair_prior_at_x": float(selected["pair_prior_at_x"]),
+        "prefix_candidate_basin_spread_m": float(selected["candidate_basin_spread_m"]),
+        "prefix_subband_median_spread_m": float(selected["subband_median_spread_m"]),
+        "prefix_pair_overlap_mean_gap_m": float(selected["pair_overlap_mean_gap_m"]),
+        "adaptive_min_k": int(cfg.adaptive_min_k),
+    }, rows
 
 
 def evaluate_trial(
@@ -662,15 +928,19 @@ def evaluate_trial(
     curve_cfg = Config(**{**asdict(cfg), "top_k_windows": 0}) if use_adaptive else cfg
     curves = compute_trial_curves(data_root, trial, segment, curve_cfg)
     tau_vl, tau_vr = tau_templates(xs_grid, cfg)
+    tau_lr = tau_lr_template(xs_grid)
     if offsets.get("model") == "per_trial" and isinstance(offsets.get("per_trial"), dict):
         trial_offsets = offsets["per_trial"].get(trial.label, {})  # type: ignore[index]
         tau_vl = tau_vl + float(trial_offsets.get("vl_sec", 0.0))
         tau_vr = tau_vr + float(trial_offsets.get("vr_sec", 0.0))
+        tau_lr = tau_lr + float(trial_offsets.get("lr_sec", 0.0))
     else:
         tau_vl = tau_vl + offset_values(xs_grid, offsets, "vl")
         tau_vr = tau_vr + offset_values(xs_grid, offsets, "vr")
+        tau_lr = tau_lr + offset_values(xs_grid, offsets, "lr")
 
-    consensus_meta: dict[str, float] = {}
+    subband_weights = offsets.get("subband_weights") if isinstance(offsets.get("subband_weights"), dict) else None
+    consensus_meta: dict[str, float | str] = {}
     if cfg.estimator == "consensus":
         candidates = []
         for item in curves["windows"]:  # type: ignore[index]
@@ -681,13 +951,18 @@ def evaluate_trial(
         score_value = float(consensus_meta.get("cluster_weight", 0.0))
     elif cfg.estimator == "score":
         windows = list(curves["windows"])  # type: ignore[arg-type]
-        scores, prefix_rows = score_windows(windows, xs_grid, tau_vl, tau_vr, cfg)
+        scores, prefix_rows = score_windows(windows, xs_grid, tau_vl, tau_vr, cfg, subband_weights, tau_lr)  # type: ignore[arg-type]
         selection_meta: dict[str, float | str] = {"window_selector": "fixed_top_k", "selected_k": len(windows)}
         if use_adaptive:
-            selected_k, selection_meta = select_window_prefix(prefix_rows, cfg)
-            scores, prefix_rows = score_windows(windows[:selected_k], xs_grid, tau_vl, tau_vr, cfg)
+            if cfg.window_selector == "confidence_prefix":
+                selected_k, selection_meta, _ = select_confidence_prefix(windows, xs_grid, tau_vl, tau_vr, cfg, subband_weights, tau_lr)  # type: ignore[arg-type]
+            elif cfg.window_selector == "hysteresis_prefix":
+                selected_k, selection_meta, _ = select_hysteresis_prefix(prefix_rows, windows, xs_grid, tau_vl, tau_vr, cfg, subband_weights, tau_lr)  # type: ignore[arg-type]
+            else:
+                selected_k, selection_meta = select_window_prefix(prefix_rows, cfg)
+            scores, prefix_rows = score_windows(windows[:selected_k], xs_grid, tau_vl, tau_vr, cfg, subband_weights, tau_lr)  # type: ignore[arg-type]
             windows = windows[:selected_k]
-        scores, basin_meta = apply_basin_validation(scores, windows, xs_grid, tau_vl, tau_vr, cfg)
+        scores, basin_meta = apply_basin_validation(scores, windows, xs_grid, tau_vl, tau_vr, cfg, subband_weights)  # type: ignore[arg-type]
         best_idx = int(np.argmax(scores))
         x_hat = float(xs_grid[best_idx])
         score_value = float(scores[best_idx])
@@ -785,6 +1060,19 @@ def summarize_loro(results: list[dict[str, object]]) -> dict[str, object]:
     ) | {"rows": rows}
 
 
+def band_key(band: object) -> str:
+    if band is None:
+        return "wide"
+    lo, hi = band  # type: ignore[misc]
+    return f"{float(lo):.0f}-{float(hi):.0f}"
+
+
+def source_subband_weight(source: dict[str, object], subband_weights: dict[str, float] | None) -> float:
+    if not subband_weights:
+        return 1.0
+    return max(float(subband_weights.get(band_key(source.get("band_hz")), 1.0)), 1e-6)
+
+
 def weighted_median(values: np.ndarray, weights: np.ndarray) -> float:
     if len(values) == 0:
         return 0.0
@@ -853,22 +1141,28 @@ def aggregate_window_score(
     tau_vl: np.ndarray,
     tau_vr: np.ndarray,
     cfg: Config,
+    subband_weights: dict[str, float] | None = None,
+    tau_lr: np.ndarray | None = None,
 ) -> np.ndarray:
     if cfg.score_aggregator == "curve_mean" or cfg.subbands is None:
-        return score_curve_from_source(item, xs_grid, tau_vl, tau_vr, cfg)
+        score = score_curve_from_source(item, xs_grid, tau_vl, tau_vr, cfg)
+        return apply_lr_prior_to_score(score, item, tau_lr, cfg)
 
     sources = item.get("subbands", [])
     if not sources:
-        return score_curve_from_source(item, xs_grid, tau_vl, tau_vr, cfg)
+        score = score_curve_from_source(item, xs_grid, tau_vl, tau_vr, cfg)
+        return apply_lr_prior_to_score(score, item, tau_lr, cfg)
 
     score_matrix = np.vstack(
-        [score_curve_from_source(source, xs_grid, tau_vl, tau_vr, cfg) for source in sources]  # type: ignore[arg-type]
+        [apply_lr_prior_to_score(score_curve_from_source(source, xs_grid, tau_vl, tau_vr, cfg), source, tau_lr, cfg) for source in sources]  # type: ignore[arg-type]
     )
-    mean_score = np.mean(score_matrix, axis=0)
+    weights = np.asarray([source_subband_weight(source, subband_weights) for source in sources], dtype=np.float64)  # type: ignore[arg-type]
+    weights = weights / max(float(np.sum(weights)), 1e-12)
+    mean_score = np.sum(score_matrix * weights[:, None], axis=0)
     if cfg.score_aggregator == "subband_score_mean":
         return mean_score
 
-    spread = np.std(score_matrix, axis=0)
+    spread = np.sqrt(np.sum(weights[:, None] * (score_matrix - mean_score) ** 2, axis=0))
     if cfg.score_aggregator == "subband_score_minus_std":
         return mean_score - cfg.subband_penalty * spread
 
@@ -877,6 +1171,31 @@ def aggregate_window_score(
         return mean_score * np.exp(-cfg.subband_penalty * cv)
 
     raise ValueError(f"Unknown score_aggregator: {cfg.score_aggregator}")
+
+
+def lr_prior_curve(source: dict[str, object], tau_lr: np.ndarray | None) -> np.ndarray | None:
+    if tau_lr is None or "lr" not in source or "lags_lr" not in source:
+        return None
+    return sample_curve(np.asarray(source["lr"]), np.asarray(source["lags_lr"]), tau_lr)
+
+
+def apply_lr_prior_to_score(
+    score: np.ndarray,
+    source: dict[str, object],
+    tau_lr: np.ndarray | None,
+    cfg: Config,
+) -> np.ndarray:
+    if cfg.lr_weight <= 0.0:
+        return score
+    lr = lr_prior_curve(source, tau_lr)
+    if lr is None:
+        return score
+    lr_norm = lr - float(np.min(lr))
+    lr_norm /= max(float(np.max(lr_norm)), 1e-12)
+    prior = np.power(0.15 + 0.85 * lr_norm, cfg.lr_weight)
+    if cfg.lr_gate > 0.0:
+        prior = np.where(lr_norm >= cfg.lr_gate, prior, 0.15**cfg.lr_weight)
+    return score * prior
 
 
 def consensus_x(candidates: list[dict[str, float]], cluster_radius_m: float = 0.16) -> tuple[float, dict[str, float]]:
@@ -928,6 +1247,9 @@ def config_from_payload(payload: dict[str, object]) -> Config:
         basin_gate=float(payload.get("basin_gate", 0.10)),
         basin_power=float(payload.get("basin_power", 0.25)),
         candidate_agreement_gate_m=float(payload["candidate_agreement_gate_m"]) if payload.get("candidate_agreement_gate_m") is not None else None,
+        subband_weight_mode=str(payload.get("subband_weight_mode", "none")),
+        lr_weight=float(payload.get("lr_weight", 0.0)),
+        lr_gate=float(payload.get("lr_gate", 0.0)),
     )
 
 
@@ -944,6 +1266,8 @@ def diagnose_trial_windows(
     tau_vl, tau_vr = tau_templates(xs_grid, cfg)
     tau_vl = tau_vl + offset_values(xs_grid, offsets, "vl")
     tau_vr = tau_vr + offset_values(xs_grid, offsets, "vr")
+    tau_lr = tau_lr_template(xs_grid) + offset_values(xs_grid, offsets, "lr")
+    subband_weights = offsets.get("subband_weights") if isinstance(offsets.get("subband_weights"), dict) else None
 
     rows = []
     fs = float(curves["fs"])  # type: ignore[index]
@@ -951,6 +1275,8 @@ def diagnose_trial_windows(
         sources = item.get("subbands", []) if cfg.subbands is not None else [item]  # type: ignore[union-attr]
         for source in sources:
             cand = candidate_from_curves(source, xs_grid, tau_vl, tau_vr, cfg)
+            lr = lr_prior_curve(source, tau_lr if cfg.lr_weight > 0.0 else None)
+            lr_at_x = float(lr[int(np.argmin(np.abs(xs_grid - cand["x_hat"])))]) if lr is not None else 0.0
             band = source.get("band_hz") if isinstance(source, dict) else None
             rows.append(
                 {
@@ -961,6 +1287,8 @@ def diagnose_trial_windows(
                     "x_hat_m": cand["x_hat"],
                     "abs_err_deg": abs(theta_from_x(cand["x_hat"]) - theta_from_x(trial.x_m)),
                     "weight": cand["weight"],
+                    "subband_weight": source_subband_weight(source, subband_weights),  # type: ignore[arg-type]
+                    "lr_prior_at_x": lr_at_x,
                     "agreement_m": cand["agreement_m"],
                     "x_vl_m": cand["x_vl"],
                     "x_vr_m": cand["x_vr"],
@@ -982,13 +1310,15 @@ def diagnose_incremental_windows(
     tau_vl, tau_vr = tau_templates(xs_grid, cfg)
     tau_vl = tau_vl + offset_values(xs_grid, offsets, "vl")
     tau_vr = tau_vr + offset_values(xs_grid, offsets, "vr")
+    tau_lr = tau_lr_template(xs_grid) + offset_values(xs_grid, offsets, "lr")
+    subband_weights = offsets.get("subband_weights") if isinstance(offsets.get("subband_weights"), dict) else None
 
     fs = float(curves["fs"])  # type: ignore[index]
     scores = np.zeros_like(xs_grid, dtype=np.float64)
     weights: list[float] = []
     rows = []
     for rank, item in enumerate(curves["windows"], start=1):  # type: ignore[index]
-        score = aggregate_window_score(item, xs_grid, tau_vl, tau_vr, cfg)  # type: ignore[arg-type]
+        score = aggregate_window_score(item, xs_grid, tau_vl, tau_vr, cfg, subband_weights, tau_lr)  # type: ignore[arg-type]
         weight = max(float(item["reliability"]), 1e-6)  # type: ignore[index]
         scores += weight * score
         weights.append(weight)
@@ -1008,10 +1338,61 @@ def diagnose_incremental_windows(
     return rows
 
 
+def diagnose_prefix_confidence(
+    data_root: Path,
+    trial: Trial,
+    segment: SegmentSpec,
+    cfg: Config,
+    xs_grid: np.ndarray,
+    offsets: dict[str, float],
+) -> list[dict[str, float | str]]:
+    all_window_cfg = Config(**{**asdict(cfg), "top_k_windows": 0})
+    curves = compute_trial_curves(data_root, trial, segment, all_window_cfg)
+    tau_vl, tau_vr = tau_templates(xs_grid, cfg)
+    tau_vl = tau_vl + offset_values(xs_grid, offsets, "vl")
+    tau_vr = tau_vr + offset_values(xs_grid, offsets, "vr")
+    tau_lr = tau_lr_template(xs_grid) + offset_values(xs_grid, offsets, "lr")
+    subband_weights = offsets.get("subband_weights") if isinstance(offsets.get("subband_weights"), dict) else None
+
+    rows = confidence_prefix_rows(curves["windows"], xs_grid, tau_vl, tau_vr, cfg, subband_weights, tau_lr)  # type: ignore[arg-type]
+    selected_k = 0
+    if rows:
+        if cfg.window_selector == "hysteresis_prefix":
+            prefix_scores, prefix_rows = score_windows(curves["windows"], xs_grid, tau_vl, tau_vr, cfg, subband_weights, tau_lr)  # type: ignore[arg-type]
+            selected_k, _, _ = select_hysteresis_prefix(prefix_rows, curves["windows"], xs_grid, tau_vl, tau_vr, cfg, subband_weights, tau_lr)  # type: ignore[arg-type]
+        else:
+            selected_k = int(max(rows, key=lambda row: (float(row["confidence"]), -float(row["window_rank"])))["window_rank"])
+
+    out: list[dict[str, float | str]] = []
+    for row in rows:
+        x_hat = float(row["x_hat_m"])
+        out.append(
+            {
+                "trial": trial.label,
+                "segment": segment.name,
+                "window_rank": int(row["window_rank"]),
+                "x_hat_m": x_hat,
+                "abs_err_deg": abs(theta_from_x(x_hat) - theta_from_x(trial.x_m)),
+                "selected": float(int(int(row["window_rank"]) == selected_k)),
+                "confidence": float(row["confidence"]),
+                "score_margin": float(row["score_margin"]),
+                "basin_prior_at_x": float(row["basin_prior_at_x"]),
+                "pair_prior_at_x": float(row["pair_prior_at_x"]),
+                "candidate_basin_spread_m": float(row["candidate_basin_spread_m"]),
+                "subband_median_spread_m": float(row["subband_median_spread_m"]),
+                "pair_overlap_mean_gap_m": float(row["pair_overlap_mean_gap_m"]),
+            }
+        )
+    return out
+
+
 def candidate_configs(profile: str) -> list[Config]:
     bands: list[tuple[float, float] | None]
     selector_options = [("fixed_top_k", 8, 0.03, 2, 9)]
     basin_options = [("none", 0.08, 0.10, 0.25, None)]
+    subband_weight_options = ["none"]
+    lr_options = [(0.0, 0.0)]
+    recipe_options: set[tuple[str, str, str, float]] | None = None
     if profile == "quick":
         bands = [(500.0, 2000.0), (80.0, 8000.0), (300.0, 3000.0), (1000.0, 4000.0)]
         betas = [1.0, 0.5]
@@ -1108,6 +1489,69 @@ def candidate_configs(profile: str) -> list[Config]:
             ("basin_gate", 0.08, 0.10, 0.25, None),
             ("basin_mul", 0.30, 0.10, 0.25, None),
         ]
+    elif profile == "strict_v5":
+        bands = [(80.0, 8000.0)]
+        betas = [0.3]
+        transforms = ["clip"]
+        geometries = [("moving_patch", 0.5)]
+        score_modes = ["product"]
+        topk_options = [9]
+        radius_options = [2.0]
+        gcc_modes = [("plain", 0.0)]
+        estimators = ["score"]
+        subband_options = [
+            ((300.0, 800.0), (800.0, 1500.0), (1500.0, 2500.0), (2500.0, 4000.0), (4000.0, 8000.0)),
+        ]
+        aggregator_options = [("subband_score_exp_cv", 0.2)]
+        selector_options = [
+            ("stable_prefix", 8, 0.03, 2, 9),
+            ("confidence_prefix", 2, 0.03, 2, 9),
+            ("hysteresis_prefix", 2, 0.03, 2, 9),
+        ]
+        basin_options = [
+            ("basin_gate", 0.08, 0.10, 0.25, None),
+            ("pair_overlap_gate", 0.12, 0.08, 0.25, None),
+        ]
+        subband_weight_options = ["none", "chirp_stability"]
+        recipe_options = {
+            ("stable_prefix", "basin_gate", "none", 0.0),
+            ("confidence_prefix", "basin_gate", "none", 0.0),
+            ("confidence_prefix", "pair_overlap_gate", "none", 0.0),
+            ("confidence_prefix", "pair_overlap_gate", "chirp_stability", 0.0),
+        }
+    elif profile == "strict_v6":
+        bands = [(80.0, 8000.0)]
+        betas = [0.3]
+        transforms = ["clip"]
+        geometries = [("moving_patch", 0.5)]
+        score_modes = ["product"]
+        topk_options = [9]
+        radius_options = [2.0]
+        gcc_modes = [("plain", 0.0)]
+        estimators = ["score"]
+        subband_options = [
+            ((300.0, 800.0), (800.0, 1500.0), (1500.0, 2500.0), (2500.0, 4000.0), (4000.0, 8000.0)),
+        ]
+        aggregator_options = [("subband_score_exp_cv", 0.2)]
+        selector_options = [
+            ("stable_prefix", 8, 0.03, 2, 9),
+            ("confidence_prefix", 2, 0.03, 2, 9),
+            ("hysteresis_prefix", 2, 0.03, 2, 9),
+        ]
+        basin_options = [
+            ("basin_gate", 0.08, 0.10, 0.25, None),
+            ("pair_overlap_gate", 0.12, 0.08, 0.25, None),
+        ]
+        lr_options = [(0.0, 0.0), (0.25, 0.0), (0.5, 0.0)]
+        recipe_options = {
+            ("stable_prefix", "basin_gate", "none", 0.0),
+            ("stable_prefix", "basin_gate", "none", 0.25),
+            ("stable_prefix", "basin_gate", "none", 0.5),
+            ("confidence_prefix", "basin_gate", "none", 0.25),
+            ("confidence_prefix", "pair_overlap_gate", "none", 0.25),
+            ("hysteresis_prefix", "basin_gate", "none", 0.0),
+            ("hysteresis_prefix", "basin_gate", "none", 0.25),
+        }
     elif profile == "refine":
         bands = [(800.0, 3000.0), (1000.0, 3500.0), (1000.0, 4000.0), (1200.0, 4500.0), (1500.0, 5000.0), (80.0, 8000.0)]
         betas = [0.7, 0.5, 0.3]
@@ -1150,50 +1594,59 @@ def candidate_configs(profile: str) -> list[Config]:
                                             for aggregator, penalty in aggregator_options:
                                                 for selector, min_k, stable_threshold, stable_steps, fallback_k in selector_options:
                                                     for basin_mode, basin_sigma, basin_gate, basin_power, agreement_gate in basin_options:
-                                                        band_name = "wide" if band is None else f"{int(band[0])}-{int(band[1])}"
-                                                        subband_name = "_sub" if subbands is not None else ""
-                                                        penalty_name = f"{penalty:g}" if penalty else ""
-                                                        agg_name = "" if aggregator == "curve_mean" else f"_{aggregator}{penalty_name}"
-                                                        selector_name = "" if selector == "fixed_top_k" else f"_{selector}_m{min_k}_s{stable_threshold:g}_n{stable_steps}_fb{fallback_k}"
-                                                        basin_name = "" if basin_mode == "none" else f"_{basin_mode}_sig{basin_sigma:g}_g{basin_gate:g}_p{basin_power:g}"
-                                                        name = (
-                                                            f"{band_name}_b{beta:g}_{transform}_{geometry}_y{ldv_y:g}_{score_mode}"
-                                                            f"_k{top_k_windows}_r{local_peak_radius_ms:g}_{gcc_mode}{coherence_floor:g}"
-                                                            f"_{estimator}{subband_name}{agg_name}{selector_name}{basin_name}"
-                                                        )
-                                                        configs.append(
-                                                            Config(
-                                                                name=name,
-                                                                band_hz=band,
-                                                                phat_beta=beta,
-                                                                transform=transform,
-                                                                geometry=geometry,
-                                                                ldv_y_m=ldv_y,
-                                                                score_mode=score_mode,
-                                                                n_fft=1024,
-                                                                hop=256,
-                                                                window_sec=0.5,
-                                                                window_hop_sec=0.25,
-                                                                top_k_windows=top_k_windows,
-                                                                local_peak_radius_ms=local_peak_radius_ms,
-                                                                gcc_mode=gcc_mode,
-                                                                estimator=estimator,
-                                                                coherence_floor=coherence_floor,
-                                                                subbands=subbands,
-                                                                score_aggregator=aggregator,
-                                                                subband_penalty=penalty,
-                                                                window_selector=selector,
-                                                                adaptive_min_k=min_k,
-                                                                stability_threshold_m=stable_threshold,
-                                                                required_stable_steps=stable_steps,
-                                                                fallback_top_k=fallback_k,
-                                                                basin_mode=basin_mode,
-                                                                basin_sigma_m=basin_sigma,
-                                                                basin_gate=basin_gate,
-                                                                basin_power=basin_power,
-                                                                candidate_agreement_gate_m=agreement_gate,
-                                                            )
-                                                        )
+                                                        for subband_weight_mode in subband_weight_options:
+                                                            for lr_weight, lr_gate in lr_options:
+                                                                if recipe_options is not None and (selector, basin_mode, subband_weight_mode, lr_weight) not in recipe_options:
+                                                                    continue
+                                                                band_name = "wide" if band is None else f"{int(band[0])}-{int(band[1])}"
+                                                                subband_name = "_sub" if subbands is not None else ""
+                                                                penalty_name = f"{penalty:g}" if penalty else ""
+                                                                agg_name = "" if aggregator == "curve_mean" else f"_{aggregator}{penalty_name}"
+                                                                selector_name = "" if selector == "fixed_top_k" else f"_{selector}_m{min_k}_s{stable_threshold:g}_n{stable_steps}_fb{fallback_k}"
+                                                                basin_name = "" if basin_mode == "none" else f"_{basin_mode}_sig{basin_sigma:g}_g{basin_gate:g}_p{basin_power:g}"
+                                                                weight_name = "" if subband_weight_mode == "none" else f"_{subband_weight_mode}"
+                                                                lr_name = "" if lr_weight <= 0.0 else f"_lrw{lr_weight:g}"
+                                                                name = (
+                                                                    f"{band_name}_b{beta:g}_{transform}_{geometry}_y{ldv_y:g}_{score_mode}"
+                                                                    f"_k{top_k_windows}_r{local_peak_radius_ms:g}_{gcc_mode}{coherence_floor:g}"
+                                                                    f"_{estimator}{subband_name}{agg_name}{selector_name}{basin_name}{weight_name}{lr_name}"
+                                                                )
+                                                                configs.append(
+                                                                    Config(
+                                                                        name=name,
+                                                                        band_hz=band,
+                                                                        phat_beta=beta,
+                                                                        transform=transform,
+                                                                        geometry=geometry,
+                                                                        ldv_y_m=ldv_y,
+                                                                        score_mode=score_mode,
+                                                                        n_fft=1024,
+                                                                        hop=256,
+                                                                        window_sec=0.5,
+                                                                        window_hop_sec=0.25,
+                                                                        top_k_windows=top_k_windows,
+                                                                        local_peak_radius_ms=local_peak_radius_ms,
+                                                                        gcc_mode=gcc_mode,
+                                                                        estimator=estimator,
+                                                                        coherence_floor=coherence_floor,
+                                                                        subbands=subbands,
+                                                                        score_aggregator=aggregator,
+                                                                        subband_penalty=penalty,
+                                                                        window_selector=selector,
+                                                                        adaptive_min_k=min_k,
+                                                                        stability_threshold_m=stable_threshold,
+                                                                        required_stable_steps=stable_steps,
+                                                                        fallback_top_k=fallback_k,
+                                                                        basin_mode=basin_mode,
+                                                                        basin_sigma_m=basin_sigma,
+                                                                        basin_gate=basin_gate,
+                                                                        basin_power=basin_power,
+                                                                        candidate_agreement_gate_m=agreement_gate,
+                                                                        subband_weight_mode=subband_weight_mode,
+                                                                        lr_weight=lr_weight,
+                                                                        lr_gate=lr_gate,
+                                                                    )
+                                                                )
     return configs
 
 
@@ -1304,7 +1757,7 @@ def run(args: argparse.Namespace) -> None:
     trials = default_trials(data_root)
     holdout = holdout_trials(data_root)
     require_trial_files(data_root, trials)
-    strict_profile = args.profile in ("strict_v2", "strict_v3", "strict_v4")
+    strict_profile = args.profile in ("strict_v2", "strict_v3", "strict_v4", "strict_v5", "strict_v6")
     if strict_profile and not holdout:
         raise ValueError(f"{args.profile} requires at least one complete holdout trial")
 
@@ -1330,6 +1783,10 @@ def run(args: argparse.Namespace) -> None:
                 "num_residuals": 0,
             }
         )
+        if cfg.subband_weight_mode != "none":
+            offsets = dict(offsets)
+            offsets["subband_weight_mode"] = cfg.subband_weight_mode
+            offsets["subband_weights"] = estimate_chirp_subband_weights(data_root, trials, chirp, cfg, xs_grid, offsets)
         canonical_chirp = summarize_trials(data_root, trials, chirp, cfg, xs_grid, offsets)
         canonical_speech = summarize_trials(data_root, trials, speech, cfg, xs_grid, offsets)
         item = {
@@ -1384,7 +1841,7 @@ def run(args: argparse.Namespace) -> None:
         },
         "top_results": results[: args.keep_top],
     }
-    if args.profile == "strict_v4":
+    if args.profile in ("strict_v4", "strict_v5", "strict_v6"):
         payload["loro"] = summarize_loro(results)
     (out_dir / "summary.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
     if results:
@@ -1403,11 +1860,20 @@ def run(args: argparse.Namespace) -> None:
             for row in diagnose_incremental_windows(data_root, trial, speech, best_cfg, xs_grid, best_offsets)  # type: ignore[arg-type]
         ]
         (out_dir / "best_incremental_window_diagnostics.json").write_text(json.dumps(incremental, indent=2), encoding="utf-8")
+        if args.profile in ("strict_v5", "strict_v6"):
+            prefix_diagnostics = [
+                row
+                for trial in diagnostic_trials
+                for row in diagnose_prefix_confidence(data_root, trial, speech, best_cfg, xs_grid, best_offsets)  # type: ignore[arg-type]
+            ]
+            (out_dir / "best_prefix_diagnostics.json").write_text(json.dumps(prefix_diagnostics, indent=2), encoding="utf-8")
     write_markdown_report(out_dir / "report.md", payload)
     print(f"Wrote {out_dir / 'summary.json'}")
     if results:
         print(f"Wrote {out_dir / 'best_window_diagnostics.json'}")
         print(f"Wrote {out_dir / 'best_incremental_window_diagnostics.json'}")
+        if args.profile in ("strict_v5", "strict_v6"):
+            print(f"Wrote {out_dir / 'best_prefix_diagnostics.json'}")
     print(f"Wrote {out_dir / 'report.md'}")
 
 
@@ -1415,7 +1881,7 @@ def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("--data_root", default=str(Path(__file__).resolve().parent.parent / "dataset" / "0223"))
     parser.add_argument("--out_dir", default="")
-    parser.add_argument("--profile", choices=("quick", "targeted", "advanced", "strict_v2", "strict_v3", "strict_v4", "refine", "full"), default="quick")
+    parser.add_argument("--profile", choices=("quick", "targeted", "advanced", "strict_v2", "strict_v3", "strict_v4", "strict_v5", "strict_v6", "refine", "full"), default="quick")
     parser.add_argument("--limit_configs", type=int, default=0)
     parser.add_argument("--keep_top", type=int, default=50)
     parser.add_argument("--progress_every", type=int, default=25)

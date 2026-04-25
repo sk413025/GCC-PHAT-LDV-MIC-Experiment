@@ -43,6 +43,9 @@ from a plain full-band GCC.
 - Added the strict-v3/strict-v4 adaptive path:
   stable-prefix window stopping, basin validation, and
   leave-one-recording-out reporting across the combined speech set.
+- Added the strict-v5 diagnostic-adaptive path:
+  confidence-prefix selection, pair-overlap basins, chirp-only subband
+  weighting, and prefix-level confidence diagnostics.
 
 ## Analysis Process
 
@@ -75,6 +78,10 @@ from a plain full-band GCC.
    votes for spatial basins, then either gates or softly reweights the final
    score. It helped one holdout repeat, but did not fix the largest stable
    wrong basins.
+10. Tested confidence-prefix, pair-overlap, and chirp-weighted variants. These
+    did not improve performance, showing that naive internal confidence can be
+    fooled by stable wrong basins and that chirp frequency stability does not
+    automatically transfer to speech.
 
 The current conclusion is conservative: the independent pipeline can move
 toward the manuscript claim, but it has not reproduced the claimed ~2 deg
@@ -116,6 +123,11 @@ speech MAE without further assumptions or better false-peak rejection.
   while `basin_mul` softly multiplies the final score by the prior. The prior
   uses no speech labels; it asks whether independent windows and frequency
   bands point to the same physical coordinate.
+- Strict-v5 adaptive diagnostics:
+  `confidence_prefix` evaluates every prefix by margin, basin support,
+  pair-overlap support, candidate spread, and subband spread. Pair-overlap
+  builds separate VL-only and VR-only basins before combining them. Chirp
+  subband weights are learned only from chirp and frozen for speech.
 
 ## Commands Run
 
@@ -158,6 +170,16 @@ python scripts/independent_pigs_audit.py \
   --profile strict_v4 \
   --offset_model affine \
   --out_dir results/independent_pigs_audit_strict_v4
+
+python scripts/independent_pigs_audit.py \
+  --profile strict_v5 \
+  --offset_model affine \
+  --out_dir results/independent_pigs_audit_strict_v5
+
+python scripts/independent_pigs_audit.py \
+  --profile strict_v6 \
+  --offset_model affine \
+  --out_dir results/independent_pigs_audit_strict_v6_hysteresis_v2
 ```
 
 ## Best Results So Far
@@ -181,6 +203,15 @@ python scripts/independent_pigs_audit.py \
 | strict-v4 basin gate, holdout | 5.02 deg | 7.80 deg | same config, adaptive selected-K plus basin gate |
 | strict-v4 basin gate, combined | 4.07 deg | 8.02 deg | same config, canonical + holdout speech |
 | strict-v4 LORO basin selection | 4.07 deg | 8.02 deg | leave-one-recording-out selected `basin_gate` for every held-out row |
+| strict-v5 stable-prefix baseline, combined | 4.07 deg | 8.02 deg | same as strict-v4 best, included as the strict-v5 guardrail |
+| strict-v5 confidence-prefix, combined | 6.36 deg | 22.44 deg | `confidence_prefix` with normal basin gate |
+| strict-v5 pair-overlap confidence, combined | 6.87 deg | 22.44 deg | `confidence_prefix` with pair-overlap gate |
+| strict-v5 chirp-weighted pair-overlap, combined | 10.22 deg | 37.19 deg | pair-overlap plus chirp-only subband weights |
+| strict-v6 LR-prior variants, combined | 7.57-7.84 deg | 22.71 deg | mic-mic soft prior added to stable-prefix variants |
+| strict-v6 hysteresis-prefix, canonical | 2.59 deg | 8.02 deg | `hysteresis_prefix` with basin gate and no LR prior |
+| strict-v6 hysteresis-prefix, holdout | 4.00 deg | 6.73 deg | same config, rollback/hysteresis selected-K |
+| strict-v6 hysteresis-prefix, combined | 3.30 deg | 8.02 deg | same config, canonical + holdout speech |
+| strict-v6 LORO hysteresis selection | 3.30 deg | 8.02 deg | leave-one-recording-out selected hysteresis for every held-out row |
 
 ## Current Interpretation
 
@@ -218,6 +249,16 @@ python scripts/independent_pigs_audit.py \
   2.60 deg to 1.57 deg. The largest errors, `+0.8m #17` and `+0.0m #22`,
   remain unchanged, which implies those recordings have stable but wrong
   candidate basins rather than merely isolated false peaks.
+- Strict-v5 tested a more adaptive confidence-prefix selector, pair-overlap
+  basin validation, and chirp-only subband weights. None beat the strict-v4
+  baseline. This negative result is useful: the naive confidence score tends
+  to prefer late, over-concentrated wrong basins, and chirp-derived high-band
+  weights did not transfer safely to speech.
+- Strict-v6 separates two ideas. The mic-mic LR prior is not useful as a
+  direct score multiplier because its chirp peaks collapse near zero lag rather
+  than following source position. The rollback/hysteresis selector is useful:
+  it improves combined MAE from 4.07 deg to 3.30 deg while keeping max error at
+  8.02 deg.
 
 ## Strict-v2 Interpretation
 
@@ -345,6 +386,80 @@ physically plausible for a barrier system: a wall mode or reflection can
 produce a repeatable LDV-Mic delay relation that is internally consistent but
 geometrically biased.
 
+## Strict-v5 Interpretation
+
+Strict-v5 was a deliberately small adaptive experiment. It kept the strict-v4
+best configuration as a guardrail, then added three stricter hypotheses:
+`confidence_prefix`, `confidence_prefix + pair_overlap_gate`, and
+`confidence_prefix + pair_overlap_gate + chirp_stability` subband weights.
+All three were label-free at speech time. The selector used only internal
+score margin, candidate-basin support, pair-overlap support, candidate spread,
+and subband spread. The chirp weights were learned from chirp recordings only
+and then frozen for speech.
+
+The result is a clear negative. The strict-v4 baseline remains best at 4.07 deg
+combined MAE / 8.02 deg max error. Plain `confidence_prefix` falls to 6.36 deg
+combined MAE and 22.44 deg max error. Adding pair-overlap makes it slightly
+worse at 6.87 deg combined MAE. Chirp-derived subband weights fail badly at
+10.22 deg combined MAE and 37.19 deg max error.
+
+The failure mode is informative. `+0.4m #15` is nearly correct at early
+prefixes (`K=2..4`), but the confidence score later prefers a wrong basin near
+center because that wrong basin has high basin support and high pair-overlap
+support. In other words, internal consistency is not the same as correctness:
+a reflection or wall mode can be very self-consistent. The pair-overlap prior
+did not solve this because both LDV-left and LDV-right can still agree on the
+same biased structural path.
+
+The chirp-only subband weights are also a cautionary result. They assign high
+weight to `4000-8000 Hz` and low weight to lower bands. That can look stable on
+chirp, but speech in that band is more vulnerable to harmonics, fricatives,
+noise, and barrier coloration. The transfer from chirp to speech is therefore
+not guaranteed, even if the weighting rule uses no speech labels.
+
+The practical lesson is that the next adaptive method should not maximize
+confidence over all prefixes. It needs a guardrail for "late confidence
+inflation" and a way to penalize basins that become more confident only after
+the estimate jumps far from an earlier stable coordinate. A promising next
+direction is a rollback/hysteresis selector: keep early accurate prefixes when
+later windows increase confidence but require a large spatial jump, unless the
+new basin is supported by an independent physical test stronger than simple
+pair overlap.
+
+## Strict-v6 Interpretation
+
+Strict-v6 tested two physical intuitions. The first was to add a third acoustic
+constraint: left-mic to right-mic TDOA. In principle this should be independent
+of the LDV-wall path, so it might reject wall-mode false basins. In practice it
+failed. Chirp diagnostics show the LR peak stays near 0 ms across source
+positions instead of tracking the expected mic-mic geometry. That means the
+mic-mic GCC is dominated by common-mode/direct electronics/room components or
+by a signal path that is not the simple source-to-left/right acoustic delay.
+Using it as a soft prior therefore hurts holdout badly.
+
+The second intuition worked. `hysteresis_prefix` explicitly protects against
+late confidence inflation. It starts from the confidence-prefix idea, but adds
+two guardrails: rollback is allowed only before a large spatial jump when the
+pre-jump basin has enough pair support, and the stable-prefix guardrail is
+computed with at least eight windows so the method does not over-trust a very
+early isolated peak. This matches the observed failure mechanism from
+strict-v5: wrong basins can become very confident after additional speech
+windows, even when an earlier prefix was physically more plausible.
+
+The best strict-v6 result uses `hysteresis_prefix` with basin gate and no LR
+prior. It improves canonical MAE from 3.12 deg to 2.59 deg, holdout MAE from
+5.02 deg to 4.00 deg, and combined MAE from 4.07 deg to 3.30 deg. LORO selects
+the same hysteresis config for every held-out row, so within this small
+strict-v6 grid the improvement is not driven by one recording alone.
+
+The main recovered case is `+0.4m #15`: strict-v4 selected `K=17` and estimated
+0.19 m, while strict-v6 rolls back to `K=3` and estimates 0.38 m, reducing the
+error from 5.58 deg to 0.53 deg. It also improves `-0.8m #20`, `+0.0m #18`,
+and `+0.4m #16`. The remaining hard cases are still `+0.8m #17` and
+`+0.0m #22`; hysteresis prevents them from getting worse but does not fully
+identify the true source basin. This suggests the remaining problem is a
+stable wrong LDV-wall basin rather than just late-window contamination.
+
 ## Important Caveats
 
 - Results under `results/` are intentionally not committed; they are generated
@@ -368,22 +483,28 @@ geometrically biased.
   but the basin parameters were still chosen from current diagnostics. Treat
   the LORO number as a stronger sanity check than combined ranking, not as an
   independent external validation set.
+- Strict-v5 includes negative results. Do not reuse `confidence_prefix`,
+  `pair_overlap_gate`, or `chirp_stability` as-is as if they were improvements;
+  their value is diagnostic, not performance.
+- Strict-v6's hysteresis thresholds were derived from this dataset's diagnostic
+  behavior. LORO is encouraging, but external validation or additional repeats
+  are still needed before treating 3.30 deg as a reproduction-level claim.
 
 ## Next Most Likely Improvements
 
-- Inspect `results/independent_pigs_audit_strict_v4/best_window_diagnostics.json`
-  and `results/independent_pigs_audit_strict_v4/best_incremental_window_diagnostics.json`
-  to identify why `+0.8m #17`, `+0.0m #22`, and `+0.4m #15` form stable wrong
-  basins.
-- Add a basin-quality metric that can distinguish true agreement from
-  suspicious over-concentrated agreement, for example comparing left-pair and
-  right-pair candidate basins before combining them.
+- Inspect `results/independent_pigs_audit_strict_v6_hysteresis_v2/best_prefix_diagnostics.json`
+  to understand why `+0.8m #17` remains stuck at 0.48 m and why `+0.0m #22`
+  still prefers -0.25 m.
+- Replace the failed mic-mic prior with residual-shape diagnostics on the
+  LDV-Mic curves themselves. A true source should have a plausible local score
+  shape around both VL and VR delays, not merely a high peak.
+- Try a conservative oracle-free max-error guardrail: if hysteresis selects a
+  prefix whose score is much less stable under subband jackknife than the
+  stable-prefix estimate, fall back to stable-prefix.
 - Improve the consensus estimator using subband agreement rather than the
   current margin/PSR-like weight.
-- Try per-subband reliability learning from chirp only: weight subbands by
-  chirp stability, then freeze weights for speech.
-- Try sensor-pair asymmetry diagnostics: a true source should make VL and VR
-  residuals jointly plausible, while a barrier/reflection path may be strongly
-  supported by one pair and only weakly compatible with the other.
+- If chirp-derived weights are revisited, regularize them much more strongly
+  and test whether high-frequency chirp stability actually predicts speech
+  stability before applying them to speech.
 - Explicitly audit whether the paper text used a different subset of repeated
   recordings or hand-selected windows.
