@@ -96,6 +96,11 @@ V1 卡在 speech 8.69°。V2 探索更多物理假設,**第 6 輪用 max-|τ| se
 | `h_round8.py` | **H39-H42**: per-frame median / RANSAC phase / bispectrum / RIR deconvolution | 全部沒贏 V2 |
 | `h_round9.py` | **H43-H53**: PI-GS 2D / staged / big-tap NLMS / 3-way max / **H52 agree-average** | **H52 → V3 3.57°** ⭐ |
 | `h_round10.py` | **H54-H59**: adaptive coh-band / PSR-weighted / 4-way smart | 都沒贏 V3 |
+| `h_round11_chirp_analyze.py` | 逆向工程 chirp 真實參數 | upsweep 500→7000Hz 確認 |
+| `h_round11_matched_filter.py` | Matched filter chirp(正確 upsweep) | 20°(wall multipath 主導) |
+| `h_round12_chirp_calib.py` | Block chirp 估 channel,反卷積 speech | 28°(失敗) |
+| `h_round13_unblock_calib.py` | **D2: unblock calibration table** | **speech 2.30°** ⭐⭐⭐ V4 |
+| `h_round14_v4_calib_combiner.py` | V3 + cal snap/blend 混合 | 4.11°(snap 失敗) |
 
 ## 跑法
 
