@@ -78,6 +78,11 @@ class Config:
     stability_threshold_m: float = 0.03
     required_stable_steps: int = 2
     fallback_top_k: int = 9
+    basin_mode: str = "none"
+    basin_sigma_m: float = 0.08
+    basin_gate: float = 0.10
+    basin_power: float = 0.25
+    candidate_agreement_gate_m: float | None = None
 
 
 def default_trials(data_root: Path) -> list[Trial]:
@@ -563,6 +568,88 @@ def select_window_prefix(prefix_rows: list[dict[str, float]], cfg: Config) -> tu
     }
 
 
+def basin_prior_from_windows(
+    windows: list[dict[str, object]],
+    xs_grid: np.ndarray,
+    tau_vl: np.ndarray,
+    tau_vr: np.ndarray,
+    cfg: Config,
+) -> tuple[np.ndarray, dict[str, float | str]]:
+    prior = np.zeros_like(xs_grid, dtype=np.float64)
+    candidate_xs: list[float] = []
+    candidate_weights: list[float] = []
+    subband_candidates: dict[str, list[float]] = {}
+
+    for item in windows:
+        sources = item.get("subbands", []) if cfg.subbands is not None else [item]
+        for source in sources:  # type: ignore[assignment]
+            cand = candidate_from_curves(source, xs_grid, tau_vl, tau_vr, cfg)
+            if cfg.candidate_agreement_gate_m is not None and cand["agreement_m"] > cfg.candidate_agreement_gate_m:
+                continue
+            weight = max(float(cand["weight"]), 1e-12)
+            prior += weight * np.exp(-0.5 * ((xs_grid - cand["x_hat"]) / max(cfg.basin_sigma_m, 1e-6)) ** 2)
+            candidate_xs.append(cand["x_hat"])
+            candidate_weights.append(weight)
+            band = source.get("band_hz") if isinstance(source, dict) else None
+            band_name = "wide" if band is None else f"{band[0]:.0f}-{band[1]:.0f}"
+            subband_candidates.setdefault(band_name, []).append(cand["x_hat"])
+
+    if float(np.max(prior)) > 0.0:
+        prior = prior / float(np.max(prior))
+
+    candidate_spread = 0.0
+    if candidate_xs:
+        xs = np.asarray(candidate_xs, dtype=np.float64)
+        weights = np.asarray(candidate_weights, dtype=np.float64)
+        center = float(np.sum(xs * weights) / max(float(np.sum(weights)), 1e-12))
+        candidate_spread = float(np.sqrt(np.sum(weights * (xs - center) ** 2) / max(float(np.sum(weights)), 1e-12)))
+
+    subband_medians = [float(np.median(values)) for values in subband_candidates.values() if values]
+    subband_spread = float(max(subband_medians) - min(subband_medians)) if subband_medians else 0.0
+    peak_idx = int(np.argmax(prior)) if len(prior) else 0
+    return prior, {
+        "basin_num_candidates": int(len(candidate_xs)),
+        "basin_peak_x_m": float(xs_grid[peak_idx]) if len(xs_grid) else 0.0,
+        "candidate_basin_spread_m": candidate_spread,
+        "subband_median_spread_m": subband_spread,
+    }
+
+
+def apply_basin_validation(
+    score: np.ndarray,
+    windows: list[dict[str, object]],
+    xs_grid: np.ndarray,
+    tau_vl: np.ndarray,
+    tau_vr: np.ndarray,
+    cfg: Config,
+) -> tuple[np.ndarray, dict[str, float | str]]:
+    meta: dict[str, float | str] = {"basin_mode": cfg.basin_mode}
+    if cfg.basin_mode == "none":
+        return score, meta
+
+    prior, prior_meta = basin_prior_from_windows(windows, xs_grid, tau_vl, tau_vr, cfg)
+    meta.update(prior_meta)
+    if float(np.max(prior)) <= 0.0:
+        meta["basin_reason"] = "empty_prior"
+        return score, meta
+
+    normalized = score - float(np.min(score))
+    normalized /= max(float(np.max(normalized)), 1e-12)
+    if cfg.basin_mode == "basin_gate":
+        final = np.where(prior >= cfg.basin_gate, normalized, 0.0)
+        if float(np.max(final)) <= 0.0:
+            meta["basin_reason"] = "gate_rejected_all_fallback"
+            final = normalized
+    elif cfg.basin_mode == "basin_mul":
+        final = normalized * np.power(prior + 1e-6, cfg.basin_power)
+    else:
+        raise ValueError(f"Unknown basin_mode: {cfg.basin_mode}")
+
+    meta["basin_prior_at_selected"] = float(prior[int(np.argmax(final))])
+    meta["basin_changed"] = float(xs_grid[int(np.argmax(final))] != xs_grid[int(np.argmax(score))])
+    return final, meta
+
+
 def evaluate_trial(
     data_root: Path,
     trial: Trial,
@@ -599,10 +686,12 @@ def evaluate_trial(
         if use_adaptive:
             selected_k, selection_meta = select_window_prefix(prefix_rows, cfg)
             scores, prefix_rows = score_windows(windows[:selected_k], xs_grid, tau_vl, tau_vr, cfg)
+            windows = windows[:selected_k]
+        scores, basin_meta = apply_basin_validation(scores, windows, xs_grid, tau_vl, tau_vr, cfg)
         best_idx = int(np.argmax(scores))
         x_hat = float(xs_grid[best_idx])
         score_value = float(scores[best_idx])
-        consensus_meta = selection_meta
+        consensus_meta = {**selection_meta, **basin_meta}
     else:
         raise ValueError(f"Unknown estimator: {cfg.estimator}")
 
@@ -640,6 +729,60 @@ def summarize_trials(
     offsets: dict[str, float],
 ) -> dict[str, object]:
     return summarize_rows([evaluate_trial(data_root, t, segment, cfg, xs_grid, offsets) for t in trials])
+
+
+def summarize_loro(results: list[dict[str, object]]) -> dict[str, object]:
+    if not results or "combined_speech" not in results[0]:
+        return {"mae_deg": 0.0, "max_err_deg": 0.0, "rows": []}
+
+    labels = [str(row["label"]) for row in results[0]["combined_speech"]["rows"]]  # type: ignore[index]
+    rows = []
+    for held_out in labels:
+        best_item = min(
+            results,
+            key=lambda item: float(
+                np.mean(
+                    [
+                        float(row["abs_err_deg"])
+                        for row in item["combined_speech"]["rows"]  # type: ignore[index]
+                        if str(row["label"]) != held_out
+                    ]
+                )
+            ),
+        )
+        held_row = next(row for row in best_item["combined_speech"]["rows"] if str(row["label"]) == held_out)  # type: ignore[index]
+        train_errs = [
+            float(row["abs_err_deg"])
+            for row in best_item["combined_speech"]["rows"]  # type: ignore[index]
+            if str(row["label"]) != held_out
+        ]
+        rows.append(
+            {
+                "held_out_label": held_out,
+                "selected_config": best_item["config"]["name"],  # type: ignore[index]
+                "train_mae_deg": float(np.mean(train_errs)),
+                "x_hat_m": float(held_row["x_hat_m"]),
+                "abs_err_deg": float(held_row["abs_err_deg"]),
+                "selected_k": int(held_row.get("num_windows", 0)),
+            }
+        )
+
+    return summarize_rows(
+        [
+            {
+                "label": row["held_out_label"],
+                "x_true_m": 0.0,
+                "x_hat_m": row["x_hat_m"],
+                "theta_true_deg": 0.0,
+                "theta_hat_deg": 0.0,
+                "abs_err_deg": row["abs_err_deg"],
+                "selected_config": row["selected_config"],
+                "train_mae_deg": row["train_mae_deg"],
+                "selected_k": row["selected_k"],
+            }
+            for row in rows
+        ]
+    ) | {"rows": rows}
 
 
 def weighted_median(values: np.ndarray, weights: np.ndarray) -> float:
@@ -780,6 +923,11 @@ def config_from_payload(payload: dict[str, object]) -> Config:
         stability_threshold_m=float(payload.get("stability_threshold_m", 0.03)),
         required_stable_steps=int(payload.get("required_stable_steps", 2)),
         fallback_top_k=int(payload.get("fallback_top_k", 9)),
+        basin_mode=str(payload.get("basin_mode", "none")),
+        basin_sigma_m=float(payload.get("basin_sigma_m", 0.08)),
+        basin_gate=float(payload.get("basin_gate", 0.10)),
+        basin_power=float(payload.get("basin_power", 0.25)),
+        candidate_agreement_gate_m=float(payload["candidate_agreement_gate_m"]) if payload.get("candidate_agreement_gate_m") is not None else None,
     )
 
 
@@ -863,6 +1011,7 @@ def diagnose_incremental_windows(
 def candidate_configs(profile: str) -> list[Config]:
     bands: list[tuple[float, float] | None]
     selector_options = [("fixed_top_k", 8, 0.03, 2, 9)]
+    basin_options = [("none", 0.08, 0.10, 0.25, None)]
     if profile == "quick":
         bands = [(500.0, 2000.0), (80.0, 8000.0), (300.0, 3000.0), (1000.0, 4000.0)]
         betas = [1.0, 0.5]
@@ -939,6 +1088,26 @@ def candidate_configs(profile: str) -> list[Config]:
             ("fixed_top_k", 8, 0.03, 2, 9),
             ("stable_prefix", 8, 0.03, 2, 9),
         ]
+    elif profile == "strict_v4":
+        bands = [(80.0, 8000.0)]
+        betas = [0.3]
+        transforms = ["clip"]
+        geometries = [("moving_patch", 0.5)]
+        score_modes = ["product"]
+        topk_options = [9]
+        radius_options = [2.0]
+        gcc_modes = [("plain", 0.0)]
+        estimators = ["score"]
+        subband_options = [
+            ((300.0, 800.0), (800.0, 1500.0), (1500.0, 2500.0), (2500.0, 4000.0), (4000.0, 8000.0)),
+        ]
+        aggregator_options = [("subband_score_exp_cv", 0.2)]
+        selector_options = [("stable_prefix", 8, 0.03, 2, 9)]
+        basin_options = [
+            ("none", 0.08, 0.10, 0.25, None),
+            ("basin_gate", 0.08, 0.10, 0.25, None),
+            ("basin_mul", 0.30, 0.10, 0.25, None),
+        ]
     elif profile == "refine":
         bands = [(800.0, 3000.0), (1000.0, 3500.0), (1000.0, 4000.0), (1200.0, 4500.0), (1500.0, 5000.0), (80.0, 8000.0)]
         betas = [0.7, 0.5, 0.3]
@@ -980,44 +1149,51 @@ def candidate_configs(profile: str) -> list[Config]:
                                         for subbands in subband_options:
                                             for aggregator, penalty in aggregator_options:
                                                 for selector, min_k, stable_threshold, stable_steps, fallback_k in selector_options:
-                                                    band_name = "wide" if band is None else f"{int(band[0])}-{int(band[1])}"
-                                                    subband_name = "_sub" if subbands is not None else ""
-                                                    penalty_name = f"{penalty:g}" if penalty else ""
-                                                    agg_name = "" if aggregator == "curve_mean" else f"_{aggregator}{penalty_name}"
-                                                    selector_name = "" if selector == "fixed_top_k" else f"_{selector}_m{min_k}_s{stable_threshold:g}_n{stable_steps}_fb{fallback_k}"
-                                                    name = (
-                                                        f"{band_name}_b{beta:g}_{transform}_{geometry}_y{ldv_y:g}_{score_mode}"
-                                                        f"_k{top_k_windows}_r{local_peak_radius_ms:g}_{gcc_mode}{coherence_floor:g}"
-                                                        f"_{estimator}{subband_name}{agg_name}{selector_name}"
-                                                    )
-                                                    configs.append(
-                                                        Config(
-                                                            name=name,
-                                                            band_hz=band,
-                                                            phat_beta=beta,
-                                                            transform=transform,
-                                                            geometry=geometry,
-                                                            ldv_y_m=ldv_y,
-                                                            score_mode=score_mode,
-                                                            n_fft=1024,
-                                                            hop=256,
-                                                            window_sec=0.5,
-                                                            window_hop_sec=0.25,
-                                                            top_k_windows=top_k_windows,
-                                                            local_peak_radius_ms=local_peak_radius_ms,
-                                                            gcc_mode=gcc_mode,
-                                                            estimator=estimator,
-                                                            coherence_floor=coherence_floor,
-                                                            subbands=subbands,
-                                                            score_aggregator=aggregator,
-                                                            subband_penalty=penalty,
-                                                            window_selector=selector,
-                                                            adaptive_min_k=min_k,
-                                                            stability_threshold_m=stable_threshold,
-                                                            required_stable_steps=stable_steps,
-                                                            fallback_top_k=fallback_k,
+                                                    for basin_mode, basin_sigma, basin_gate, basin_power, agreement_gate in basin_options:
+                                                        band_name = "wide" if band is None else f"{int(band[0])}-{int(band[1])}"
+                                                        subband_name = "_sub" if subbands is not None else ""
+                                                        penalty_name = f"{penalty:g}" if penalty else ""
+                                                        agg_name = "" if aggregator == "curve_mean" else f"_{aggregator}{penalty_name}"
+                                                        selector_name = "" if selector == "fixed_top_k" else f"_{selector}_m{min_k}_s{stable_threshold:g}_n{stable_steps}_fb{fallback_k}"
+                                                        basin_name = "" if basin_mode == "none" else f"_{basin_mode}_sig{basin_sigma:g}_g{basin_gate:g}_p{basin_power:g}"
+                                                        name = (
+                                                            f"{band_name}_b{beta:g}_{transform}_{geometry}_y{ldv_y:g}_{score_mode}"
+                                                            f"_k{top_k_windows}_r{local_peak_radius_ms:g}_{gcc_mode}{coherence_floor:g}"
+                                                            f"_{estimator}{subband_name}{agg_name}{selector_name}{basin_name}"
                                                         )
-                                                    )
+                                                        configs.append(
+                                                            Config(
+                                                                name=name,
+                                                                band_hz=band,
+                                                                phat_beta=beta,
+                                                                transform=transform,
+                                                                geometry=geometry,
+                                                                ldv_y_m=ldv_y,
+                                                                score_mode=score_mode,
+                                                                n_fft=1024,
+                                                                hop=256,
+                                                                window_sec=0.5,
+                                                                window_hop_sec=0.25,
+                                                                top_k_windows=top_k_windows,
+                                                                local_peak_radius_ms=local_peak_radius_ms,
+                                                                gcc_mode=gcc_mode,
+                                                                estimator=estimator,
+                                                                coherence_floor=coherence_floor,
+                                                                subbands=subbands,
+                                                                score_aggregator=aggregator,
+                                                                subband_penalty=penalty,
+                                                                window_selector=selector,
+                                                                adaptive_min_k=min_k,
+                                                                stability_threshold_m=stable_threshold,
+                                                                required_stable_steps=stable_steps,
+                                                                fallback_top_k=fallback_k,
+                                                                basin_mode=basin_mode,
+                                                                basin_sigma_m=basin_sigma,
+                                                                basin_gate=basin_gate,
+                                                                basin_power=basin_power,
+                                                                candidate_agreement_gate_m=agreement_gate,
+                                                            )
+                                                        )
     return configs
 
 
@@ -1087,6 +1263,23 @@ def write_markdown_report(path: Path, payload: dict[str, object]) -> None:
                 for k in sorted(set(selected)):
                     lines.append(f"- K={k}: {selected.count(k)} trials")
 
+        loro = payload.get("loro")
+        if isinstance(loro, dict) and loro.get("rows"):
+            lines.extend(["", "## Leave-One-Recording-Out", ""])
+            lines.append(f"LORO MAE: {float(loro['mae_deg']):.2f} deg; max error: {float(loro['max_err_deg']):.2f} deg")
+            lines.extend(
+                [
+                    "",
+                    "| Held-out | Selected config | train MAE | held-out err | selected K |",
+                    "|---|---|---:|---:|---:|",
+                ]
+            )
+            for row in loro["rows"]:  # type: ignore[index]
+                lines.append(
+                    f"| {row['held_out_label']} | `{row['selected_config']}` | "
+                    f"{row['train_mae_deg']:.2f} | {row['abs_err_deg']:.2f} | {row['selected_k']} |"
+                )
+
         lines.extend(["", "## Interpretation Notes", ""])
         lines.append("- Offsets are calibrated only from chirp, then frozen for speech.")
         if strict:
@@ -1111,7 +1304,7 @@ def run(args: argparse.Namespace) -> None:
     trials = default_trials(data_root)
     holdout = holdout_trials(data_root)
     require_trial_files(data_root, trials)
-    strict_profile = args.profile in ("strict_v2", "strict_v3")
+    strict_profile = args.profile in ("strict_v2", "strict_v3", "strict_v4")
     if strict_profile and not holdout:
         raise ValueError(f"{args.profile} requires at least one complete holdout trial")
 
@@ -1191,6 +1384,8 @@ def run(args: argparse.Namespace) -> None:
         },
         "top_results": results[: args.keep_top],
     }
+    if args.profile == "strict_v4":
+        payload["loro"] = summarize_loro(results)
     (out_dir / "summary.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
     if results:
         best_cfg = config_from_payload(results[0]["config"])  # type: ignore[arg-type]
@@ -1220,7 +1415,7 @@ def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("--data_root", default=str(Path(__file__).resolve().parent.parent / "dataset" / "0223"))
     parser.add_argument("--out_dir", default="")
-    parser.add_argument("--profile", choices=("quick", "targeted", "advanced", "strict_v2", "strict_v3", "refine", "full"), default="quick")
+    parser.add_argument("--profile", choices=("quick", "targeted", "advanced", "strict_v2", "strict_v3", "strict_v4", "refine", "full"), default="quick")
     parser.add_argument("--limit_configs", type=int, default=0)
     parser.add_argument("--keep_top", type=int, default=50)
     parser.add_argument("--progress_every", type=int, default=25)

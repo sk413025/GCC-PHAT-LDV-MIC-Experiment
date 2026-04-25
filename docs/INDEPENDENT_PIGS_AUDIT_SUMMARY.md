@@ -40,6 +40,9 @@ from a plain full-band GCC.
 - Added a strict-v2 validation path:
   canonical-vs-holdout trial sets, score-level subband aggregation, and
   incremental window diagnostics.
+- Added the strict-v3/strict-v4 adaptive path:
+  stable-prefix window stopping, basin validation, and
+  leave-one-recording-out reporting across the combined speech set.
 
 ## Analysis Process
 
@@ -65,6 +68,13 @@ from a plain full-band GCC.
    cross-subband disagreement improved combined canonical+holdout performance,
    which supports the hypothesis that remaining errors are driven by
    frequency-local false peaks.
+8. Tested adaptive stopping with `stable_prefix`. This improved both average
+   and worst-case combined speech error, showing that a fixed window count was
+   mixing different recording regimes.
+9. Tested basin validation. This treats per-window/per-subband candidates as
+   votes for spatial basins, then either gates or softly reweights the final
+   score. It helped one holdout repeat, but did not fix the largest stable
+   wrong basins.
 
 The current conclusion is conservative: the independent pipeline can move
 toward the manuscript claim, but it has not reproduced the claimed ~2 deg
@@ -95,6 +105,17 @@ speech MAE without further assumptions or better false-peak rejection.
   The new score-level path scores each subband separately and then aggregates
   the score curves. `subband_score_exp_cv` downweights coordinates that are
   strong in one frequency band but inconsistent across bands.
+- Strict-v3 adaptive stopping:
+  `stable_prefix` adds reliability-ranked speech windows until the cumulative
+  coordinate estimate stops moving by more than a small lateral threshold. This
+  is intended to avoid both under-using recordings that need more evidence and
+  over-using recordings where later windows introduce false peaks.
+- Strict-v4 basin validation:
+  per-window/per-subband candidates are converted into a smooth spatial prior.
+  `basin_gate` keeps only score regions supported by that candidate basin,
+  while `basin_mul` softly multiplies the final score by the prior. The prior
+  uses no speech labels; it asks whether independent windows and frequency
+  bands point to the same physical coordinate.
 
 ## Commands Run
 
@@ -132,6 +153,11 @@ python scripts/independent_pigs_audit.py \
   --profile strict_v3 \
   --offset_model affine \
   --out_dir results/independent_pigs_audit_strict_v3
+
+python scripts/independent_pigs_audit.py \
+  --profile strict_v4 \
+  --offset_model affine \
+  --out_dir results/independent_pigs_audit_strict_v4
 ```
 
 ## Best Results So Far
@@ -151,6 +177,10 @@ python scripts/independent_pigs_audit.py \
 | strict-v3 stable-prefix, canonical | 3.12 deg | 8.02 deg | `80-8000_b0.3_clip_moving_patch_y0.5_product_k9_r2_plain0_score_sub_subband_score_exp_cv0.2_stable_prefix_m8_s0.03_n2_fb9` |
 | strict-v3 stable-prefix, holdout | 5.23 deg | 7.80 deg | same config, adaptive selected-K speech windows |
 | strict-v3 stable-prefix, combined | 4.18 deg | 8.02 deg | same config, canonical + holdout speech |
+| strict-v4 basin gate, canonical | 3.12 deg | 8.02 deg | `80-8000_b0.3_clip_moving_patch_y0.5_product_k9_r2_plain0_score_sub_subband_score_exp_cv0.2_stable_prefix_m8_s0.03_n2_fb9_basin_gate_sig0.08_g0.1_p0.25` |
+| strict-v4 basin gate, holdout | 5.02 deg | 7.80 deg | same config, adaptive selected-K plus basin gate |
+| strict-v4 basin gate, combined | 4.07 deg | 8.02 deg | same config, canonical + holdout speech |
+| strict-v4 LORO basin selection | 4.07 deg | 8.02 deg | leave-one-recording-out selected `basin_gate` for every held-out row |
 
 ## Current Interpretation
 
@@ -181,6 +211,13 @@ python scripts/independent_pigs_audit.py \
 - Strict-v3 improves on strict-v2 by replacing fixed `K=9` speech aggregation
   with a stable-prefix selector. Combined MAE improves from 4.53 deg to
   4.18 deg, while combined max error improves from 9.90 deg to 8.02 deg.
+- Strict-v4 adds basin validation. The best variant, `basin_gate`, improves
+  combined MAE from 4.18 deg to 4.07 deg and holdout MAE from 5.23 deg to
+  5.02 deg, but does not improve the worst-case 8.02 deg error.
+- The strict-v4 improvement is narrow: it mainly corrects `+0.4m #13` from
+  2.60 deg to 1.57 deg. The largest errors, `+0.8m #17` and `+0.0m #22`,
+  remain unchanged, which implies those recordings have stable but wrong
+  candidate basins rather than merely isolated false peaks.
 
 ## Strict-v2 Interpretation
 
@@ -270,6 +307,44 @@ repeatable LDV-Mic delay pattern that points to the wrong lateral coordinate.
 The next algorithmic target should therefore be basin validation, not just
 window stopping.
 
+## Strict-v4 Interpretation
+
+Strict-v4 implements the basin-validation idea directly. After stable-prefix
+chooses how many speech windows to use, each selected window and subband
+produces its own candidate coordinate. These candidates are turned into a
+smooth spatial prior. The assumption is physical rather than statistical
+label-fitting: a real source coordinate should be supported repeatedly across
+time windows and frequency bands, while speech harmonics, wall resonances, and
+reflections are more likely to appear as isolated or frequency-local peaks.
+
+Two basin mechanisms were tested. `basin_gate` keeps only the parts of the
+final PI-GS score that sit inside a candidate-supported basin. `basin_mul`
+keeps the whole score but softly boosts regions with basin support. Both use
+the same chirp-frozen calibration and do not look at speech labels inside a
+recording. The strict-v4 grid is intentionally small: baseline strict-v3,
+narrow hard gate, and wider soft multiplier.
+
+The result is useful but sobering. `basin_gate` improves combined speech MAE
+from 4.18 deg to 4.07 deg and holdout MAE from 5.23 deg to 5.02 deg. However,
+it only changes one best-row estimate: `+0.4m #13` moves from 0.50 m to
+0.46 m, lowering that row's error from 2.60 deg to 1.57 deg. The large
+failures `+0.8m #17`, `+0.0m #22`, and `+0.4m #15` are not corrected.
+
+The leave-one-recording-out check selects `basin_gate` for every held-out row
+and reports the same 4.07 deg MAE / 8.02 deg max error. This is a small
+positive sign: within this three-config grid, the basin-gate choice is not
+driven by one single held-out recording. But it is not a formal reproduction
+claim, because the basin parameters themselves were motivated by prior
+diagnostics on the same dataset.
+
+The strict-v4 causal lesson is that some errors are now "stable wrong." Basin
+validation can reject a peak when the final score chooses a coordinate that
+other windows/subbands do not support. It cannot reject a wrong coordinate
+when many windows and bands agree on the same wrong path. That failure mode is
+physically plausible for a barrier system: a wall mode or reflection can
+produce a repeatable LDV-Mic delay relation that is internally consistent but
+geometrically biased.
+
 ## Important Caveats
 
 - Results under `results/` are intentionally not committed; they are generated
@@ -289,20 +364,26 @@ window stopping.
   chosen from the current diagnostic set. The next formal validation step
   should use leave-one-recording-out selection before treating the numbers as a
   reproduction claim.
+- Strict-v4 adds leave-one-recording-out model selection over three configs,
+  but the basin parameters were still chosen from current diagnostics. Treat
+  the LORO number as a stronger sanity check than combined ranking, not as an
+  independent external validation set.
 
 ## Next Most Likely Improvements
 
-- Extend stable-prefix and score-level subband consistency to a
-  leave-one-recording-out protocol so selector thresholds are chosen without
-  looking at the same speech rows used for reporting.
-- Inspect `results/independent_pigs_audit_strict_v3/best_incremental_window_diagnostics.json`
-  to identify why `+0.8m #17` and `+0.0m #22` remain biased after adaptive
-  window selection.
+- Inspect `results/independent_pigs_audit_strict_v4/best_window_diagnostics.json`
+  and `results/independent_pigs_audit_strict_v4/best_incremental_window_diagnostics.json`
+  to identify why `+0.8m #17`, `+0.0m #22`, and `+0.4m #15` form stable wrong
+  basins.
+- Add a basin-quality metric that can distinguish true agreement from
+  suspicious over-concentrated agreement, for example comparing left-pair and
+  right-pair candidate basins before combining them.
 - Improve the consensus estimator using subband agreement rather than the
   current margin/PSR-like weight.
-- Inspect `results/independent_pigs_audit_strict_v3/best_window_diagnostics.json`
-  to identify which subbands create the remaining holdout false peaks.
 - Try per-subband reliability learning from chirp only: weight subbands by
   chirp stability, then freeze weights for speech.
+- Try sensor-pair asymmetry diagnostics: a true source should make VL and VR
+  residuals jointly plausible, while a barrier/reflection path may be strongly
+  supported by one pair and only weakly compatible with the other.
 - Explicitly audit whether the paper text used a different subset of repeated
   recordings or hand-selected windows.
