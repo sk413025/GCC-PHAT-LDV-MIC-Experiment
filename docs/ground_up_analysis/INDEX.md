@@ -1,17 +1,21 @@
 # Ground-Up PI-GS Reproduction — Results & Analysis
 
-## 重點數字 (V2 update with Round 5+6 breakthrough)
+## 重點數字 (V3 — 10 輪 closed-loop 後的 final ceiling)
 
-| 指標 | Paper 宣稱 | V1 ground-up | **V2 ground-up (H38a)** |
-|---|---|---|---|
-| Chirp MAE (block) | 1.94° (override) | 8.43° / 2.48° oracle | 10.31° / **0.93° oracle** |
-| Speech MAE (block) | 2.23° | 8.69° / 1.74° oracle | **3.74°** ⭐ / 1.59° oracle |
-| Mic unblock chirp | 4.03° | 2.16° | (same) |
-| Mic unblock speech | 4.04° | ~3° | (same) |
+| 指標 | Paper 宣稱 | V1 | V2 (H38a) | **V3 (H52)** |
+|---|---|---|---|---|
+| Chirp MAE (block) | 1.94° | 8.43° | 10.31° | 10.53° |
+| Speech MAE (block) | 2.23° | 8.69° | 3.74° | **3.57°** ⭐ |
+| Speech oracle (per-position best) | — | 1.74° | 1.59° | 1.59° |
+| Chirp oracle | — | 2.48° | 0.93° | 0.93° |
 
-**V1 → V2 突破**(speech):從 8.69° 改到 **3.74°**(改善 57%)。關鍵是發現 H1 與 H37 互補的失敗模式,用 **max-|τ| self-selection rule** 自動選非失敗的估計器。完整討論見 [`ROUND_5_6_BREAKTHROUGH.md`](ROUND_5_6_BREAKTHROUGH.md)。
+**V1 → V3 演進**:speech MAE 8.69° → 3.74° → **3.57°**(總體改善 59%)。關鍵兩個物理發現:
+1. **H1 + H37 互補性**(round 5):LDV-NLMS direct 救 -x、NLMS+diff/sum 救 +x
+2. **Self-selection 機制**:V2 max-|τ| → V3 agree-average(同號接近時取平均更精確)
 
-**核心物理直覺**:Lock-to-zero 是演算法 failure 的 signature(|τ|≈0),正確估計則 |τ|≥0.2 ms。max-|τ| rule 利用此**拓撲特性**自然挑出沒失敗的演算法,不需 PSR、不需 ground truth。
+**核心物理直覺**:Lock-to-zero 是演算法 failure 的 signature(|τ|≈0),正確估計則 |τ|≥0.2 ms。**max-|τ| 利用失敗模式的拓撲性質**,優於任何統計性 ensemble(median/PSR-weighted/consensus 都因為 lock-to-zero 是 correlated failure 而失敗)。
+
+V3 之後 round 8-10 試了 25 個新假設(per-frame median、RANSAC、bispectrum、RIR deconvolution、subspace、PSR-weighted fusion、adaptive band……)**全部沒進一步改進**,印證 3.57° 是**單一 pipeline 的真正天花板**(per-recording 可用資訊的物理上限)。
 
 ## 文件導讀
 
@@ -43,6 +47,13 @@
    - **Round 5 H37**: NLMS + diff/sum + multi-band median + reject-zero → +x 解放
    - **Round 6 H38a**: max-|τ| self-selection 把 H1 (-x) + H37 (+x) 互補性發揮 → **speech 3.74°**
    - 30+ 策略完整 ranking,V1 → V2 per-position 改善表
+
+5. **[`ROUND_8_10_PLATEAU.md`](ROUND_8_10_PLATEAU.md)** ⭐ —— V3 微突破 + 收斂分析:
+   - **Round 9 H52**: V2 max-|τ| 改成 agree-average(同號接近時取平均) → **speech 3.57°**
+   - Round 8-10 共 25 個新假設(per-frame、RANSAC、bispectrum、RIR、subspace、PSR fusion、adaptive band)
+   - **全部沒進一步改進** — 印證 3.57° 是 per-recording 物理上限
+   - V3 vs Oracle per-position gap 分析(-0.4 是 4.77° 最大 gap,oracle 用無 LDV 簡單低頻 bandpass)
+   - 為什麼 max-|τ| / agree-average 是唯一有效的 self-selection 機制(其他統計方法都被 correlated lock-to-zero 失敗劫持)
 
 ## 結果檔案分類(local-only artifacts,gitignored;重跑可生)
 

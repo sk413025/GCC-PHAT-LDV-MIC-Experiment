@@ -93,6 +93,9 @@ V1 卡在 speech 8.69°。V2 探索更多物理假設,**第 6 輪用 max-|τ| se
 | `h_round5_final.py` | **H35-H37**: H1+H33 stack | H37 speech 8.27° (+x 突破) |
 | `h_round6_combiner.py` | **H38**: max-|τ| self-selection (H1 + H37 互補) | **speech 3.74°** ⭐ |
 | `h_round7_chirp_full.py` | chirp 用全 13 秒視窗 | 沒幫助(chirp +x 是 SNR 問題) |
+| `h_round8.py` | **H39-H42**: per-frame median / RANSAC phase / bispectrum / RIR deconvolution | 全部沒贏 V2 |
+| `h_round9.py` | **H43-H53**: PI-GS 2D / staged / big-tap NLMS / 3-way max / **H52 agree-average** | **H52 → V3 3.57°** ⭐ |
+| `h_round10.py` | **H54-H59**: adaptive coh-band / PSR-weighted / 4-way smart | 都沒贏 V3 |
 
 ## 跑法
 
