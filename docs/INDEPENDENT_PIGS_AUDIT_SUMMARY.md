@@ -1,0 +1,163 @@
+# Independent PI-GS Audit Summary
+
+Generated from an independent raw-WAV pipeline that does not import the
+project's existing research scripts.
+
+## Research Rationale
+
+The audit starts from the physical story in the paper but treats the existing
+codebase as untrusted. The only trusted inputs are the WAV recordings, nominal
+sensor geometry, and basic wave-propagation constraints.
+
+The central physical hypothesis is that the LDV provides a structure-borne
+reference that is more target-coherent than the microphone pressure channels.
+If the LDV and microphones share a usable target-related component, the correct
+source coordinate should make both LDV-Mic predicted delays agree at the same
+time. A single LDV-Mic peak is not enough, because barrier re-radiation and
+speech harmonics can create sharp but wrong peaks. The useful signal should
+survive cross-pair, cross-window, and cross-frequency consistency checks.
+
+The signal-processing hypothesis is that raw GCC-PHAT is too brittle for these
+recordings. PHAT suppresses magnitude coloration, but it can also amplify
+low-energy noisy bins and speech harmonic artifacts. That is why the audit
+tests partial PHAT exponents, clipping, pre-emphasis, subband aggregation, and
+chirp-derived calibration instead of assuming the manuscript result follows
+from a plain full-band GCC.
+
+## What Was Implemented
+
+- Added `scripts/independent_pigs_audit.py`.
+- Reimplemented LDV-Mic GCC and PI-GS-style spatial search using only
+  `numpy` and `scipy`.
+- Added multiple preprocessing/search variants:
+  bandpass banks, PHAT exponent, clipping/pre-emphasis/differencing,
+  moving-patch vs fixed-spot geometry, harmonic/product/sum scores,
+  top-k window aggregation, and chirp-derived offset calibration.
+- Added three offset modes:
+  `none`, `constant`, `affine`, and `per_trial`.
+- Added the second-stage improvement path:
+  coherence-masked GCC, window-level consensus, and subband ensemble scoring.
+
+## Analysis Process
+
+1. Rebuilt a naive PI-GS objective from first principles:
+   compute LDV-Mic GCC curves, evaluate them at geometry-predicted delays, and
+   search over source lateral coordinate.
+2. Tested plain wideband and midband GCC-PHAT variants. These stayed far from
+   the paper claim, which suggested that the original result likely depended on
+   preprocessing, calibration, or window selection.
+3. Added chirp-only calibration modes. Global/affine chirp calibration helped,
+   while per-position chirp calibration did not transfer well to speech. This
+   argues against a simple "same-position chirp reference solves speech" story.
+4. Diagnosed window-level behavior. High PSR-like reliability sometimes picked
+   confidently wrong windows, confirming that single-pair peak sharpness is not
+   a reliable correctness signal in this barrier setup.
+5. Added subband ensemble, coherence-masked GCC, and window consensus. The best
+   improvement came from subband ensemble with clipped audio and product
+   scoring, not from the first coherence mask or consensus estimator.
+
+The current conclusion is conservative: the independent pipeline can move
+toward the manuscript claim, but it has not reproduced the claimed ~2 deg
+speech MAE without further assumptions or better false-peak rejection.
+
+## Method Details
+
+- Geometry models:
+  `moving_patch` assumes the source primarily excites a nearby barrier patch
+  that then radiates to each microphone. `fixed_spot` assumes the LDV spot is a
+  fixed reference point and compares source-to-LDV vs source-to-microphone
+  travel times.
+- Offset calibration:
+  offsets are estimated from chirp only and frozen for speech. `constant`
+  estimates one VL/VR offset pair, `affine` lets the offset vary linearly with
+  lateral coordinate, and `per_trial` estimates a per-recording offset.
+- Preprocessing:
+  bandpass, partial PHAT, clipping, pre-emphasis, and differencing are treated
+  as hypotheses about suppressing low-SNR bins, harmonic artifacts, and
+  barrier-induced coloration.
+- Advanced scoring:
+  subband ensemble splits the wideband score into narrower bands before
+  aggregation, while product/harmonic scores require both LDV-Mic pairs to be
+  strong. The diagnostic output records per-window/per-subband candidates so
+  remaining false peaks can be traced.
+
+## Commands Run
+
+```bash
+python scripts/independent_pigs_audit.py \
+  --profile quick \
+  --out_dir results/independent_pigs_audit_quick
+
+python scripts/independent_pigs_audit.py \
+  --profile targeted \
+  --offset_model affine \
+  --out_dir results/independent_pigs_audit_targeted_affine
+
+python scripts/independent_pigs_audit.py \
+  --profile targeted \
+  --offset_model per_trial \
+  --out_dir results/independent_pigs_audit_targeted_per_trial
+
+python scripts/independent_pigs_audit.py \
+  --profile targeted \
+  --no-calibrate_offsets \
+  --out_dir results/independent_pigs_audit_targeted_nocal
+
+python scripts/independent_pigs_audit.py \
+  --profile advanced \
+  --offset_model affine \
+  --out_dir results/independent_pigs_audit_advanced_affine
+```
+
+## Best Results So Far
+
+| Run | Best Speech MAE | Speech Max | Best Config |
+|---|---:|---:|---|
+| quick + constant chirp offset | 4.55 deg | 9.66 deg | `1000-4000_b0.5_raw_moving_patch_y0.5_harmonic` |
+| targeted + affine chirp offset | 4.18 deg | 12.02 deg | `80-8000_b0.3_raw_moving_patch_y0.5_harmonic_k4_r2` |
+| targeted + per-trial chirp offset | 6.71 deg | 17.84 deg | `80-8000_b0.3_raw_moving_patch_y0.5_sum_k12_r1` |
+| targeted + no calibration | 6.80 deg | 21.68 deg | `1000-4000_b0.5_clip_moving_patch_y0.6_product_k4_r1` |
+| advanced + affine chirp offset | 3.65 deg | 7.76 deg | `80-8000_b0.3_clip_moving_patch_y0.5_product_k8_r2_plain0_score_sub` |
+
+## Current Interpretation
+
+- Independent raw-WAV reconstruction can improve substantially over naive
+  PI-GS, but did not reproduce the manuscript's claimed ~2 deg speech MAE.
+- Chirp-derived calibration helps, but not enough by itself.
+- Per-position chirp calibration did not improve speech, which argues against
+  a simple "same-position chirp reference fixes everything" explanation.
+- Window-level diagnosis shows that high PSR/reliability windows can be
+  confidently wrong; structural/harmonic false peaks are likely dominating.
+- The best current result is still driven by failure at center and +0.4 m
+  positions, while extreme positions can be accurate under some configs.
+- The advanced run improved MAE from 4.18 deg to 3.65 deg. The winning change
+  was subband ensemble with clipped audio and product score; coherence masking
+  and the first consensus estimator did not outperform the simpler score
+  aggregation.
+- The new best result reduces center/+0.4 m errors but shifts the largest
+  residual error to +0.8 m, suggesting the remaining problem is subband
+  disagreement / structural false peaks rather than a single global offset.
+
+## Important Caveats
+
+- Results under `results/` are intentionally not committed; they are generated
+  artifacts and are ignored by `.gitignore`.
+- The audit does not prove the manuscript numbers. It documents which
+  physically motivated assumptions improve performance and which do not.
+- Any future result that uses speech labels, hand-picked speech windows, or
+  per-speech-position tuning must be marked as oracle/label leakage rather than
+  a valid reproduction.
+- The advanced result has poor chirp MAE but better speech MAE, so it should be
+  interpreted as a speech-specific processing hypothesis, not as a universal
+  solved calibration.
+
+## Next Most Likely Improvements
+
+- Improve the consensus estimator using subband agreement rather than the
+  current margin/PSR-like weight.
+- Inspect `results/independent_pigs_audit_advanced_affine/best_window_diagnostics.json`
+  to identify which windows/subbands pull +0.8 m toward the center.
+- Try per-subband reliability learning from chirp only: weight subbands by
+  chirp stability, then freeze weights for speech.
+- Explicitly audit whether the paper text used a different subset of repeated
+  recordings or hand-selected windows.
