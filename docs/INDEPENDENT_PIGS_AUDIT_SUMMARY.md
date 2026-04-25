@@ -127,6 +127,11 @@ python scripts/independent_pigs_audit.py \
   --profile strict_v2 \
   --offset_model affine \
   --out_dir results/independent_pigs_audit_strict_v2
+
+python scripts/independent_pigs_audit.py \
+  --profile strict_v3 \
+  --offset_model affine \
+  --out_dir results/independent_pigs_audit_strict_v3
 ```
 
 ## Best Results So Far
@@ -143,6 +148,9 @@ python scripts/independent_pigs_audit.py \
 | strict-v2 score-level, canonical | 3.18 deg | 8.02 deg | `80-8000_b0.3_clip_moving_patch_y0.5_product_k9_r2_plain0_score_sub_subband_score_exp_cv0.2` |
 | strict-v2 score-level, holdout | 5.88 deg | 9.90 deg | same config, evaluated on complete block repeats |
 | strict-v2 score-level, combined | 4.53 deg | 9.90 deg | same config, canonical + holdout speech |
+| strict-v3 stable-prefix, canonical | 3.12 deg | 8.02 deg | `80-8000_b0.3_clip_moving_patch_y0.5_product_k9_r2_plain0_score_sub_subband_score_exp_cv0.2_stable_prefix_m8_s0.03_n2_fb9` |
+| strict-v3 stable-prefix, holdout | 5.23 deg | 7.80 deg | same config, adaptive selected-K speech windows |
+| strict-v3 stable-prefix, combined | 4.18 deg | 8.02 deg | same config, canonical + holdout speech |
 
 ## Current Interpretation
 
@@ -170,6 +178,9 @@ python scripts/independent_pigs_audit.py \
   residual is `+0.4m #15`, which is estimated near center, so future work
   should focus on why that recording's barrier/microphone correlation pulls
   inward.
+- Strict-v3 improves on strict-v2 by replacing fixed `K=9` speech aggregation
+  with a stable-prefix selector. Combined MAE improves from 4.53 deg to
+  4.18 deg, while combined max error improves from 9.90 deg to 8.02 deg.
 
 ## Strict-v2 Interpretation
 
@@ -211,6 +222,54 @@ incremental window diagnostics for `+0.4m #15` and turn the fixed `K=9` choice
 into an automatic stopping/selection rule based on spatial stability and
 subband agreement.
 
+## Strict-v3 Interpretation
+
+Strict-v3 implements that automatic stopping idea. It keeps the strict-v2 best
+physical and spectral hypothesis fixed, but changes speech aggregation from a
+fixed `K=9` prefix to `stable_prefix`. The selector still sorts windows by the
+same reliability measure, but it evaluates the cumulative spatial estimate
+after each added window. Once the estimate stops moving by more than 0.03 m for
+two consecutive updates after at least eight windows, it stops. If no stable
+point is found, it falls back to `K=9`.
+
+This is a direct response to the strict-v2 diagnostics. Some recordings are
+hurt by adding too many windows; others need more than the first few windows
+before the estimate stabilizes. Fixed `K=9` is therefore a compromise, not a
+physical rule. Stable-prefix treats each recording independently without using
+the speech label: the only evidence it uses is whether the estimated source
+coordinate becomes self-consistent as more high-reliability windows are added.
+
+The strict-v3 result improves both average and worst-case error. Canonical MAE
+is 3.12 deg, holdout MAE is 5.23 deg, combined MAE is 4.18 deg, and combined
+max error is 8.02 deg. The selected-K distribution is also informative:
+`K=8` for five trials, `K=9` for one trial, `K=10` for one trial, `K=11` for two
+trials, and `K=17` for one trial. This confirms that the method is no longer
+secretly just using one global window count.
+
+The largest remaining errors are now `+0.8m #17` and `+0.0m #22`. The next
+likely bottleneck is therefore not just when to stop adding windows, but how to
+reject or downweight spatial basins that remain stable while still being
+biased by barrier/room false paths.
+
+The causal chain is now clearer. Strict-v2 showed that cross-subband agreement
+helps reject frequency-local false peaks, but its fixed `K=9` window count
+still mixed good and bad speech windows. Incremental diagnostics showed two
+opposite failure modes: some trials were already good before `K=9` and then
+got pulled away by later windows, while other trials needed more windows before
+the cumulative estimate settled. Strict-v3 therefore changes the question from
+"how many windows should every recording use?" to "when has this recording's
+spatial estimate stopped moving?" That is why the improvement is
+interpretably tied to the observed failure, not just another parameter sweep.
+
+The remaining failures should be interpreted differently from the strict-v2
+failures. Stable-prefix can prevent unstable or late-arriving bad windows from
+continuing to perturb the estimate, but it cannot detect a wrong basin that is
+already stable. A stable wrong basin is physically plausible in this setup:
+barrier vibration modes, room reflections, and speech harmonics can create a
+repeatable LDV-Mic delay pattern that points to the wrong lateral coordinate.
+The next algorithmic target should therefore be basin validation, not just
+window stopping.
+
 ## Important Caveats
 
 - Results under `results/` are intentionally not committed; they are generated
@@ -226,17 +285,22 @@ subband agreement.
 - The strict-v2 report ranks a fixed hypothesis grid against holdout speech.
   Treat it as an audit guardrail, not as proof that holdout labels may be used
   freely for tuning.
+- Strict-v3 improves holdout-aware metrics, but its selector thresholds were
+  chosen from the current diagnostic set. The next formal validation step
+  should use leave-one-recording-out selection before treating the numbers as a
+  reproduction claim.
 
 ## Next Most Likely Improvements
 
-- Inspect `results/independent_pigs_audit_strict_v2/best_incremental_window_diagnostics.json`
-  to identify which windows pull `+0.4m #15` toward the center.
-- Extend score-level subband consistency to a leave-one-recording-out protocol
-  so the aggregation penalty is selected without looking at the same speech
-  rows used for reporting.
+- Extend stable-prefix and score-level subband consistency to a
+  leave-one-recording-out protocol so selector thresholds are chosen without
+  looking at the same speech rows used for reporting.
+- Inspect `results/independent_pigs_audit_strict_v3/best_incremental_window_diagnostics.json`
+  to identify why `+0.8m #17` and `+0.0m #22` remain biased after adaptive
+  window selection.
 - Improve the consensus estimator using subband agreement rather than the
   current margin/PSR-like weight.
-- Inspect `results/independent_pigs_audit_strict_v2/best_window_diagnostics.json`
+- Inspect `results/independent_pigs_audit_strict_v3/best_window_diagnostics.json`
   to identify which subbands create the remaining holdout false peaks.
 - Try per-subband reliability learning from chirp only: weight subbands by
   chirp stability, then freeze weights for speech.
