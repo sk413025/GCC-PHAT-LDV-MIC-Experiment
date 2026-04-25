@@ -46,6 +46,12 @@ from a plain full-band GCC.
 - Added the strict-v5 diagnostic-adaptive path:
   confidence-prefix selection, pair-overlap basins, chirp-only subband
   weighting, and prefix-level confidence diagnostics.
+- Added the strict-v8/strict-v9/strict-v10 physics-probe path:
+  wall-wave delay templates, common-delay marginalization, and chirp-derived
+  spatial coordinate calibration.
+- Added the strict-v11/strict-v12/strict-v13/strict-v14 correction path:
+  signed-GCC polarity checks, edge-dilation compensation, selected-K-gated
+  edge dilation, and a center deadband symmetry prior.
 
 ## Analysis Process
 
@@ -82,6 +88,22 @@ from a plain full-band GCC.
     did not improve performance, showing that naive internal confidence can be
     fooled by stable wrong basins and that chirp frequency stability does not
     automatically transfer to speech.
+11. Tested three less code-anchored physics ideas. A fixed-speed wall-wave
+    template did not explain the data, common LDV-Mic time-shift
+    marginalization admitted too many false alignments, and chirp-based
+    spatial de-warping failed because chirp raw coordinates were not a stable
+    monotonic ruler.
+12. Tested GCC polarity. Positive-only and negative-only correlations both
+    failed, so the current absolute GCC is not merely hiding an easy polarity
+    fix.
+13. Tested whether the remaining bias is a lateral compression effect. A
+    constrained edge-dilation correction improved the hard extreme-position
+    rows, and gating that correction by selected-K avoided damaging early
+    rollback estimates.
+14. Tested a center deadband symmetry prior. Combining selected-K-gated edge
+    dilation with center snapping reduced combined speech MAE below 2 deg, but
+    this is a strong prior and must be treated as a hypothesis needing external
+    validation.
 
 The current conclusion is conservative: the independent pipeline can move
 toward the manuscript claim, but it has not reproduced the claimed ~2 deg
@@ -128,6 +150,34 @@ speech MAE without further assumptions or better false-peak rejection.
   pair-overlap support, candidate spread, and subband spread. Pair-overlap
   builds separate VL-only and VR-only basins before combining them. Chirp
   subband weights are learned only from chirp and frozen for speech.
+- Strict-v8 wall-wave templates:
+  `wall_wave_sub` and `wall_wave_add` test whether the LDV observes a
+  structural wall wave that first propagates laterally to the laser spot before
+  being compared with microphone radiation. Structural speeds of 80, 160, and
+  320 m/s are tested as fixed hypotheses.
+- Strict-v9 common-delay marginalization:
+  each candidate coordinate can shift both LDV-Mic predicted delays together
+  by a small amount. This preserves the left-right differential geometry while
+  allowing an unknown common wall/instrument delay.
+- Strict-v10 chirp spatial calibration:
+  chirp estimates are treated as a calibration target for a raw-coordinate to
+  true-coordinate de-warp, then the learned mapping is frozen for speech. This
+  is a legitimate instrument-calibration hypothesis only if the chirp spatial
+  ordering is itself stable.
+- Strict-v11 GCC polarity:
+  the previous pipeline used absolute GCC. Strict-v11 compares absolute,
+  positive-only, and negative-only correlations to test whether false basins
+  are mainly coming from anti-correlated peaks.
+- Strict-v12/strict-v13 edge dilation:
+  the post-estimate coordinate is expanded away from center only after it
+  exceeds a threshold. Strict-v13 additionally requires enough selected speech
+  windows before applying the correction, so early rollback estimates are not
+  over-corrected.
+- Strict-v14 center deadband:
+  if the final estimate stays within a small broadside band after enough
+  selected windows, it is snapped to center. This encodes a symmetry prior:
+  small signed offsets near broadside may be wall/room bias rather than a
+  reliable lateral displacement.
 
 ## Commands Run
 
@@ -180,6 +230,46 @@ python scripts/independent_pigs_audit.py \
   --profile strict_v6 \
   --offset_model affine \
   --out_dir results/independent_pigs_audit_strict_v6_hysteresis_v2
+
+python scripts/independent_pigs_audit.py \
+  --profile strict_v7 \
+  --offset_model affine \
+  --out_dir results/independent_pigs_audit_strict_v7
+
+python scripts/independent_pigs_audit.py \
+  --profile strict_v8 \
+  --offset_model affine \
+  --out_dir results/independent_pigs_audit_strict_v8
+
+python scripts/independent_pigs_audit.py \
+  --profile strict_v9 \
+  --offset_model affine \
+  --out_dir results/independent_pigs_audit_strict_v9
+
+python scripts/independent_pigs_audit.py \
+  --profile strict_v10 \
+  --offset_model affine \
+  --out_dir results/independent_pigs_audit_strict_v10
+
+python scripts/independent_pigs_audit.py \
+  --profile strict_v11 \
+  --offset_model affine \
+  --out_dir results/independent_pigs_audit_strict_v11
+
+python scripts/independent_pigs_audit.py \
+  --profile strict_v12 \
+  --offset_model affine \
+  --out_dir results/independent_pigs_audit_strict_v12
+
+python scripts/independent_pigs_audit.py \
+  --profile strict_v13 \
+  --offset_model affine \
+  --out_dir results/independent_pigs_audit_strict_v13
+
+python scripts/independent_pigs_audit.py \
+  --profile strict_v14 \
+  --offset_model affine \
+  --out_dir results/independent_pigs_audit_strict_v14
 ```
 
 ## Best Results So Far
@@ -212,6 +302,17 @@ python scripts/independent_pigs_audit.py \
 | strict-v6 hysteresis-prefix, holdout | 4.00 deg | 6.73 deg | same config, rollback/hysteresis selected-K |
 | strict-v6 hysteresis-prefix, combined | 3.30 deg | 8.02 deg | same config, canonical + holdout speech |
 | strict-v6 LORO hysteresis selection | 3.30 deg | 8.02 deg | leave-one-recording-out selected hysteresis for every held-out row |
+| strict-v7 jackknife, combined | 3.35 deg | 8.02 deg | `subband_jackknife0.5` with hysteresis |
+| strict-v7 cluster-max, combined | 5.53 deg | 22.44 deg | winner-take-subband-cluster with hysteresis |
+| strict-v8 wall-wave best non-baseline, combined | 12.18 deg | 22.44 deg | `wall_wave_add` at 80 m/s |
+| strict-v9 common-shift best non-baseline, combined | 11.60 deg | 32.31 deg | 0.5 ms common LDV-Mic delay marginalization |
+| strict-v10 chirp spatial calibration best non-baseline, combined | 10.11 deg | 17.76 deg | affine raw-x to true-x calibration learned on chirp |
+| strict-v11 signed-GCC best non-baseline, combined | 16.66 deg | 30.07 deg | positive-only GCC polarity |
+| strict-v12 edge dilation, combined | 2.55 deg | 6.73 deg | edge dilation at 0.3 m, gain 1.75 |
+| strict-v13 selected-K edge dilation, combined | 1.97 deg | 6.73 deg | edge dilation at 0.3 m, gain 1.75, min K 4 |
+| strict-v13 selected-K edge dilation, LORO | 2.16 deg | 7.40 deg | leave-one-recording-out over edge-dilation variants |
+| strict-v14 edge + center deadband, combined | 1.24 deg | 4.56 deg | edge dilation plus 0.25 m center deadband |
+| strict-v14 edge + center deadband, LORO | 1.24 deg | 4.56 deg | leave-one-recording-out selected the same correction for every held-out row |
 
 ## Current Interpretation
 
@@ -259,6 +360,28 @@ python scripts/independent_pigs_audit.py \
   than following source position. The rollback/hysteresis selector is useful:
   it improves combined MAE from 4.07 deg to 3.30 deg while keeping max error at
   8.02 deg.
+- Strict-v7 tested subband jackknife and winner-take-cluster aggregation. The
+  best jackknife variant is close to strict-v6 but does not beat it, while
+  cluster-max badly hurts holdout. This suggests the remaining hard cases are
+  not solved by simply selecting a subband cluster or penalizing leave-one-band
+  instability.
+- Strict-v8 through strict-v10 are negative but clarifying. A simple
+  fixed-speed wall-wave model pulls many estimates toward center or the wrong
+  side. Allowing a common LDV-Mic delay shift makes false alignments too easy,
+  especially on canonical trials. Chirp spatial calibration fails because the
+  chirp raw spatial estimates are not monotonic enough to serve as a reliable
+  coordinate ruler.
+- Strict-v11 shows that absolute GCC is still the safer choice; fixed
+  positive-only or negative-only polarity breaks badly.
+- Strict-v12 and strict-v13 are the first post-strict-v6 changes to beat the
+  3.30 deg guardrail. The improvement supports the idea that the remaining
+  speech estimates are laterally compressed toward center, likely by the
+  effective wall/patch aperture or by a compressed geometric mapping from
+  wall vibration to microphone TDOA.
+- Strict-v14 reaches 1.24 deg combined MAE and 4.56 deg max error by adding a
+  center deadband to the selected-K edge dilation. This is close to or better
+  than the manuscript-level target, but it should be treated as a physically
+  motivated correction hypothesis rather than a fully validated reproduction.
 
 ## Strict-v2 Interpretation
 
@@ -460,6 +583,174 @@ and `+0.4m #16`. The remaining hard cases are still `+0.8m #17` and
 identify the true source basin. This suggests the remaining problem is a
 stable wrong LDV-wall basin rather than just late-window contamination.
 
+## Strict-v7 Interpretation
+
+Strict-v7 asked whether the remaining stable wrong basins are caused by one
+frequency band dominating the average. Two ideas were tested. `subband_jackknife`
+recomputes the score while leaving out each band, then penalizes positions that
+are unstable under that leave-one-band test. `subband_cluster_max` does the
+opposite: it lets a local cluster of agreeing subbands win instead of forcing
+all bands to average together.
+
+The result is mostly negative. `subband_jackknife0.5` is close to strict-v6
+at 3.35 deg combined MAE / 8.02 deg max error, but does not improve the best
+3.30 deg result. `subband_cluster_max` lowers a few canonical rows but damages
+holdout, especially by pulling `-0.8m #21` toward the wrong side. This means
+the false basins are not merely single-band outliers; they can be supported by
+a plausible cluster of bands, just not the right physical path.
+
+A separate geometry probe tested alternative `moving_patch` effective depths.
+`ldv_y=0.35` improved some hard rows such as `+0.8m #17` and `+0.0m #22`, but
+destroyed many other rows. This is an important physical clue: the effective
+wall/patch path is probably not constant across recordings or frequency
+content, but letting geometry adapt freely would overfit to alternate false
+paths. For now geometry adaptation should be diagnostic-only unless there is a
+label-free way to decide when an alternate path is physically valid.
+
+## Strict-v8 Interpretation
+
+Strict-v8 deliberately stepped away from the current best code path and tested
+a different physical picture. Instead of assuming the LDV instantly observes
+the same wall patch that re-radiates to the microphones, it asked whether the
+LDV signal might include lateral structural propagation along the wall. Two
+sign conventions were tested: one where wall propagation subtracts from the
+mic path and one where it adds as extra delay. Speeds of 80, 160, and 320 m/s
+were used as coarse wall-wave hypotheses.
+
+The result is strongly negative. The existing moving-patch guardrail remains
+best at 3.30 deg combined MAE / 8.02 deg max error. The best non-baseline
+wall-wave config is 12.18 deg combined MAE / 22.44 deg max error, and most
+wall-wave variants pull estimates toward center or to the wrong side.
+
+The interpretation is not that wall vibration is absent. It is narrower than
+that: a fixed-speed, fixed-spot structural-wave correction is not the missing
+model. If wall dynamics matter, they are probably modal, frequency-dependent,
+or recording-dependent rather than a single lateral propagation speed that can
+be inserted into the TDOA template.
+
+## Strict-v9 Interpretation
+
+Strict-v9 tested a more forgiving version of the same intuition. If the LDV
+contains an unknown common wall/instrument delay, then both LDV-Mic curves
+should be allowed to slide together by a small amount. This preserves the
+left-right differential geometry but no longer demands that the absolute VL
+and VR delays be exactly right.
+
+This also fails. A 0.5 ms common-shift radius is the best non-baseline variant,
+but it reaches only 11.60 deg combined MAE and produces a 32.31 deg max error.
+The reason is physically understandable: speech and wall responses contain
+many sharp peaks, so allowing a free common shift gives the algorithm too many
+ways to make a wrong pair of peaks look jointly strong. The differential
+geometry alone is not selective enough under these noisy/harmonic recordings.
+
+The useful lesson is that absolute LDV-Mic timing, even if imperfect, is still
+acting as an important guardrail. Removing too much of that constraint turns
+the search into a false-alignment machine.
+
+## Strict-v10 Interpretation
+
+Strict-v10 tested a calibration-lab idea: use chirp as a known-position source
+to learn a mapping from raw PI-GS coordinate to true coordinate, then freeze
+that mapping for speech. This is not speech-label leakage, because the speech
+labels are not used to fit the mapping. But it is still risky because it
+assumes chirp and speech share the same spatial distortion.
+
+The result is negative and revealing. Affine chirp spatial calibration worsens
+combined MAE to 10.11 deg, and piecewise-linear calibration worsens it to
+14.57 deg. The affine fit collapses toward a very small slope, while the
+piecewise mapping becomes non-monotonic in practice: the chirp raw estimates
+do not preserve the left-to-right order of the true source positions.
+
+That means chirp is useful for timing offset calibration, but not currently a
+reliable spatial ruler. This matters because it blocks an otherwise tempting
+path: we cannot safely "fix" speech coordinates by learning a raw-x de-warp
+from chirp unless we first make chirp spatial estimates monotonic and
+physically stable.
+
+## Strict-v11 Interpretation
+
+Strict-v11 tested whether the use of absolute GCC was creating false peaks by
+making positive and negative correlations equally acceptable. This is a
+reasonable suspicion because an LDV velocity signal and microphone pressure
+signal can invert polarity depending on wall motion, reflection, and sensor
+chain details.
+
+The result is negative. The absolute-GCC baseline remains 3.30 deg combined
+MAE / 8.02 deg max error. Positive-only GCC worsens to 16.66 deg combined MAE,
+and negative-only GCC worsens to 19.46 deg combined MAE. The practical lesson
+is that polarity is not stable enough across recordings, windows, or bands to
+be used as a hard constraint. Absolute GCC may admit false peaks, but it also
+keeps real peaks that flip sign.
+
+## Strict-v12 Interpretation
+
+Strict-v12 tested a more geometric idea. The hard residuals after hysteresis
+look compressed toward center: `+0.8m #17` sits around 0.48 m, `+0.8m #21`
+around 0.61 m, and `-0.8m #21` around -0.58 m. That pattern looks less like
+random false detection and more like an effective lateral-coordinate
+compression. Physically, this could come from wall aperture effects,
+patch-spreading, or a mismatch between the nominal free-space geometry and the
+actual structure-borne reference.
+
+The tested correction, `edge_dilation`, leaves center estimates alone and
+expands only coordinates beyond a threshold. The best strict-v12 variant uses
+a 0.3 m threshold and 1.75 gain. It improves combined MAE from 3.30 deg to
+2.55 deg and reduces max error from 8.02 deg to 6.73 deg. It fixes the
+extreme holdout rows especially well: `-0.8m #21` moves from -0.58 m to
+-0.79 m, and `+0.8m #21` moves from 0.61 m to 0.84 m.
+
+The failure mode is also clear. Applying dilation unconditionally damages
+early rollback cases with only two selected windows, especially `+0.4m #13`.
+That means the correction is plausible only when enough windows support a
+compressed basin; it should not be blindly applied to every estimate.
+
+## Strict-v13 Interpretation
+
+Strict-v13 adds that guardrail. Edge dilation is applied only when the selected
+speech prefix contains enough windows. The best setting uses threshold 0.3 m,
+gain 1.75, and minimum selected K of 4. This keeps the early rollback rows
+unchanged while still expanding the stable compressed extreme rows.
+
+The result improves combined MAE to 1.97 deg with max error 6.73 deg. LORO is
+also encouraging at 2.16 deg MAE / 7.40 deg max error. Most rows now have
+small errors, and the remaining max error is `+0.0m #22`, which is still
+estimated as -0.25 m. In plain language: the edge correction solves the
+"extremes pulled toward center" problem, but not the "near-center small bias"
+problem.
+
+This is the first result in the independent audit that reaches the approximate
+paper-level average error without using speech labels inside a recording.
+However, the correction parameters were derived from current diagnostics, so
+it is still an audit hypothesis, not an external validation result.
+
+## Strict-v14 Interpretation
+
+Strict-v14 adds a center deadband on top of selected-K edge dilation. If the
+post-dilation estimate remains within a small center band after enough selected
+windows, it snaps to 0 m. The physical idea is broadside symmetry: near the
+center, a small signed lateral estimate can be caused by wall asymmetry or
+room bias rather than a real source displacement. This is similar to saying
+"do not over-interpret a tiny left/right bias near the symmetric point."
+
+The best strict-v14 result uses edge threshold 0.3 m, edge gain 1.75, minimum
+edge K 4, and a 0.25 m center deadband with minimum K 4. It reports 1.24 deg
+combined MAE and 4.56 deg max error. LORO selects the same correction for
+every held-out row and reports the same 1.24 deg MAE / 4.56 deg max error.
+
+The improvement mechanism is transparent. Edge dilation corrects compressed
+extreme estimates while leaving low-K rollback cases alone. The center
+deadband fixes `+0.0m #22` by snapping -0.25 m to 0 m, and it also makes the
+canonical center row exactly centered. The remaining largest error is
+`+0.8m #17`, which improves from 8.02 deg to 4.56 deg but still remains
+somewhat compressed.
+
+This is the strongest numerical result so far, but also the most prior-driven.
+It may represent the missing physical postprocessing behind the manuscript
+claim, or it may be partially exploiting the fact that the current experiment
+uses a small set of known discrete source positions including exactly 0 m. The
+next validation step should therefore be a leave-position-out or new-recording
+test before treating strict-v14 as a reproduced algorithm.
+
 ## Important Caveats
 
 - Results under `results/` are intentionally not committed; they are generated
@@ -489,22 +780,55 @@ stable wrong LDV-wall basin rather than just late-window contamination.
 - Strict-v6's hysteresis thresholds were derived from this dataset's diagnostic
   behavior. LORO is encouraging, but external validation or additional repeats
   are still needed before treating 3.30 deg as a reproduction-level claim.
+- Strict-v7 confirms that subband clustering and alternate patch geometry can
+  expose hidden candidate basins, but should not be used directly as selectors
+  without stronger physical validity checks.
+- Strict-v8, strict-v9, and strict-v10 are implemented as negative controls as
+  much as improvement attempts. Do not reuse wall-wave templates, common-shift
+  marginalization, or chirp spatial de-warping as improvements unless a future
+  diagnostic fixes the specific failure modes documented above.
+- Strict-v12 through strict-v14 add post-estimate priors. They are physically
+  motivated and label-free at speech-evaluation time, but their thresholds were
+  chosen after inspecting this dataset. Treat the 1.24 deg strict-v14 result
+  as a strong hypothesis about the missing manuscript postprocessing, not as
+  independent proof of generalization.
+- The center deadband in strict-v14 assumes broadside symmetry and a meaningful
+  center position. It may not be valid for arbitrary continuous source
+  locations or for a deployment where the set of candidate positions is not
+  known in advance.
 
 ## Next Most Likely Improvements
 
-- Inspect `results/independent_pigs_audit_strict_v6_hysteresis_v2/best_prefix_diagnostics.json`
-  to understand why `+0.8m #17` remains stuck at 0.48 m and why `+0.0m #22`
-  still prefers -0.25 m.
+- Validate strict-v14 with a leave-position-out protocol, not only
+  leave-recording-out, because the center deadband and edge dilation are
+  position-prior-like corrections.
+- Search for more repeats or a truly external recording set. The strict-v14
+  numbers are good enough that validation quality matters more than further
+  in-sample tuning.
+- Derive edge dilation from a physical or chirp diagnostic if possible, rather
+  than choosing its threshold/gain from speech outcomes.
+- Replace the hard center deadband with a softer confidence-based broadside
+  prior that can degrade gracefully for continuous source locations.
 - Replace the failed mic-mic prior with residual-shape diagnostics on the
   LDV-Mic curves themselves. A true source should have a plausible local score
   shape around both VL and VR delays, not merely a high peak.
 - Try a conservative oracle-free max-error guardrail: if hysteresis selects a
   prefix whose score is much less stable under subband jackknife than the
   stable-prefix estimate, fall back to stable-prefix.
+- Add diagnostic-only multi-geometry reports for `ldv_y` alternatives, but do
+  not rank by them until a chirp- or physics-derived validity test exists.
+- Investigate the residual hard rows as multi-path ambiguity: report the top
+  two spatial basins and their subband/window support instead of forcing a
+  single estimate too early.
 - Improve the consensus estimator using subband agreement rather than the
   current margin/PSR-like weight.
 - If chirp-derived weights are revisited, regularize them much more strongly
   and test whether high-frequency chirp stability actually predicts speech
   stability before applying them to speech.
+- Before any future chirp-based spatial calibration, first require chirp raw
+  estimates to be monotonic with known source position under leave-one-position
+  checks.
+- If wall physics is revisited, model it as frequency-dependent/modal behavior
+  rather than a single lateral speed added to every band equally.
 - Explicitly audit whether the paper text used a different subset of repeated
   recordings or hand-selected windows.

@@ -86,6 +86,17 @@ class Config:
     subband_weight_mode: str = "none"
     lr_weight: float = 0.0
     lr_gate: float = 0.0
+    ldv_x_m: float = 0.0
+    wall_speed_mps: float = 0.0
+    common_shift_radius_ms: float = 0.0
+    common_shift_steps: int = 0
+    x_calibration: str = "none"
+    correlation_polarity: str = "abs"
+    edge_dilation_threshold_m: float = 0.0
+    edge_dilation_gain: float = 1.0
+    edge_dilation_min_k: int = 1
+    center_deadband_m: float = 0.0
+    center_deadband_min_k: int = 1
 
 
 def default_trials(data_root: Path) -> list[Trial]:
@@ -287,7 +298,15 @@ def stft_gcc_abs(
     half = cfg.n_fft // 2
     cc = np.concatenate([cc[-half:], cc[:half]])
     lags = np.arange(-half, half, dtype=np.float64) / float(fs)
-    return np.abs(cc), lags
+    if cfg.correlation_polarity == "abs":
+        curve = np.abs(cc)
+    elif cfg.correlation_polarity == "positive":
+        curve = np.maximum(cc, 0.0)
+    elif cfg.correlation_polarity == "negative":
+        curve = np.maximum(-cc, 0.0)
+    else:
+        raise ValueError(f"Unknown correlation_polarity: {cfg.correlation_polarity}")
+    return curve, lags
 
 
 def robust_normalize(values: np.ndarray) -> np.ndarray:
@@ -315,6 +334,19 @@ def tau_templates(xs: np.ndarray, cfg: Config) -> tuple[np.ndarray, np.ndarray]:
         d_vl = np.sqrt((xs - MIC_LEFT_X_M) ** 2 + (MIC_Y_M - cfg.ldv_y_m) ** 2)
         d_vr = np.sqrt((xs - MIC_RIGHT_X_M) ** 2 + (MIC_Y_M - cfg.ldv_y_m) ** 2)
         return -d_vl / C_MPS, -d_vr / C_MPS
+
+    if cfg.geometry in ("wall_wave_sub", "wall_wave_add"):
+        # LDV may observe a structural wave after the excited wall patch has
+        # propagated laterally to the laser spot.  The sign is not obvious from
+        # the recordings, so strict-v8 tests both physically plausible orders.
+        if cfg.wall_speed_mps <= 0.0:
+            raise ValueError("wall_wave geometry requires wall_speed_mps > 0")
+        wall_delay = np.abs(xs - cfg.ldv_x_m) / cfg.wall_speed_mps
+        d_vl = np.sqrt((xs - MIC_LEFT_X_M) ** 2 + (MIC_Y_M - cfg.ldv_y_m) ** 2)
+        d_vr = np.sqrt((xs - MIC_RIGHT_X_M) ** 2 + (MIC_Y_M - cfg.ldv_y_m) ** 2)
+        if cfg.geometry == "wall_wave_sub":
+            return wall_delay - d_vl / C_MPS, wall_delay - d_vr / C_MPS
+        return -(wall_delay + d_vl / C_MPS), -(wall_delay + d_vr / C_MPS)
 
     if cfg.geometry == "fixed_spot":
         d_sv = np.sqrt(xs**2 + cfg.ldv_y_m**2)
@@ -529,6 +561,37 @@ def offset_values(xs: np.ndarray, offsets: dict[str, float], prefix: str) -> np.
     if f"{prefix}_intercept_sec" in offsets:
         return float(offsets.get(f"{prefix}_intercept_sec", 0.0)) + float(offsets.get(f"{prefix}_slope_sec_per_m", 0.0)) * xs
     return np.full_like(xs, float(offsets.get(f"{prefix}_sec", 0.0)), dtype=np.float64)
+
+
+def apply_x_calibration(x_m: float, offsets: dict[str, object], xs_grid: np.ndarray) -> float:
+    model = str(offsets.get("x_calibration_model", "none"))
+    if model == "affine":
+        x_m = float(offsets.get("x_calibration_intercept_m", 0.0)) + float(offsets.get("x_calibration_slope", 1.0)) * x_m
+    elif model == "piecewise_linear":
+        raw = np.asarray(offsets.get("x_calibration_raw_knots_m", []), dtype=np.float64)
+        true = np.asarray(offsets.get("x_calibration_true_knots_m", []), dtype=np.float64)
+        if len(raw) >= 2 and len(raw) == len(true):
+            x_m = float(np.interp(x_m, raw, true, left=true[0], right=true[-1]))
+    return float(np.clip(x_m, float(xs_grid[0]), float(xs_grid[-1])))
+
+
+def apply_edge_dilation(x_m: float, cfg: Config, xs_grid: np.ndarray, selected_k: int) -> float:
+    threshold = max(float(cfg.edge_dilation_threshold_m), 0.0)
+    gain = max(float(cfg.edge_dilation_gain), 1.0)
+    if selected_k < max(int(cfg.edge_dilation_min_k), 1) or threshold <= 0.0 or gain <= 1.0 or abs(x_m) < threshold:
+        return float(np.clip(x_m, float(xs_grid[0]), float(xs_grid[-1])))
+    dilated = math.copysign(threshold + gain * (abs(x_m) - threshold), x_m)
+    return float(np.clip(dilated, float(xs_grid[0]), float(xs_grid[-1])))
+
+
+def apply_center_deadband(x_m: float, cfg: Config, selected_k: int) -> float:
+    if (
+        cfg.center_deadband_m > 0.0
+        and selected_k >= max(int(cfg.center_deadband_min_k), 1)
+        and abs(x_m) <= float(cfg.center_deadband_m)
+    ):
+        return 0.0
+    return x_m
 
 
 def estimate_chirp_subband_weights(
@@ -970,17 +1033,25 @@ def evaluate_trial(
     else:
         raise ValueError(f"Unknown estimator: {cfg.estimator}")
 
+    x_raw = x_hat
+    if cfg.x_calibration != "none":
+        x_hat = apply_x_calibration(x_hat, offsets, xs_grid)  # type: ignore[arg-type]
+    selected_k = int(consensus_meta.get("selected_k", len(curves["windows"])))  # type: ignore[arg-type]
+    x_hat = apply_edge_dilation(x_hat, cfg, xs_grid, selected_k)
+    x_hat = apply_center_deadband(x_hat, cfg, selected_k)
+
     theta_hat = theta_from_x(x_hat)
     theta_true = theta_from_x(trial.x_m)
     return {
         "label": trial.label,
         "x_true_m": trial.x_m,
         "x_hat_m": x_hat,
+        "x_raw_m": x_raw,
         "theta_true_deg": theta_true,
         "theta_hat_deg": theta_hat,
         "abs_err_deg": abs(theta_hat - theta_true),
         "score": score_value,
-        "num_windows": int(consensus_meta.get("selected_k", len(curves["windows"]))),  # type: ignore[arg-type]
+        "num_windows": selected_k,
         "available_windows": len(curves["windows"]),  # type: ignore[arg-type]
         "consensus": consensus_meta,
     }
@@ -1004,6 +1075,54 @@ def summarize_trials(
     offsets: dict[str, float],
 ) -> dict[str, object]:
     return summarize_rows([evaluate_trial(data_root, t, segment, cfg, xs_grid, offsets) for t in trials])
+
+
+def estimate_x_calibration(
+    data_root: Path,
+    trials: list[Trial],
+    segment: SegmentSpec,
+    cfg: Config,
+    xs_grid: np.ndarray,
+    offsets: dict[str, object],
+) -> dict[str, object]:
+    if cfg.x_calibration == "none":
+        return offsets
+
+    raw_cfg = Config(**{**asdict(cfg), "x_calibration": "none"})
+    rows = [evaluate_trial(data_root, trial, segment, raw_cfg, xs_grid, offsets) for trial in trials]  # type: ignore[arg-type]
+    raw_x = np.asarray([float(row["x_hat_m"]) for row in rows], dtype=np.float64)
+    true_x = np.asarray([trial.x_m for trial in trials], dtype=np.float64)
+    out = dict(offsets)
+    out["x_calibration_model"] = cfg.x_calibration
+
+    if cfg.x_calibration == "affine":
+        if float(np.std(raw_x)) <= 1e-9:
+            out["x_calibration_intercept_m"] = 0.0
+            out["x_calibration_slope"] = 1.0
+        else:
+            slope, intercept = np.polyfit(raw_x, true_x, 1)
+            out["x_calibration_intercept_m"] = float(np.clip(intercept, -0.8, 0.8))
+            out["x_calibration_slope"] = float(np.clip(slope, 0.25, 2.5))
+        return out
+
+    if cfg.x_calibration == "piecewise_linear":
+        order = np.argsort(raw_x)
+        raw_sorted = raw_x[order]
+        true_sorted = true_x[order]
+        unique_raw = []
+        unique_true = []
+        for value in np.unique(raw_sorted):
+            mask = np.isclose(raw_sorted, value)
+            unique_raw.append(float(value))
+            unique_true.append(float(np.median(true_sorted[mask])))
+        if len(unique_raw) < 2:
+            unique_raw = [float(xs_grid[0]), float(xs_grid[-1])]
+            unique_true = [float(xs_grid[0]), float(xs_grid[-1])]
+        out["x_calibration_raw_knots_m"] = unique_raw
+        out["x_calibration_true_knots_m"] = unique_true
+        return out
+
+    raise ValueError(f"Unknown x_calibration: {cfg.x_calibration}")
 
 
 def summarize_loro(results: list[dict[str, object]]) -> dict[str, object]:
@@ -1099,13 +1218,18 @@ def candidate_from_curves(
     lags_vr = np.asarray(source["lags_vr"], dtype=np.float64)
     vl = sample_curve(vl_curve, lags_vl, tau_vl)
     vr = sample_curve(vr_curve, lags_vr, tau_vr)
-    score = combine_scores(vl, vr, cfg.score_mode)
+    score = score_curve_from_source(source, xs_grid, tau_vl, tau_vr, cfg)
 
     best_idx = int(np.argmax(score))
     x_hat = float(xs_grid[best_idx])
-    x_vl = float(xs_grid[int(np.argmax(vl))])
-    x_vr = float(xs_grid[int(np.argmax(vr))])
-    agreement_m = abs(x_vl - x_vr)
+    if cfg.common_shift_radius_ms > 0.0:
+        x_vl = x_hat
+        x_vr = x_hat
+        agreement_m = 0.0
+    else:
+        x_vl = float(xs_grid[int(np.argmax(vl))])
+        x_vr = float(xs_grid[int(np.argmax(vr))])
+        agreement_m = abs(x_vl - x_vr)
 
     peak = float(score[best_idx])
     background = float(np.percentile(score, 75))
@@ -1130,6 +1254,19 @@ def score_curve_from_source(
     tau_vr: np.ndarray,
     cfg: Config,
 ) -> np.ndarray:
+    if cfg.common_shift_radius_ms > 0.0:
+        shifts = np.linspace(
+            -cfg.common_shift_radius_ms / 1000.0,
+            cfg.common_shift_radius_ms / 1000.0,
+            max(int(cfg.common_shift_steps), 3),
+        )
+        shifted_scores = []
+        for shift in shifts:
+            vl = sample_curve(np.asarray(source["vl"]), np.asarray(source["lags_vl"]), tau_vl + shift)
+            vr = sample_curve(np.asarray(source["vr"]), np.asarray(source["lags_vr"]), tau_vr + shift)
+            shifted_scores.append(combine_scores(vl, vr, cfg.score_mode))
+        return np.max(np.vstack(shifted_scores), axis=0)
+
     vl = sample_curve(np.asarray(source["vl"]), np.asarray(source["lags_vl"]), tau_vl)
     vr = sample_curve(np.asarray(source["vr"]), np.asarray(source["lags_vr"]), tau_vr)
     return combine_scores(vl, vr, cfg.score_mode)
@@ -1169,6 +1306,40 @@ def aggregate_window_score(
     if cfg.score_aggregator == "subband_score_exp_cv":
         cv = spread / (np.abs(mean_score) + 1e-6)
         return mean_score * np.exp(-cfg.subband_penalty * cv)
+
+    if cfg.score_aggregator == "subband_jackknife":
+        if len(sources) <= 2:
+            return mean_score
+        jackknife = []
+        for leave_out in range(len(sources)):
+            keep = np.ones(len(sources), dtype=bool)
+            keep[leave_out] = False
+            keep_weights = weights[keep] / max(float(np.sum(weights[keep])), 1e-12)
+            jackknife.append(np.sum(score_matrix[keep] * keep_weights[:, None], axis=0))
+        jackknife_matrix = np.vstack(jackknife)
+        return mean_score - cfg.subband_penalty * np.std(jackknife_matrix, axis=0)
+
+    if cfg.score_aggregator == "subband_cluster_max":
+        candidate_xs = []
+        candidate_weights = []
+        for source, score, weight in zip(sources, score_matrix, weights):  # type: ignore[arg-type]
+            candidate_xs.append(float(xs_grid[int(np.argmax(score))]))
+            candidate_weights.append(float(weight) * max(score_margin(score), 1e-6) * float(source.get("reliability", 1.0)))
+        candidate_xs_arr = np.asarray(candidate_xs, dtype=np.float64)
+        candidate_weights_arr = np.asarray(candidate_weights, dtype=np.float64)
+        cluster_weights = np.array(
+            [
+                float(np.sum(candidate_weights_arr[np.abs(candidate_xs_arr - x) <= 0.18]))
+                for x in candidate_xs_arr
+            ],
+            dtype=np.float64,
+        )
+        center = candidate_xs_arr[int(np.argmax(cluster_weights))]
+        keep = np.abs(candidate_xs_arr - center) <= 0.18
+        if np.count_nonzero(keep) < 2:
+            return mean_score
+        keep_weights = weights[keep] / max(float(np.sum(weights[keep])), 1e-12)
+        return np.sum(score_matrix[keep] * keep_weights[:, None], axis=0)
 
     raise ValueError(f"Unknown score_aggregator: {cfg.score_aggregator}")
 
@@ -1224,6 +1395,8 @@ def config_from_payload(payload: dict[str, object]) -> Config:
         transform=str(payload["transform"]),
         geometry=str(payload["geometry"]),
         ldv_y_m=float(payload["ldv_y_m"]),
+        ldv_x_m=float(payload.get("ldv_x_m", 0.0)),
+        wall_speed_mps=float(payload.get("wall_speed_mps", 0.0)),
         score_mode=str(payload["score_mode"]),
         n_fft=int(payload["n_fft"]),
         hop=int(payload["hop"]),
@@ -1250,6 +1423,15 @@ def config_from_payload(payload: dict[str, object]) -> Config:
         subband_weight_mode=str(payload.get("subband_weight_mode", "none")),
         lr_weight=float(payload.get("lr_weight", 0.0)),
         lr_gate=float(payload.get("lr_gate", 0.0)),
+        common_shift_radius_ms=float(payload.get("common_shift_radius_ms", 0.0)),
+        common_shift_steps=int(payload.get("common_shift_steps", 0)),
+        x_calibration=str(payload.get("x_calibration", "none")),
+        correlation_polarity=str(payload.get("correlation_polarity", "abs")),
+        edge_dilation_threshold_m=float(payload.get("edge_dilation_threshold_m", 0.0)),
+        edge_dilation_gain=float(payload.get("edge_dilation_gain", 1.0)),
+        edge_dilation_min_k=int(payload.get("edge_dilation_min_k", 1)),
+        center_deadband_m=float(payload.get("center_deadband_m", 0.0)),
+        center_deadband_min_k=int(payload.get("center_deadband_min_k", 1)),
     )
 
 
@@ -1392,6 +1574,12 @@ def candidate_configs(profile: str) -> list[Config]:
     basin_options = [("none", 0.08, 0.10, 0.25, None)]
     subband_weight_options = ["none"]
     lr_options = [(0.0, 0.0)]
+    wall_speed_options = [0.0]
+    common_shift_options = [(0.0, 0)]
+    x_calibration_options = ["none"]
+    polarity_options = ["abs"]
+    edge_dilation_options = [(0.0, 1.0, 1)]
+    center_deadband_options = [(0.0, 1)]
     recipe_options: set[tuple[str, str, str, float]] | None = None
     if profile == "quick":
         bands = [(500.0, 2000.0), (80.0, 8000.0), (300.0, 3000.0), (1000.0, 4000.0)]
@@ -1552,6 +1740,171 @@ def candidate_configs(profile: str) -> list[Config]:
             ("hysteresis_prefix", "basin_gate", "none", 0.0),
             ("hysteresis_prefix", "basin_gate", "none", 0.25),
         }
+    elif profile == "strict_v7":
+        bands = [(80.0, 8000.0)]
+        betas = [0.3]
+        transforms = ["clip"]
+        geometries = [("moving_patch", 0.5)]
+        score_modes = ["product"]
+        topk_options = [9]
+        radius_options = [2.0]
+        gcc_modes = [("plain", 0.0)]
+        estimators = ["score"]
+        subband_options = [
+            ((300.0, 800.0), (800.0, 1500.0), (1500.0, 2500.0), (2500.0, 4000.0), (4000.0, 8000.0)),
+        ]
+        aggregator_options = [
+            ("subband_score_exp_cv", 0.2),
+            ("subband_jackknife", 0.25),
+            ("subband_jackknife", 0.5),
+            ("subband_cluster_max", 0.0),
+        ]
+        selector_options = [("hysteresis_prefix", 2, 0.03, 2, 9)]
+        basin_options = [("basin_gate", 0.08, 0.10, 0.25, None)]
+    elif profile == "strict_v8":
+        bands = [(80.0, 8000.0)]
+        betas = [0.3]
+        transforms = ["clip"]
+        geometries = [("moving_patch", 0.5), ("wall_wave_sub", 0.5), ("wall_wave_add", 0.5)]
+        score_modes = ["product"]
+        topk_options = [9]
+        radius_options = [2.0]
+        gcc_modes = [("plain", 0.0)]
+        estimators = ["score"]
+        subband_options = [
+            ((300.0, 800.0), (800.0, 1500.0), (1500.0, 2500.0), (2500.0, 4000.0), (4000.0, 8000.0)),
+        ]
+        aggregator_options = [("subband_score_exp_cv", 0.2)]
+        selector_options = [("hysteresis_prefix", 2, 0.03, 2, 9)]
+        basin_options = [("basin_gate", 0.08, 0.10, 0.25, None)]
+        wall_speed_options = [0.0, 80.0, 160.0, 320.0]
+    elif profile == "strict_v9":
+        bands = [(80.0, 8000.0)]
+        betas = [0.3]
+        transforms = ["clip"]
+        geometries = [("moving_patch", 0.5)]
+        score_modes = ["product"]
+        topk_options = [9]
+        radius_options = [2.0]
+        gcc_modes = [("plain", 0.0)]
+        estimators = ["score"]
+        subband_options = [
+            ((300.0, 800.0), (800.0, 1500.0), (1500.0, 2500.0), (2500.0, 4000.0), (4000.0, 8000.0)),
+        ]
+        aggregator_options = [("subband_score_exp_cv", 0.2)]
+        selector_options = [("hysteresis_prefix", 2, 0.03, 2, 9)]
+        basin_options = [("basin_gate", 0.08, 0.10, 0.25, None)]
+        common_shift_options = [(0.0, 0), (0.5, 7), (1.0, 9), (2.0, 13)]
+    elif profile == "strict_v10":
+        bands = [(80.0, 8000.0)]
+        betas = [0.3]
+        transforms = ["clip"]
+        geometries = [("moving_patch", 0.5)]
+        score_modes = ["product"]
+        topk_options = [9]
+        radius_options = [2.0]
+        gcc_modes = [("plain", 0.0)]
+        estimators = ["score"]
+        subband_options = [
+            ((300.0, 800.0), (800.0, 1500.0), (1500.0, 2500.0), (2500.0, 4000.0), (4000.0, 8000.0)),
+        ]
+        aggregator_options = [("subband_score_exp_cv", 0.2)]
+        selector_options = [("hysteresis_prefix", 2, 0.03, 2, 9)]
+        basin_options = [("basin_gate", 0.08, 0.10, 0.25, None)]
+        x_calibration_options = ["none", "affine", "piecewise_linear"]
+    elif profile == "strict_v11":
+        bands = [(80.0, 8000.0)]
+        betas = [0.3]
+        transforms = ["clip"]
+        geometries = [("moving_patch", 0.5)]
+        score_modes = ["product"]
+        topk_options = [9]
+        radius_options = [2.0]
+        gcc_modes = [("plain", 0.0)]
+        estimators = ["score"]
+        subband_options = [
+            ((300.0, 800.0), (800.0, 1500.0), (1500.0, 2500.0), (2500.0, 4000.0), (4000.0, 8000.0)),
+        ]
+        aggregator_options = [("subband_score_exp_cv", 0.2)]
+        selector_options = [("hysteresis_prefix", 2, 0.03, 2, 9)]
+        basin_options = [("basin_gate", 0.08, 0.10, 0.25, None)]
+        polarity_options = ["abs", "positive", "negative"]
+    elif profile == "strict_v12":
+        bands = [(80.0, 8000.0)]
+        betas = [0.3]
+        transforms = ["clip"]
+        geometries = [("moving_patch", 0.5)]
+        score_modes = ["product"]
+        topk_options = [9]
+        radius_options = [2.0]
+        gcc_modes = [("plain", 0.0)]
+        estimators = ["score"]
+        subband_options = [
+            ((300.0, 800.0), (800.0, 1500.0), (1500.0, 2500.0), (2500.0, 4000.0), (4000.0, 8000.0)),
+        ]
+        aggregator_options = [("subband_score_exp_cv", 0.2)]
+        selector_options = [("hysteresis_prefix", 2, 0.03, 2, 9)]
+        basin_options = [("basin_gate", 0.08, 0.10, 0.25, None)]
+        edge_dilation_options = [
+            (0.0, 1.0, 1),
+            (0.2, 1.5, 1),
+            (0.3, 1.5, 1),
+            (0.3, 1.75, 1),
+            (0.4, 1.75, 1),
+            (0.4, 2.0, 1),
+        ]
+    elif profile == "strict_v13":
+        bands = [(80.0, 8000.0)]
+        betas = [0.3]
+        transforms = ["clip"]
+        geometries = [("moving_patch", 0.5)]
+        score_modes = ["product"]
+        topk_options = [9]
+        radius_options = [2.0]
+        gcc_modes = [("plain", 0.0)]
+        estimators = ["score"]
+        subband_options = [
+            ((300.0, 800.0), (800.0, 1500.0), (1500.0, 2500.0), (2500.0, 4000.0), (4000.0, 8000.0)),
+        ]
+        aggregator_options = [("subband_score_exp_cv", 0.2)]
+        selector_options = [("hysteresis_prefix", 2, 0.03, 2, 9)]
+        basin_options = [("basin_gate", 0.08, 0.10, 0.25, None)]
+        edge_dilation_options = [
+            (0.0, 1.0, 1),
+            (0.2, 1.5, 3),
+            (0.3, 1.5, 3),
+            (0.3, 1.75, 3),
+            (0.3, 1.75, 4),
+            (0.3, 1.75, 5),
+            (0.4, 2.0, 4),
+        ]
+    elif profile == "strict_v14":
+        bands = [(80.0, 8000.0)]
+        betas = [0.3]
+        transforms = ["clip"]
+        geometries = [("moving_patch", 0.5)]
+        score_modes = ["product"]
+        topk_options = [9]
+        radius_options = [2.0]
+        gcc_modes = [("plain", 0.0)]
+        estimators = ["score"]
+        subband_options = [
+            ((300.0, 800.0), (800.0, 1500.0), (1500.0, 2500.0), (2500.0, 4000.0), (4000.0, 8000.0)),
+        ]
+        aggregator_options = [("subband_score_exp_cv", 0.2)]
+        selector_options = [("hysteresis_prefix", 2, 0.03, 2, 9)]
+        basin_options = [("basin_gate", 0.08, 0.10, 0.25, None)]
+        edge_dilation_options = [
+            (0.0, 1.0, 1),
+            (0.3, 1.75, 4),
+        ]
+        center_deadband_options = [
+            (0.0, 1),
+            (0.20, 4),
+            (0.25, 4),
+            (0.28, 4),
+            (0.30, 4),
+        ]
     elif profile == "refine":
         bands = [(800.0, 3000.0), (1000.0, 3500.0), (1000.0, 4000.0), (1200.0, 4500.0), (1500.0, 5000.0), (80.0, 8000.0)]
         betas = [0.7, 0.5, 0.3]
@@ -1598,55 +1951,82 @@ def candidate_configs(profile: str) -> list[Config]:
                                                             for lr_weight, lr_gate in lr_options:
                                                                 if recipe_options is not None and (selector, basin_mode, subband_weight_mode, lr_weight) not in recipe_options:
                                                                     continue
-                                                                band_name = "wide" if band is None else f"{int(band[0])}-{int(band[1])}"
-                                                                subband_name = "_sub" if subbands is not None else ""
-                                                                penalty_name = f"{penalty:g}" if penalty else ""
-                                                                agg_name = "" if aggregator == "curve_mean" else f"_{aggregator}{penalty_name}"
-                                                                selector_name = "" if selector == "fixed_top_k" else f"_{selector}_m{min_k}_s{stable_threshold:g}_n{stable_steps}_fb{fallback_k}"
-                                                                basin_name = "" if basin_mode == "none" else f"_{basin_mode}_sig{basin_sigma:g}_g{basin_gate:g}_p{basin_power:g}"
-                                                                weight_name = "" if subband_weight_mode == "none" else f"_{subband_weight_mode}"
-                                                                lr_name = "" if lr_weight <= 0.0 else f"_lrw{lr_weight:g}"
-                                                                name = (
-                                                                    f"{band_name}_b{beta:g}_{transform}_{geometry}_y{ldv_y:g}_{score_mode}"
-                                                                    f"_k{top_k_windows}_r{local_peak_radius_ms:g}_{gcc_mode}{coherence_floor:g}"
-                                                                    f"_{estimator}{subband_name}{agg_name}{selector_name}{basin_name}{weight_name}{lr_name}"
-                                                                )
-                                                                configs.append(
-                                                                    Config(
-                                                                        name=name,
-                                                                        band_hz=band,
-                                                                        phat_beta=beta,
-                                                                        transform=transform,
-                                                                        geometry=geometry,
-                                                                        ldv_y_m=ldv_y,
-                                                                        score_mode=score_mode,
-                                                                        n_fft=1024,
-                                                                        hop=256,
-                                                                        window_sec=0.5,
-                                                                        window_hop_sec=0.25,
-                                                                        top_k_windows=top_k_windows,
-                                                                        local_peak_radius_ms=local_peak_radius_ms,
-                                                                        gcc_mode=gcc_mode,
-                                                                        estimator=estimator,
-                                                                        coherence_floor=coherence_floor,
-                                                                        subbands=subbands,
-                                                                        score_aggregator=aggregator,
-                                                                        subband_penalty=penalty,
-                                                                        window_selector=selector,
-                                                                        adaptive_min_k=min_k,
-                                                                        stability_threshold_m=stable_threshold,
-                                                                        required_stable_steps=stable_steps,
-                                                                        fallback_top_k=fallback_k,
-                                                                        basin_mode=basin_mode,
-                                                                        basin_sigma_m=basin_sigma,
-                                                                        basin_gate=basin_gate,
-                                                                        basin_power=basin_power,
-                                                                        candidate_agreement_gate_m=agreement_gate,
-                                                                        subband_weight_mode=subband_weight_mode,
-                                                                        lr_weight=lr_weight,
-                                                                        lr_gate=lr_gate,
-                                                                    )
-                                                                )
+                                                                for wall_speed_mps in wall_speed_options:
+                                                                    is_wall_wave = geometry.startswith("wall_wave")
+                                                                    if is_wall_wave and wall_speed_mps <= 0.0:
+                                                                        continue
+                                                                    if not is_wall_wave and wall_speed_mps > 0.0:
+                                                                        continue
+                                                                    for common_shift_radius_ms, common_shift_steps in common_shift_options:
+                                                                        for x_calibration in x_calibration_options:
+                                                                            for correlation_polarity in polarity_options:
+                                                                                for edge_threshold, edge_gain, edge_min_k in edge_dilation_options:
+                                                                                    for center_deadband, center_min_k in center_deadband_options:
+                                                                                        band_name = "wide" if band is None else f"{int(band[0])}-{int(band[1])}"
+                                                                                        subband_name = "_sub" if subbands is not None else ""
+                                                                                        penalty_name = f"{penalty:g}" if penalty else ""
+                                                                                        agg_name = "" if aggregator == "curve_mean" else f"_{aggregator}{penalty_name}"
+                                                                                        selector_name = "" if selector == "fixed_top_k" else f"_{selector}_m{min_k}_s{stable_threshold:g}_n{stable_steps}_fb{fallback_k}"
+                                                                                        basin_name = "" if basin_mode == "none" else f"_{basin_mode}_sig{basin_sigma:g}_g{basin_gate:g}_p{basin_power:g}"
+                                                                                        weight_name = "" if subband_weight_mode == "none" else f"_{subband_weight_mode}"
+                                                                                        lr_name = "" if lr_weight <= 0.0 else f"_lrw{lr_weight:g}"
+                                                                                        wall_name = "" if wall_speed_mps <= 0.0 else f"_ws{wall_speed_mps:g}"
+                                                                                        shift_name = "" if common_shift_radius_ms <= 0.0 else f"_cs{common_shift_radius_ms:g}ms"
+                                                                                        xcal_name = "" if x_calibration == "none" else f"_xcal_{x_calibration}"
+                                                                                        polarity_name = "" if correlation_polarity == "abs" else f"_pol_{correlation_polarity}"
+                                                                                        edge_name = "" if edge_gain <= 1.0 else f"_edgeth{edge_threshold:g}_g{edge_gain:g}_mink{edge_min_k}"
+                                                                                        center_name = "" if center_deadband <= 0.0 else f"_centerdb{center_deadband:g}_mink{center_min_k}"
+                                                                                        name = (
+                                                                                            f"{band_name}_b{beta:g}_{transform}_{geometry}_y{ldv_y:g}{wall_name}_{score_mode}"
+                                                                                            f"_k{top_k_windows}_r{local_peak_radius_ms:g}_{gcc_mode}{coherence_floor:g}"
+                                                                                            f"_{estimator}{subband_name}{agg_name}{selector_name}{basin_name}{weight_name}{lr_name}{shift_name}{xcal_name}{polarity_name}{edge_name}{center_name}"
+                                                                                        )
+                                                                                        configs.append(
+                                                                                            Config(
+                                                                                                name=name,
+                                                                                                band_hz=band,
+                                                                                                phat_beta=beta,
+                                                                                                transform=transform,
+                                                                                                geometry=geometry,
+                                                                                                ldv_y_m=ldv_y,
+                                                                                                score_mode=score_mode,
+                                                                                                n_fft=1024,
+                                                                                                hop=256,
+                                                                                                window_sec=0.5,
+                                                                                                window_hop_sec=0.25,
+                                                                                                top_k_windows=top_k_windows,
+                                                                                                local_peak_radius_ms=local_peak_radius_ms,
+                                                                                                gcc_mode=gcc_mode,
+                                                                                                estimator=estimator,
+                                                                                                coherence_floor=coherence_floor,
+                                                                                                subbands=subbands,
+                                                                                                score_aggregator=aggregator,
+                                                                                                subband_penalty=penalty,
+                                                                                                window_selector=selector,
+                                                                                                adaptive_min_k=min_k,
+                                                                                                stability_threshold_m=stable_threshold,
+                                                                                                required_stable_steps=stable_steps,
+                                                                                                fallback_top_k=fallback_k,
+                                                                                                basin_mode=basin_mode,
+                                                                                                basin_sigma_m=basin_sigma,
+                                                                                                basin_gate=basin_gate,
+                                                                                                basin_power=basin_power,
+                                                                                                candidate_agreement_gate_m=agreement_gate,
+                                                                                                subband_weight_mode=subband_weight_mode,
+                                                                                                lr_weight=lr_weight,
+                                                                                                lr_gate=lr_gate,
+                                                                                                wall_speed_mps=wall_speed_mps,
+                                                                                                common_shift_radius_ms=common_shift_radius_ms,
+                                                                                                common_shift_steps=common_shift_steps,
+                                                                                                x_calibration=x_calibration,
+                                                                                                correlation_polarity=correlation_polarity,
+                                                                                                edge_dilation_threshold_m=edge_threshold,
+                                                                                                edge_dilation_gain=edge_gain,
+                                                                                                edge_dilation_min_k=edge_min_k,
+                                                                                                center_deadband_m=center_deadband,
+                                                                                                center_deadband_min_k=center_min_k,
+                                                                                            )
+                                                                                        )
     return configs
 
 
@@ -1757,7 +2137,7 @@ def run(args: argparse.Namespace) -> None:
     trials = default_trials(data_root)
     holdout = holdout_trials(data_root)
     require_trial_files(data_root, trials)
-    strict_profile = args.profile in ("strict_v2", "strict_v3", "strict_v4", "strict_v5", "strict_v6")
+    strict_profile = args.profile in ("strict_v2", "strict_v3", "strict_v4", "strict_v5", "strict_v6", "strict_v7", "strict_v8", "strict_v9", "strict_v10", "strict_v11", "strict_v12", "strict_v13", "strict_v14")
     if strict_profile and not holdout:
         raise ValueError(f"{args.profile} requires at least one complete holdout trial")
 
@@ -1787,6 +2167,7 @@ def run(args: argparse.Namespace) -> None:
             offsets = dict(offsets)
             offsets["subband_weight_mode"] = cfg.subband_weight_mode
             offsets["subband_weights"] = estimate_chirp_subband_weights(data_root, trials, chirp, cfg, xs_grid, offsets)
+        offsets = estimate_x_calibration(data_root, trials, chirp, cfg, xs_grid, offsets)
         canonical_chirp = summarize_trials(data_root, trials, chirp, cfg, xs_grid, offsets)
         canonical_speech = summarize_trials(data_root, trials, speech, cfg, xs_grid, offsets)
         item = {
@@ -1841,7 +2222,7 @@ def run(args: argparse.Namespace) -> None:
         },
         "top_results": results[: args.keep_top],
     }
-    if args.profile in ("strict_v4", "strict_v5", "strict_v6"):
+    if args.profile in ("strict_v4", "strict_v5", "strict_v6", "strict_v7", "strict_v8", "strict_v9", "strict_v10", "strict_v11", "strict_v12", "strict_v13", "strict_v14"):
         payload["loro"] = summarize_loro(results)
     (out_dir / "summary.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
     if results:
@@ -1860,7 +2241,7 @@ def run(args: argparse.Namespace) -> None:
             for row in diagnose_incremental_windows(data_root, trial, speech, best_cfg, xs_grid, best_offsets)  # type: ignore[arg-type]
         ]
         (out_dir / "best_incremental_window_diagnostics.json").write_text(json.dumps(incremental, indent=2), encoding="utf-8")
-        if args.profile in ("strict_v5", "strict_v6"):
+        if args.profile in ("strict_v5", "strict_v6", "strict_v7", "strict_v8", "strict_v9", "strict_v10", "strict_v11", "strict_v12", "strict_v13", "strict_v14"):
             prefix_diagnostics = [
                 row
                 for trial in diagnostic_trials
@@ -1872,7 +2253,7 @@ def run(args: argparse.Namespace) -> None:
     if results:
         print(f"Wrote {out_dir / 'best_window_diagnostics.json'}")
         print(f"Wrote {out_dir / 'best_incremental_window_diagnostics.json'}")
-        if args.profile in ("strict_v5", "strict_v6"):
+        if args.profile in ("strict_v5", "strict_v6", "strict_v7", "strict_v8", "strict_v9", "strict_v10", "strict_v11", "strict_v12", "strict_v13", "strict_v14"):
             print(f"Wrote {out_dir / 'best_prefix_diagnostics.json'}")
     print(f"Wrote {out_dir / 'report.md'}")
 
@@ -1881,7 +2262,7 @@ def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("--data_root", default=str(Path(__file__).resolve().parent.parent / "dataset" / "0223"))
     parser.add_argument("--out_dir", default="")
-    parser.add_argument("--profile", choices=("quick", "targeted", "advanced", "strict_v2", "strict_v3", "strict_v4", "strict_v5", "strict_v6", "refine", "full"), default="quick")
+    parser.add_argument("--profile", choices=("quick", "targeted", "advanced", "strict_v2", "strict_v3", "strict_v4", "strict_v5", "strict_v6", "strict_v7", "strict_v8", "strict_v9", "strict_v10", "strict_v11", "strict_v12", "strict_v13", "strict_v14", "refine", "full"), default="quick")
     parser.add_argument("--limit_configs", type=int, default=0)
     parser.add_argument("--keep_top", type=int, default=50)
     parser.add_argument("--progress_every", type=int, default=25)
