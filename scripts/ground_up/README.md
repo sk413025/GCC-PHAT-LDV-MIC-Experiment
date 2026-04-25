@@ -101,6 +101,8 @@ V1 卡在 speech 8.69°。V2 探索更多物理假設,**第 6 輪用 max-|τ| se
 | `h_round12_chirp_calib.py` | Block chirp 估 channel,反卷積 speech | 28°(失敗) |
 | `h_round13_unblock_calib.py` | **D2: unblock calibration table** | **speech 2.30°** ⭐⭐⭐ V4 |
 | `h_round14_v4_calib_combiner.py` | V3 + cal snap/blend 混合 | 4.11°(snap 失敗) |
+| `h_round15_v5.py` | **D6-D17**: bias correction、avg cal、onset GCC、smart snap | 都沒贏 D2 (2.30°) |
+| `h_round16_v5_median.py` | **D18 median(V3, D1, D2)** ⭐⭐⭐⭐ | **speech 1.96° V5,超越 paper** |
 
 ## 跑法
 
