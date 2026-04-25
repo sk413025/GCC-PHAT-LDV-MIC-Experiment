@@ -105,9 +105,14 @@ from a plain full-band GCC.
     this is a strong prior and must be treated as a hypothesis needing external
     validation.
 
-The current conclusion is conservative: the independent pipeline can move
-toward the manuscript claim, but it has not reproduced the claimed ~2 deg
-speech MAE without further assumptions or better false-peak rejection.
+The current conclusion is split by metric. For speech, strict-v13 and
+strict-v14 reach paper-level MAE on the current canonical+holdout set, with
+strict-v14 numerically exceeding the manuscript-level speech target. For chirp,
+the same strict-v14 configuration still performs poorly, so it should not be
+read as reproducing the full paper table. The best interpretation is that the
+speech result is now explainable by an explicit physical post-correction
+hypothesis, while the broader paper claim still needs external validation and
+clearer chirp accounting.
 
 ## Method Details
 
@@ -317,7 +322,9 @@ python scripts/independent_pigs_audit.py \
 ## Current Interpretation
 
 - Independent raw-WAV reconstruction can improve substantially over naive
-  PI-GS, but did not reproduce the manuscript's claimed ~2 deg speech MAE.
+  PI-GS. On the current speech set, strict-v13 and strict-v14 now reach or
+  exceed the manuscript-level speech MAE, but they do so with explicit
+  post-estimate physical priors and are not yet external validation.
 - Chirp-derived calibration helps, but not enough by itself.
 - Per-position chirp calibration did not improve speech, which argues against
   a simple "same-position chirp reference fixes everything" explanation.
@@ -382,6 +389,37 @@ python scripts/independent_pigs_audit.py \
   center deadband to the selected-K edge dilation. This is close to or better
   than the manuscript-level target, but it should be treated as a physically
   motivated correction hypothesis rather than a fully validated reproduction.
+
+## Paper Comparison Interpretation
+
+The most important distinction is speech versus chirp. The paper-facing
+numbers discussed in the surrounding analysis are approximately 2.23 deg MAE
+for blocked speech and 1.94 deg MAE for blocked chirp. Strict-v14 reaches
+1.24 deg combined speech MAE and 4.56 deg max speech error on the current
+canonical+holdout speech set, so the speech number is no longer the main gap.
+However, the same strict-v14 run has 11.86 deg chirp MAE, so it does not
+reproduce the full paper table or the chirp claim.
+
+In plain terms, strict-v14 appears to explain how paper-level speech
+performance can be achieved: the raw PI-GS estimate finds a mostly correct
+basin, hysteresis prevents late-window contamination, edge dilation compensates
+for lateral compression toward center, and the center deadband avoids
+over-interpreting small broadside offsets. This is a coherent physical story,
+but it is a post-correction story rather than "plain GCC-PHAT PI-GS works out
+of the box."
+
+The recommended reading is therefore:
+
+- `strict-v13` is the more conservative algorithmic result. It uses selected-K
+  gated edge dilation, reaches 1.97 deg combined speech MAE, and is easier to
+  defend as a continuous lateral-compression correction.
+- `strict-v14` is the strongest numerical result. It adds a broadside center
+  deadband and reaches 1.24 deg combined speech MAE, but it is more prior-like
+  and should be validated with leave-position-out or new recordings before it
+  is treated as a general method.
+- The remaining paper gap is not "can speech reach ~2 deg?" on this dataset;
+  it is "can the correction be justified without dataset-specific priors, and
+  can the chirp claim be reproduced or honestly separated?"
 
 ## Strict-v2 Interpretation
 
