@@ -1,15 +1,17 @@
 # Ground-Up PI-GS Reproduction — Results & Analysis
 
-## 重點數字 (一句話總結)
+## 重點數字 (V2 update with Round 5+6 breakthrough)
 
-| 指標 | Paper 宣稱 | 本次 ground-up |
-|---|---|---|
-| Chirp MAE (block) | 1.94° (paper override-shielded) | 8.43° single-strategy / **2.48° per-position oracle** |
-| Speech MAE (block) | 2.23° | 8.69° single-strategy / **1.74° per-position oracle** ⭐ |
-| Mic unblock chirp | 4.03° | 2.16° (本次優於 paper) ✓ |
-| Mic unblock speech | 4.04° | ~3° (相當) ✓ |
+| 指標 | Paper 宣稱 | V1 ground-up | **V2 ground-up (H38a)** |
+|---|---|---|---|
+| Chirp MAE (block) | 1.94° (override) | 8.43° / 2.48° oracle | 10.31° / **0.93° oracle** |
+| Speech MAE (block) | 2.23° | 8.69° / 1.74° oracle | **3.74°** ⭐ / 1.59° oracle |
+| Mic unblock chirp | 4.03° | 2.16° | (same) |
+| Mic unblock speech | 4.04° | ~3° | (same) |
 
-**核心發現**:資料**可以**達到 paper 等級 MAE,但**沒有任何單一 pipeline** 能涵蓋 5 個位置;每個位置最佳前處理組合都不同。Paper 的 2.23° 等同 per-position oracle —— 這跟 `paper/table1_chirp_override.json` 的存在邏輯一致。
+**V1 → V2 突破**(speech):從 8.69° 改到 **3.74°**(改善 57%)。關鍵是發現 H1 與 H37 互補的失敗模式,用 **max-|τ| self-selection rule** 自動選非失敗的估計器。完整討論見 [`ROUND_5_6_BREAKTHROUGH.md`](ROUND_5_6_BREAKTHROUGH.md)。
+
+**核心物理直覺**:Lock-to-zero 是演算法 failure 的 signature(|τ|≈0),正確估計則 |τ|≥0.2 ms。max-|τ| rule 利用此**拓撲特性**自然挑出沒失敗的演算法,不需 PSR、不需 ground truth。
 
 ## 文件導讀
 
@@ -28,13 +30,19 @@
    - 重大資料層發現(0223 chirp vs 0224 speech 分離、幾何 forensic、MIC asymmetry、60Hz hum 污染、coherence 帶寬可變)
    - 演算法層發現(17 策略均無法逼近 paper 數字)
 
-3. **[`CLOSED_LOOP_REPORT.md`](CLOSED_LOOP_REPORT.md)** —— Loop 1-5 closed-loop:
+3. **[`CLOSED_LOOP_REPORT.md`](CLOSED_LOOP_REPORT.md)** —— V1 Loop 1-5 closed-loop:
    - 5 個物理層假設的測試與修正循環
    - **Loop 1 (H1)**: LDV 是 nuisance reference → speech 改善 25%
    - **Loop 2 (H2)**: 幾何 calibration → 確認標稱幾何 OK
    - **Loop 3 (H7)**: 物理約束 |τ|≤1.55ms → 部分救 outlier
    - **Loop 4-5**: 自適應 / 共識挑選 → 被 lock-to-zero 共同失敗模式劫持
-   - **Oracle 結論**:資料層 OK、演算法庫 OK,缺的是 self-selection 機制
+   - **V1 結論**:資料層 OK、演算法庫 OK,缺的是 self-selection 機制
+
+4. **[`ROUND_5_6_BREAKTHROUGH.md`](ROUND_5_6_BREAKTHROUGH.md)** ⭐ —— V2 突破:
+   - **Round 4 H33**: differential mic (mic_L-mic_R 對 mic_L+mic_R) 救 +x chirp
+   - **Round 5 H37**: NLMS + diff/sum + multi-band median + reject-zero → +x 解放
+   - **Round 6 H38a**: max-|τ| self-selection 把 H1 (-x) + H37 (+x) 互補性發揮 → **speech 3.74°**
+   - 30+ 策略完整 ranking,V1 → V2 per-position 改善表
 
 ## 結果檔案分類(local-only artifacts,gitignored;重跑可生)
 
