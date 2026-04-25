@@ -67,7 +67,7 @@ Phase F 結論 ← Loop 5 共識挑選 ← Loop 4 自適應 ← Loop 3 物理約
 |---|---|
 | `e02_geometry_forensic.py` | 量測 R_VL、R_VR、R_LR 真實 peak,反推 LDV / mic 位置 least-squares |
 
-### Loop 階段(closed-loop hypothesis-test)
+### V1 Loop 階段(closed-loop hypothesis-test)
 
 每個 g* 對應一個物理層假設 → 測試 → 修正:
 
@@ -78,8 +78,21 @@ Phase F 結論 ← Loop 5 共識挑選 ← Loop 4 自適應 ← Loop 3 物理約
 | `g03_loop3_physical_constraint.py` | **H7**: 限制 |τ| ≤ 1.55ms | 部分救 outlier |
 | `g04_diag_plus_x_failure.py` | +x 失敗是 windowing 問題? | 不是,是 LDV 對 +x source 耦合不足 |
 | `g05_loop4_adaptive.py` | **H8**: per-recording 自適應頻段 | 多數 band 不過 coherence 閾值 |
-| `g06_oracle_analysis.py` | Oracle 上限多少? | **chirp 2.48°、speech 1.74° ⭐(超越 paper)** |
+| `g06_oracle_analysis.py` | Oracle 上限多少? | chirp 2.48°、speech 1.74° |
 | `g07_loop5_consensus.py` | **H10**: 多 band 共識挑選 | 失敗 — 被 lock-to-zero 群劫持 |
+
+### V2 Round 階段(BREAKTHROUGH)
+
+V1 卡在 speech 8.69°。V2 探索更多物理假設,**第 6 輪用 max-|τ| self-selection rule 突破到 speech 3.74°**:
+
+| 檔案 | 假設 | 結果 |
+|---|---|---|
+| `h_round2.py` | **H11-H15**: early-window / lag-zero exclude / AR pre-whiten / sym diff / coh mask | 全部沒贏 H1 |
+| `h_round3.py` | **H19-H23**: twin-recording / per-frame median / multi-band consistency / NLMS+multiband | H21 9.61° |
+| `h_round4.py` | **H28-H34**: inst-freq tracking / TF sparsity / **diff/sum mic** / robust combo | H33 chirp 7.52° (mic-diff 救 +x) |
+| `h_round5_final.py` | **H35-H37**: H1+H33 stack | H37 speech 8.27° (+x 突破) |
+| `h_round6_combiner.py` | **H38**: max-|τ| self-selection (H1 + H37 互補) | **speech 3.74°** ⭐ |
+| `h_round7_chirp_full.py` | chirp 用全 13 秒視窗 | 沒幫助(chirp +x 是 SNR 問題) |
 
 ## 跑法
 
@@ -110,14 +123,23 @@ python3 scripts/ground_up/d01_combine.py
 # Phase E forensic
 python3 scripts/ground_up/e02_geometry_forensic.py
 
-# Closed-loop iterations
+# V1 Closed-loop iterations
 python3 scripts/ground_up/g01_loop1_subtract.py
 python3 scripts/ground_up/g02_loop2_geocal.py
 python3 scripts/ground_up/g03_loop3_physical_constraint.py
 python3 scripts/ground_up/g04_diag_plus_x_failure.py
 python3 scripts/ground_up/g05_loop4_adaptive.py
-python3 scripts/ground_up/g06_oracle_analysis.py    # oracle bound
+python3 scripts/ground_up/g06_oracle_analysis.py    # oracle bound (run after rounds)
 python3 scripts/ground_up/g07_loop5_consensus.py
+
+# V2 Round iterations (BREAKTHROUGH)
+python3 scripts/ground_up/h_round2.py
+python3 scripts/ground_up/h_round3.py
+python3 scripts/ground_up/h_round4.py
+python3 scripts/ground_up/h_round5_final.py
+python3 scripts/ground_up/h_round6_combiner.py    # ⭐ speech 3.74°
+python3 scripts/ground_up/h_round7_chirp_full.py
+python3 scripts/ground_up/g06_oracle_analysis.py    # re-run oracle
 ```
 
 執行時間:Phase A-D 約 5 分鐘,Loop 1-5 約 10 分鐘。
