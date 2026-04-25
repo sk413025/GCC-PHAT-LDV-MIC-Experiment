@@ -37,6 +37,9 @@ from a plain full-band GCC.
   `none`, `constant`, `affine`, and `per_trial`.
 - Added the second-stage improvement path:
   coherence-masked GCC, window-level consensus, and subband ensemble scoring.
+- Added a strict-v2 validation path:
+  canonical-vs-holdout trial sets, score-level subband aggregation, and
+  incremental window diagnostics.
 
 ## Analysis Process
 
@@ -55,6 +58,13 @@ from a plain full-band GCC.
 5. Added subband ensemble, coherence-masked GCC, and window consensus. The best
    improvement came from subband ensemble with clipped audio and product
    scoring, not from the first coherence mask or consensus estimator.
+6. Added holdout block repeats to test whether canonical improvements
+   generalize. This exposed that some canonical gains were fragile and that
+   holdout performance is the better guardrail for future work.
+7. Tested score-level subband aggregation. Penalizing positions with high
+   cross-subband disagreement improved combined canonical+holdout performance,
+   which supports the hypothesis that remaining errors are driven by
+   frequency-local false peaks.
 
 The current conclusion is conservative: the independent pipeline can move
 toward the manuscript claim, but it has not reproduced the claimed ~2 deg
@@ -80,6 +90,11 @@ speech MAE without further assumptions or better false-peak rejection.
   aggregation, while product/harmonic scores require both LDV-Mic pairs to be
   strong. The diagnostic output records per-window/per-subband candidates so
   remaining false peaks can be traced.
+- Strict-v2 scoring:
+  the original subband path averages normalized GCC curves before scoring.
+  The new score-level path scores each subband separately and then aggregates
+  the score curves. `subband_score_exp_cv` downweights coordinates that are
+  strong in one frequency band but inconsistent across bands.
 
 ## Commands Run
 
@@ -107,6 +122,11 @@ python scripts/independent_pigs_audit.py \
   --profile advanced \
   --offset_model affine \
   --out_dir results/independent_pigs_audit_advanced_affine
+
+python scripts/independent_pigs_audit.py \
+  --profile strict_v2 \
+  --offset_model affine \
+  --out_dir results/independent_pigs_audit_strict_v2
 ```
 
 ## Best Results So Far
@@ -118,6 +138,11 @@ python scripts/independent_pigs_audit.py \
 | targeted + per-trial chirp offset | 6.71 deg | 17.84 deg | `80-8000_b0.3_raw_moving_patch_y0.5_sum_k12_r1` |
 | targeted + no calibration | 6.80 deg | 21.68 deg | `1000-4000_b0.5_clip_moving_patch_y0.6_product_k4_r1` |
 | advanced + affine chirp offset | 3.65 deg | 7.76 deg | `80-8000_b0.3_clip_moving_patch_y0.5_product_k8_r2_plain0_score_sub` |
+| strict-v2 baseline, canonical | 3.65 deg | 7.76 deg | `80-8000_b0.3_clip_moving_patch_y0.5_product_k8_r2_plain0_score_sub` |
+| strict-v2 baseline, holdout | 6.94 deg | 13.14 deg | same config, evaluated on complete block repeats |
+| strict-v2 score-level, canonical | 3.18 deg | 8.02 deg | `80-8000_b0.3_clip_moving_patch_y0.5_product_k9_r2_plain0_score_sub_subband_score_exp_cv0.2` |
+| strict-v2 score-level, holdout | 5.88 deg | 9.90 deg | same config, evaluated on complete block repeats |
+| strict-v2 score-level, combined | 4.53 deg | 9.90 deg | same config, canonical + holdout speech |
 
 ## Current Interpretation
 
@@ -137,6 +162,54 @@ python scripts/independent_pigs_audit.py \
 - The new best result reduces center/+0.4 m errors but shifts the largest
   residual error to +0.8 m, suggesting the remaining problem is subband
   disagreement / structural false peaks rather than a single global offset.
+- Strict-v2 shows that canonical-only MAE is not a sufficient success metric.
+  The best holdout-aware result uses `K=9` plus `subband_score_exp_cv0.2`,
+  improving combined MAE from 5.30 deg to 4.53 deg and reducing combined max
+  error from 13.14 deg to 9.90 deg.
+- The holdout set remains harder than canonical. The largest strict-v2
+  residual is `+0.4m #15`, which is estimated near center, so future work
+  should focus on why that recording's barrier/microphone correlation pulls
+  inward.
+
+## Strict-v2 Interpretation
+
+Strict-v2 was added because canonical-only evaluation was starting to look too
+optimistic. The original five canonical speech trials can be improved by
+choosing the right preprocessing and window count, but that does not prove the
+method generalizes. The extra complete block repeats act as a small holdout set:
+they use the same physical setup and labels, but different recordings. If a
+change improves canonical and holdout together, it is more likely to reflect a
+real signal-processing improvement rather than a lucky fit to five files.
+
+The strict-v2 baseline keeps the previous best physical hypothesis fixed:
+clipped audio, partial PHAT, `moving_patch` geometry, affine chirp offset, and
+five subbands. Its combined canonical+holdout speech MAE is 5.30 deg. The best
+strict-v2 variant changes only the aggregation logic: each subband first forms
+its own spatial score, then `subband_score_exp_cv0.2` penalizes coordinates
+whose support is strong in one band but inconsistent across bands. This lowers
+combined MAE to 4.53 deg and combined max error to 9.90 deg.
+
+This result is physically plausible. True LDV-Mic target correlation should not
+usually appear in only one narrow frequency band; the same geometry should
+receive at least partial support across several bands. By contrast, wall
+resonances, speech harmonics, and reflected paths can create sharp but
+frequency-local false peaks. Penalizing cross-subband disagreement therefore
+directly targets the most likely failure mechanism observed in diagnostics.
+
+The `K=9` window count should be read as an empirical stability point, not a
+physical constant. With too few windows, a small number of sharp false peaks can
+dominate. With too many windows, lower-quality speech windows add structural
+and harmonic artifacts. The fact that `K=10` can improve canonical MAE but
+hurt holdout is exactly why strict-v2 ranks by combined/holdout-aware metrics
+instead of canonical alone.
+
+The remaining error pattern is also informative. The best strict-v2 result is
+good on most canonical trials, but holdout `+0.4m #15` is pulled close to the
+center. That suggests the next bottleneck is not the basic TDOA geometry; it is
+recording-specific false-peak rejection. The next experiments should inspect
+incremental window diagnostics for `+0.4m #15` and turn the fixed `K=9` choice
+into an automatic stopping/selection rule based on spatial stability and
+subband agreement.
 
 ## Important Caveats
 
@@ -150,13 +223,21 @@ python scripts/independent_pigs_audit.py \
 - The advanced result has poor chirp MAE but better speech MAE, so it should be
   interpreted as a speech-specific processing hypothesis, not as a universal
   solved calibration.
+- The strict-v2 report ranks a fixed hypothesis grid against holdout speech.
+  Treat it as an audit guardrail, not as proof that holdout labels may be used
+  freely for tuning.
 
 ## Next Most Likely Improvements
 
+- Inspect `results/independent_pigs_audit_strict_v2/best_incremental_window_diagnostics.json`
+  to identify which windows pull `+0.4m #15` toward the center.
+- Extend score-level subband consistency to a leave-one-recording-out protocol
+  so the aggregation penalty is selected without looking at the same speech
+  rows used for reporting.
 - Improve the consensus estimator using subband agreement rather than the
   current margin/PSR-like weight.
-- Inspect `results/independent_pigs_audit_advanced_affine/best_window_diagnostics.json`
-  to identify which windows/subbands pull +0.8 m toward the center.
+- Inspect `results/independent_pigs_audit_strict_v2/best_window_diagnostics.json`
+  to identify which subbands create the remaining holdout false peaks.
 - Try per-subband reliability learning from chirp only: weight subbands by
   chirp stability, then freeze weights for speech.
 - Explicitly audit whether the paper text used a different subset of repeated

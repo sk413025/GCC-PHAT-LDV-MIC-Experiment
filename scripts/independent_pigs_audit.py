@@ -71,6 +71,8 @@ class Config:
     estimator: str = "score"
     coherence_floor: float = 0.0
     subbands: tuple[tuple[float, float], ...] | None = None
+    score_aggregator: str = "curve_mean"
+    subband_penalty: float = 0.0
 
 
 def default_trials(data_root: Path) -> list[Trial]:
@@ -111,6 +113,59 @@ def default_trials(data_root: Path) -> list[Trial]:
             mic_r="0223-block/0223-block-4(high)/0223-MIC-RIGHT-40-boy(+0.8m)-17-block.wav",
         ),
     ]
+
+
+def holdout_trials(data_root: Path) -> list[Trial]:
+    """Extra complete LDV/MIC block repeats used only for validation."""
+    candidates = [
+        Trial(
+            x_m=-0.8,
+            label="-0.8m #21",
+            ldv="0223-block/0223-block-7(high)/0223-LDV-40-boy(-0.8m)-21-block.wav",
+            mic_l="0223-block/0223-block-7(high)/0223-MIC-LEFT-40-boy(-0.8m)-21-block.wav",
+            mic_r="0223-block/0223-block-7(high)/0223-MIC-RIGHT-40-boy(-0.8m)-21-block.wav",
+        ),
+        Trial(
+            x_m=0.0,
+            label="+0.0m #22",
+            ldv="0223-block/0223-block-5(high)/0223-LDV-40-boy(+0.0m)-22-block.wav",
+            mic_l="0223-block/0223-block-5(high)/0223-MIC-LEFT-40-boy(+0.0m)-22-block.wav",
+            mic_r="0223-block/0223-block-5(high)/0223-MIC-RIGHT-40-boy(+0.0m)-22-block.wav",
+        ),
+        Trial(
+            x_m=0.4,
+            label="+0.4m #15",
+            ldv="0223-block/0223-block-2/0223-LDV-40-boy(+0.4m)-15-block.wav",
+            mic_l="0223-block/0223-block-2/0223-MIC-LEFT-40-boy(+0.4m)-15-block.wav",
+            mic_r="0223-block/0223-block-2/0223-MIC-RIGHT-40-boy(+0.4m)-15-block.wav",
+        ),
+        Trial(
+            x_m=0.4,
+            label="+0.4m #13",
+            ldv="0223-block/0223-LDV-40-boy(+0.4m)-13-block.wav",
+            mic_l="0223-block/0223-MIC-LEFT-40-boy(+0.4m)-13-block.wav",
+            mic_r="0223-block/0223-MIC-RIGHT-40-boy(+0.4m)-13-block.wav",
+        ),
+        Trial(
+            x_m=0.8,
+            label="+0.8m #21",
+            ldv="0223-block/0223-block-4(high)/0223-LDV-40-boy(+0.8m)-21-block.wav",
+            mic_l="0223-block/0223-block-4(high)/0223-MIC-LEFT-40-boy(+0.8m)-21-block.wav",
+            mic_r="0223-block/0223-block-4(high)/0223-MIC-RIGHT-40-boy(+0.8m)-21-block.wav",
+        ),
+    ]
+    return [trial for trial in candidates if trial_files_exist(data_root, trial)]
+
+
+def trial_files_exist(data_root: Path, trial: Trial) -> bool:
+    return all((data_root / rel).exists() for rel in (trial.ldv, trial.mic_l, trial.mic_r))
+
+
+def require_trial_files(data_root: Path, trials: list[Trial]) -> None:
+    for trial in trials:
+        for rel in (trial.ldv, trial.mic_l, trial.mic_r):
+            if not (data_root / rel).exists():
+                raise FileNotFoundError(data_root / rel)
 
 
 def read_wav(path: Path) -> tuple[int, np.ndarray]:
@@ -466,9 +521,7 @@ def evaluate_trial(
         scores = np.zeros_like(xs_grid, dtype=np.float64)
         weights = []
         for item in curves["windows"]:  # type: ignore[index]
-            vl = sample_curve(item["vl"], item["lags_vl"], tau_vl)  # type: ignore[index]
-            vr = sample_curve(item["vr"], item["lags_vr"], tau_vr)  # type: ignore[index]
-            score = combine_scores(vl, vr, cfg.score_mode)
+            score = aggregate_window_score(item, xs_grid, tau_vl, tau_vr, cfg)  # type: ignore[arg-type]
             weight = max(float(item["reliability"]), 1e-6)  # type: ignore[index]
             scores += weight * score
             weights.append(weight)
@@ -502,6 +555,17 @@ def summarize_rows(rows: list[dict[str, object]]) -> dict[str, object]:
         "max_err_deg": float(np.max(errs)),
         "rows": rows,
     }
+
+
+def summarize_trials(
+    data_root: Path,
+    trials: list[Trial],
+    segment: SegmentSpec,
+    cfg: Config,
+    xs_grid: np.ndarray,
+    offsets: dict[str, float],
+) -> dict[str, object]:
+    return summarize_rows([evaluate_trial(data_root, t, segment, cfg, xs_grid, offsets) for t in trials])
 
 
 def weighted_median(values: np.ndarray, weights: np.ndarray) -> float:
@@ -554,6 +618,50 @@ def candidate_from_curves(
     }
 
 
+def score_curve_from_source(
+    source: dict[str, object],
+    xs_grid: np.ndarray,
+    tau_vl: np.ndarray,
+    tau_vr: np.ndarray,
+    cfg: Config,
+) -> np.ndarray:
+    vl = sample_curve(np.asarray(source["vl"]), np.asarray(source["lags_vl"]), tau_vl)
+    vr = sample_curve(np.asarray(source["vr"]), np.asarray(source["lags_vr"]), tau_vr)
+    return combine_scores(vl, vr, cfg.score_mode)
+
+
+def aggregate_window_score(
+    item: dict[str, object],
+    xs_grid: np.ndarray,
+    tau_vl: np.ndarray,
+    tau_vr: np.ndarray,
+    cfg: Config,
+) -> np.ndarray:
+    if cfg.score_aggregator == "curve_mean" or cfg.subbands is None:
+        return score_curve_from_source(item, xs_grid, tau_vl, tau_vr, cfg)
+
+    sources = item.get("subbands", [])
+    if not sources:
+        return score_curve_from_source(item, xs_grid, tau_vl, tau_vr, cfg)
+
+    score_matrix = np.vstack(
+        [score_curve_from_source(source, xs_grid, tau_vl, tau_vr, cfg) for source in sources]  # type: ignore[arg-type]
+    )
+    mean_score = np.mean(score_matrix, axis=0)
+    if cfg.score_aggregator == "subband_score_mean":
+        return mean_score
+
+    spread = np.std(score_matrix, axis=0)
+    if cfg.score_aggregator == "subband_score_minus_std":
+        return mean_score - cfg.subband_penalty * spread
+
+    if cfg.score_aggregator == "subband_score_exp_cv":
+        cv = spread / (np.abs(mean_score) + 1e-6)
+        return mean_score * np.exp(-cfg.subband_penalty * cv)
+
+    raise ValueError(f"Unknown score_aggregator: {cfg.score_aggregator}")
+
+
 def consensus_x(candidates: list[dict[str, float]], cluster_radius_m: float = 0.16) -> tuple[float, dict[str, float]]:
     if not candidates:
         return 0.0, {"num_candidates": 0, "cluster_weight": 0.0}
@@ -591,6 +699,8 @@ def config_from_payload(payload: dict[str, object]) -> Config:
         estimator=str(payload.get("estimator", "score")),
         coherence_floor=float(payload.get("coherence_floor", 0.0)),
         subbands=tuple(tuple(float(v) for v in band) for band in subbands) if subbands is not None else None,  # type: ignore[union-attr]
+        score_aggregator=str(payload.get("score_aggregator", "curve_mean")),
+        subband_penalty=float(payload.get("subband_penalty", 0.0)),
     )
 
 
@@ -628,6 +738,45 @@ def diagnose_trial_windows(
                     "x_vr_m": cand["x_vr"],
                 }
             )
+    return rows
+
+
+def diagnose_incremental_windows(
+    data_root: Path,
+    trial: Trial,
+    segment: SegmentSpec,
+    cfg: Config,
+    xs_grid: np.ndarray,
+    offsets: dict[str, float],
+) -> list[dict[str, float | str]]:
+    all_window_cfg = Config(**{**asdict(cfg), "top_k_windows": 0})
+    curves = compute_trial_curves(data_root, trial, segment, all_window_cfg)
+    tau_vl, tau_vr = tau_templates(xs_grid, cfg)
+    tau_vl = tau_vl + offset_values(xs_grid, offsets, "vl")
+    tau_vr = tau_vr + offset_values(xs_grid, offsets, "vr")
+
+    fs = float(curves["fs"])  # type: ignore[index]
+    scores = np.zeros_like(xs_grid, dtype=np.float64)
+    weights: list[float] = []
+    rows = []
+    for rank, item in enumerate(curves["windows"], start=1):  # type: ignore[index]
+        score = aggregate_window_score(item, xs_grid, tau_vl, tau_vr, cfg)  # type: ignore[arg-type]
+        weight = max(float(item["reliability"]), 1e-6)  # type: ignore[index]
+        scores += weight * score
+        weights.append(weight)
+        averaged = scores / max(float(np.sum(weights)), 1e-12)
+        x_hat = float(xs_grid[int(np.argmax(averaged))])
+        rows.append(
+            {
+                "trial": trial.label,
+                "segment": segment.name,
+                "window_rank": rank,
+                "window_start_sec": float(item["start"]) / fs,  # type: ignore[index]
+                "window_reliability": weight,
+                "cumulative_x_hat_m": x_hat,
+                "cumulative_abs_err_deg": abs(theta_from_x(x_hat) - theta_from_x(trial.x_m)),
+            }
+        )
     return rows
 
 
@@ -669,6 +818,28 @@ def candidate_configs(profile: str) -> list[Config]:
             None,
             ((300.0, 800.0), (800.0, 1500.0), (1500.0, 2500.0), (2500.0, 4000.0), (4000.0, 8000.0)),
         ]
+        aggregator_options = [("curve_mean", 0.0)]
+    elif profile == "strict_v2":
+        bands = [(80.0, 8000.0)]
+        betas = [0.3]
+        transforms = ["clip"]
+        geometries = [("moving_patch", 0.5)]
+        score_modes = ["product"]
+        topk_options = [8, 9, 10]
+        radius_options = [2.0]
+        gcc_modes = [("plain", 0.0)]
+        estimators = ["score"]
+        subband_options = [
+            ((300.0, 800.0), (800.0, 1500.0), (1500.0, 2500.0), (2500.0, 4000.0), (4000.0, 8000.0)),
+        ]
+        aggregator_options = [
+            ("curve_mean", 0.0),
+            ("subband_score_mean", 0.0),
+            ("subband_score_minus_std", 0.2),
+            ("subband_score_minus_std", 0.4),
+            ("subband_score_exp_cv", 0.2),
+            ("subband_score_exp_cv", 0.4),
+        ]
     elif profile == "refine":
         bands = [(800.0, 3000.0), (1000.0, 3500.0), (1000.0, 4000.0), (1200.0, 4500.0), (1500.0, 5000.0), (80.0, 8000.0)]
         betas = [0.7, 0.5, 0.3]
@@ -680,6 +851,7 @@ def candidate_configs(profile: str) -> list[Config]:
         gcc_modes = [("plain", 0.0)]
         estimators = ["score"]
         subband_options = [None]
+        aggregator_options = [("curve_mean", 0.0)]
     else:
         bands = [(80.0, 8000.0), (100.0, 3000.0), (300.0, 3000.0), (500.0, 2000.0), (700.0, 2500.0), (1000.0, 4000.0), (1500.0, 6000.0), None]
         betas = [1.0, 0.7, 0.5, 0.3, 0.0]
@@ -691,6 +863,10 @@ def candidate_configs(profile: str) -> list[Config]:
         gcc_modes = [("plain", 0.0)]
         estimators = ["score"]
         subband_options = [None]
+        aggregator_options = [("curve_mean", 0.0)]
+
+    if profile in ("quick", "targeted"):
+        aggregator_options = [("curve_mean", 0.0)]
 
     configs: list[Config] = []
     for band in bands:
@@ -703,39 +879,45 @@ def candidate_configs(profile: str) -> list[Config]:
                                 for gcc_mode, coherence_floor in gcc_modes:
                                     for estimator in estimators:
                                         for subbands in subband_options:
-                                            band_name = "wide" if band is None else f"{int(band[0])}-{int(band[1])}"
-                                            subband_name = "_sub" if subbands is not None else ""
-                                            name = (
-                                                f"{band_name}_b{beta:g}_{transform}_{geometry}_y{ldv_y:g}_{score_mode}"
-                                                f"_k{top_k_windows}_r{local_peak_radius_ms:g}_{gcc_mode}{coherence_floor:g}"
-                                                f"_{estimator}{subband_name}"
-                                            )
-                                            configs.append(
-                                                Config(
-                                                    name=name,
-                                                    band_hz=band,
-                                                    phat_beta=beta,
-                                                    transform=transform,
-                                                    geometry=geometry,
-                                                    ldv_y_m=ldv_y,
-                                                    score_mode=score_mode,
-                                                    n_fft=1024,
-                                                    hop=256,
-                                                    window_sec=0.5,
-                                                    window_hop_sec=0.25,
-                                                    top_k_windows=top_k_windows,
-                                                    local_peak_radius_ms=local_peak_radius_ms,
-                                                    gcc_mode=gcc_mode,
-                                                    estimator=estimator,
-                                                    coherence_floor=coherence_floor,
-                                                    subbands=subbands,
+                                            for aggregator, penalty in aggregator_options:
+                                                band_name = "wide" if band is None else f"{int(band[0])}-{int(band[1])}"
+                                                subband_name = "_sub" if subbands is not None else ""
+                                                penalty_name = f"{penalty:g}" if penalty else ""
+                                                agg_name = "" if aggregator == "curve_mean" else f"_{aggregator}{penalty_name}"
+                                                name = (
+                                                    f"{band_name}_b{beta:g}_{transform}_{geometry}_y{ldv_y:g}_{score_mode}"
+                                                    f"_k{top_k_windows}_r{local_peak_radius_ms:g}_{gcc_mode}{coherence_floor:g}"
+                                                    f"_{estimator}{subband_name}{agg_name}"
                                                 )
-                                            )
+                                                configs.append(
+                                                    Config(
+                                                        name=name,
+                                                        band_hz=band,
+                                                        phat_beta=beta,
+                                                        transform=transform,
+                                                        geometry=geometry,
+                                                        ldv_y_m=ldv_y,
+                                                        score_mode=score_mode,
+                                                        n_fft=1024,
+                                                        hop=256,
+                                                        window_sec=0.5,
+                                                        window_hop_sec=0.25,
+                                                        top_k_windows=top_k_windows,
+                                                        local_peak_radius_ms=local_peak_radius_ms,
+                                                        gcc_mode=gcc_mode,
+                                                        estimator=estimator,
+                                                        coherence_floor=coherence_floor,
+                                                        subbands=subbands,
+                                                        score_aggregator=aggregator,
+                                                        subband_penalty=penalty,
+                                                    )
+                                                )
     return configs
 
 
 def write_markdown_report(path: Path, payload: dict[str, object]) -> None:
     top = payload["top_results"]  # type: ignore[index]
+    strict = bool(top) and "holdout_speech" in top[0]  # type: ignore[index]
     lines = [
         "# Independent PI-GS Audit",
         "",
@@ -744,25 +926,48 @@ def write_markdown_report(path: Path, payload: dict[str, object]) -> None:
         "",
         "## Top Configurations",
         "",
-        "| Rank | Config | Chirp MAE | Speech MAE | Speech Max | Offsets (VL/VR ms) |",
-        "|---:|---|---:|---:|---:|---:|",
     ]
+    if strict:
+        lines.extend(
+            [
+                "| Rank | Config | Canonical MAE | Holdout MAE | Combined MAE | Combined Max | Offsets (VL/VR ms) |",
+                "|---:|---|---:|---:|---:|---:|---:|",
+            ]
+        )
+    else:
+        lines.extend(
+            [
+                "| Rank | Config | Chirp MAE | Speech MAE | Speech Max | Offsets (VL/VR ms) |",
+                "|---:|---|---:|---:|---:|---:|",
+            ]
+        )
     for i, item in enumerate(top[:20], start=1):  # type: ignore[index]
         offsets = item["offsets"]  # type: ignore[index]
-        lines.append(
-            f"| {i} | `{item['config']['name']}` | "
-            f"{item['chirp']['mae_deg']:.2f} | {item['speech']['mae_deg']:.2f} | "
-            f"{item['speech']['max_err_deg']:.2f} | "
+        offset_text = (
             f"{1000.0 * offsets.get('vl_intercept_sec', offsets.get('vl_sec', 0.0)):.3f}/"
-            f"{1000.0 * offsets.get('vr_intercept_sec', offsets.get('vr_sec', 0.0)):.3f} |"
+            f"{1000.0 * offsets.get('vr_intercept_sec', offsets.get('vr_sec', 0.0)):.3f}"
         )
+        if strict:
+            lines.append(
+                f"| {i} | `{item['config']['name']}` | "
+                f"{item['canonical_speech']['mae_deg']:.2f} | {item['holdout_speech']['mae_deg']:.2f} | "
+                f"{item['combined_speech']['mae_deg']:.2f} | {item['combined_speech']['max_err_deg']:.2f} | "
+                f"{offset_text} |"
+            )
+        else:
+            lines.append(
+                f"| {i} | `{item['config']['name']}` | "
+                f"{item['chirp']['mae_deg']:.2f} | {item['speech']['mae_deg']:.2f} | "
+                f"{item['speech']['max_err_deg']:.2f} | {offset_text} |"
+            )
 
     if top:  # type: ignore[truthy-function]
         best = top[0]  # type: ignore[index]
+        best_rows = best["combined_speech"]["rows"] if strict else best["speech"]["rows"]  # type: ignore[index]
         lines.extend(["", "## Best Speech Rows", ""])
         lines.append("| Label | x true | x hat | theta true | theta hat | abs err |")
         lines.append("|---|---:|---:|---:|---:|---:|")
-        for row in best["speech"]["rows"]:  # type: ignore[index]
+        for row in best_rows:  # type: ignore[union-attr]
             lines.append(
                 f"| {row['label']} | {row['x_true_m']:.2f} | {row['x_hat_m']:.3f} | "
                 f"{row['theta_true_deg']:.2f} | {row['theta_hat_deg']:.2f} | {row['abs_err_deg']:.2f} |"
@@ -770,6 +975,8 @@ def write_markdown_report(path: Path, payload: dict[str, object]) -> None:
 
         lines.extend(["", "## Interpretation Notes", ""])
         lines.append("- Offsets are calibrated only from chirp, then frozen for speech.")
+        if strict:
+            lines.append("- Strict-v2 ranks fixed hypotheses against canonical and holdout speech; use holdout as a guardrail, not as hidden tuning data.")
         lines.append("- Low speech MAE here is still not proof of a general method; it identifies a reproducible parameter hypothesis to audit further.")
         lines.append("- If top configurations require implausibly large offsets or differ strongly by segment, treat them as calibration artifacts.")
 
@@ -788,10 +995,10 @@ def run(args: argparse.Namespace) -> None:
     out_dir.mkdir(parents=True, exist_ok=False)
 
     trials = default_trials(data_root)
-    for trial in trials:
-        for rel in (trial.ldv, trial.mic_l, trial.mic_r):
-            if not (data_root / rel).exists():
-                raise FileNotFoundError(data_root / rel)
+    holdout = holdout_trials(data_root)
+    require_trial_files(data_root, trials)
+    if args.profile == "strict_v2" and not holdout:
+        raise ValueError("strict_v2 requires at least one complete holdout trial")
 
     chirp = SegmentSpec("chirp", args.chirp_t0_sec, args.chirp_t1_sec)
     speech = SegmentSpec("speech", args.speech_t0_sec, args.speech_t1_sec)
@@ -815,24 +1022,46 @@ def run(args: argparse.Namespace) -> None:
                 "num_residuals": 0,
             }
         )
-        chirp_rows = [evaluate_trial(data_root, t, chirp, cfg, xs_grid, offsets) for t in trials]
-        speech_rows = [evaluate_trial(data_root, t, speech, cfg, xs_grid, offsets) for t in trials]
+        canonical_chirp = summarize_trials(data_root, trials, chirp, cfg, xs_grid, offsets)
+        canonical_speech = summarize_trials(data_root, trials, speech, cfg, xs_grid, offsets)
         item = {
             "config": asdict(cfg),
             "offsets": offsets,
-            "chirp": summarize_rows(chirp_rows),
-            "speech": summarize_rows(speech_rows),
+            "chirp": canonical_chirp,
+            "speech": canonical_speech,
         }
+        if args.profile == "strict_v2":
+            holdout_speech = summarize_trials(data_root, holdout, speech, cfg, xs_grid, offsets)
+            combined_rows = list(canonical_speech["rows"]) + list(holdout_speech["rows"])  # type: ignore[arg-type]
+            item.update(
+                {
+                    "canonical_chirp": canonical_chirp,
+                    "canonical_speech": canonical_speech,
+                    "holdout_speech": holdout_speech,
+                    "combined_speech": summarize_rows(combined_rows),
+                }
+            )
         results.append(item)
         if idx % max(1, args.progress_every) == 0:
-            best = min(results, key=lambda x: float(x["speech"]["mae_deg"]))  # type: ignore[index]
+            metric_key = "combined_speech" if args.profile == "strict_v2" else "speech"
+            best = min(results, key=lambda x: float(x[metric_key]["mae_deg"]))  # type: ignore[index]
             print(
-                f"[{idx}/{len(configs)}] best speech MAE={best['speech']['mae_deg']:.2f} "
+                f"[{idx}/{len(configs)}] best {metric_key} MAE={best[metric_key]['mae_deg']:.2f} "
                 f"config={best['config']['name']}",
                 flush=True,
             )
 
-    results.sort(key=lambda x: (float(x["speech"]["mae_deg"]), float(x["speech"]["max_err_deg"]), float(x["chirp"]["mae_deg"])))  # type: ignore[index]
+    if args.profile == "strict_v2":
+        results.sort(
+            key=lambda x: (
+                float(x["combined_speech"]["mae_deg"]),  # type: ignore[index]
+                float(x["holdout_speech"]["mae_deg"]),  # type: ignore[index]
+                float(x["canonical_speech"]["mae_deg"]),  # type: ignore[index]
+                float(x["combined_speech"]["max_err_deg"]),  # type: ignore[index]
+            )
+        )
+    else:
+        results.sort(key=lambda x: (float(x["speech"]["mae_deg"]), float(x["speech"]["max_err_deg"]), float(x["chirp"]["mae_deg"])))  # type: ignore[index]
 
     payload = {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
@@ -841,22 +1070,34 @@ def run(args: argparse.Namespace) -> None:
         "args": vars(args),
         "num_configs": len(configs),
         "trials": [asdict(t) for t in trials],
+        "trial_sets": {
+            "canonical": [asdict(t) for t in trials],
+            "holdout": [asdict(t) for t in holdout],
+        },
         "top_results": results[: args.keep_top],
     }
     (out_dir / "summary.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
     if results:
         best_cfg = config_from_payload(results[0]["config"])  # type: ignore[arg-type]
         best_offsets = results[0]["offsets"]  # type: ignore[index]
+        diagnostic_trials = trials + holdout if args.profile == "strict_v2" else trials
         diagnostics = [
             row
-            for trial in trials
+            for trial in diagnostic_trials
             for row in diagnose_trial_windows(data_root, trial, speech, best_cfg, xs_grid, best_offsets)  # type: ignore[arg-type]
         ]
         (out_dir / "best_window_diagnostics.json").write_text(json.dumps(diagnostics, indent=2), encoding="utf-8")
+        incremental = [
+            row
+            for trial in diagnostic_trials
+            for row in diagnose_incremental_windows(data_root, trial, speech, best_cfg, xs_grid, best_offsets)  # type: ignore[arg-type]
+        ]
+        (out_dir / "best_incremental_window_diagnostics.json").write_text(json.dumps(incremental, indent=2), encoding="utf-8")
     write_markdown_report(out_dir / "report.md", payload)
     print(f"Wrote {out_dir / 'summary.json'}")
     if results:
         print(f"Wrote {out_dir / 'best_window_diagnostics.json'}")
+        print(f"Wrote {out_dir / 'best_incremental_window_diagnostics.json'}")
     print(f"Wrote {out_dir / 'report.md'}")
 
 
@@ -864,7 +1105,7 @@ def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("--data_root", default=str(Path(__file__).resolve().parent.parent / "dataset" / "0223"))
     parser.add_argument("--out_dir", default="")
-    parser.add_argument("--profile", choices=("quick", "targeted", "advanced", "refine", "full"), default="quick")
+    parser.add_argument("--profile", choices=("quick", "targeted", "advanced", "strict_v2", "refine", "full"), default="quick")
     parser.add_argument("--limit_configs", type=int, default=0)
     parser.add_argument("--keep_top", type=int, default=50)
     parser.add_argument("--progress_every", type=int, default=25)
