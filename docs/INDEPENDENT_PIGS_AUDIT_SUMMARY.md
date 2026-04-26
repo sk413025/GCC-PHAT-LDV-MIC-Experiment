@@ -789,6 +789,191 @@ uses a small set of known discrete source positions including exactly 0 m. The
 next validation step should therefore be a leave-position-out or new-recording
 test before treating strict-v14 as a reproduced algorithm.
 
+## Chirp Physics Diagnostics Round
+
+After strict-v14, the remaining uncomfortable fact is that speech is strong
+but chirp is still poor in the main audit. To attack that directly, a separate
+raw-WAV diagnostic script was added at `scripts/chirp_physics_diagnostics.py`.
+It deliberately does not reuse the main PI-GS estimator. Instead, it tests
+basic physical interpretations of the chirp:
+
+- mic-mic TDOA with ordinary cross-correlation/GCC;
+- mic-mic TDOA after synthetic chirp matched filtering;
+- LDV-mic geometric scoring after synthetic chirp matched filtering;
+- fixed-window, all-trial replay, and explicitly marked sliding-window oracle
+  reports.
+
+The best mic-mic-only chirp condition reaches only 5.66 deg canonical MAE. It
+is monotonic, but it is strongly compressed toward the center except at the
+edges. This matches the physical suspicion that the microphones see a strong
+common chirp/reflection field, so left-right timing alone is not enough.
+
+The best canonical LDV-mic matched-filter condition is much more revealing:
+1500-4000 Hz, differentiated signals, a 500-7000 Hz / 1.5 s synthetic chirp,
+LDV effective y of 0.5 m, and a +2 ms common shift produce 2.25 deg canonical
+chirp MAE. That is close to the paper-facing chirp claim around 1.94 deg. The
+sequence is also monotonic:
+
+```text
+true x:  -0.8   -0.4    0.0   +0.4   +0.8
+est x:   -1.063 -0.409 +0.087 +0.334 +0.765
+```
+
+But the same condition does not generalize cleanly to the repeated holdout
+recordings. On canonical+holdout it is 7.22 deg MAE, and the direct all-trial
+condition ranking does not find a better non-oracle fixed-window rule. This
+means the 2.25 deg result is a real clue, but not yet a robust reproduction.
+
+The most important diagnostic is the sliding-window oracle. If each trial is
+allowed to choose its 0.5 s chirp window using the known source label, the best
+LDV-mic matched-filter family reaches 1.05 deg MAE / 3.19 deg max error across
+all 10 canonical+holdout recordings:
+
+```text
+est x: -0.786 -0.421 -0.084 +0.341 +0.795 | -0.798 +0.118 +0.396 +0.347 +0.840
+err:    0.34   0.55   2.27   1.56   0.12 |  0.05   3.19   0.11   1.40   0.96 deg
+```
+
+This should not be interpreted as a valid blind algorithm, because it uses the
+answer to pick the window. Its value is diagnostic: the chirp recordings do
+contain paper-level spatial information, but the correct physical event is not
+always the strongest matched-filter peak. Different repeats place the useful
+window in different parts of the first 2 seconds. In plain language, the data
+has the needle; our current automatic selector is still often grabbing a
+shinier piece of hay.
+
+Several attempted automatic selectors were negative. Choosing the largest
+matched-filter/geometric score fails because false reflections often normalize
+to score 1.0. Requiring agreement with mic-mic TDOA also fails because the
+mic-mic estimate itself tends to collapse toward broadside and disagrees with
+the true edge cases. A useful next selector probably has to inspect the
+LDV-mic score-shape over time, adjacent-window stability, and whether VL/VR
+peaks form a physically plausible pair, rather than using raw peak height.
+
+The next iteration expanded the LDV-mic physical grid. The original diagnostic
+mostly assumed an effective LDV y of 0.5 m and a small set of common shifts.
+The expanded run varies effective LDV y from 0.0 m to 0.8 m, common shift from
+0.5 ms to 3.0 ms, and includes denser half-second chirp windows. The best
+non-oracle all-trial chirp result improves from 7.22 deg MAE to 6.01 deg MAE:
+
+```text
+condition: 80-800 Hz, diff, window 0.75-1.25 s,
+           ldv_y=0.8 m, common_shift=1.25 ms, product/sum
+est x:     -0.963 -1.025 -0.005 +0.260 +0.271 | -0.734 +0.403 +0.403 +0.381 +0.381
+MAE:       6.01 deg all, 7.31 deg canonical, 4.72 deg holdout
+```
+
+This is a real non-oracle improvement, but it changes the error profile rather
+than solving chirp. The earlier 1500-4000 Hz condition is excellent on the
+canonical five rows but fails on holdout. The new 80-800 Hz condition is less
+accurate on the canonical rows but more stable across repeats. That is
+physically plausible: low-frequency wall/structure response is less sensitive
+to fine chirp timing and high-frequency modal nulls, but it also has worse
+spatial resolution and pulls the right-edge positions toward the center.
+
+Two other ideas were tested and rejected. A window-aware subchirp template is
+more physically literal than using the full 1.5 s chirp template inside each
+0.5 s window, but it worsens the fixed-window result and raises the oracle
+upper bound from 1.05 deg to about 2.09 deg. That suggests the full-template
+matched filter is acting like a useful empirical chirp/reflection fingerprint,
+not just a clean local sweep detector. Multi-geometry or multi-template
+agreement also fails as an automatic selector because stable reflections can
+be consistently wrong.
+
+A further chirp iteration tested fusion rather than trying to pick one perfect
+condition. The physical motivation is simple: low-frequency structure response
+is repeat-stable but spatially blunt, while mid-frequency chirp response has
+sharper spatial information but is more vulnerable to repeat-specific
+reflections. Averaging several views can cancel some path-specific errors.
+
+The fixed, row-label-free three-regime fusion combines:
+
+- high-resolution early chirp: 1500-4000 Hz, 0.25-0.75 s, `ldv_y=0.3`,
+  `common_shift=1.5 ms`;
+- low-frequency stable chirp: 80-800 Hz, 0.75-1.25 s, `ldv_y=0.8`,
+  `common_shift=1.25 ms`;
+- mid-frequency repeat-stable chirp: 1500-4000 Hz, 0.375-0.875 s,
+  `ldv_y=0.1`, `common_shift=1.0 ms`.
+
+Equal averaging of these three regimes improves the non-oracle all-trial chirp
+result from 6.01 deg MAE to 4.28 deg MAE:
+
+```text
+equal-fusion x:
+-1.037 -0.669 +0.260 +0.336 +0.755 | -0.315 -0.062 +0.291 +0.346 +0.705
+MAE: 4.28 deg all, 4.43 deg canonical, 4.14 deg holdout
+```
+
+Adding a simple center/edge prior to the same fixed fusion gives 3.38 deg MAE:
+
+```text
+postprocess: center deadband 0.275 m, edge threshold 0.2 m, edge gain 1.1
+x: -1.121 -0.716 +0.000 +0.350 +0.811 | -0.327 +0.000 +0.300 +0.360 +0.755
+MAE: 3.38 deg all, 3.40 deg canonical, 3.37 deg holdout
+```
+
+This is the strongest chirp result so far that is based on a fixed physical
+fusion recipe, but its postprocess thresholds were still chosen after seeing
+the current dataset. Treat it as a plausible missing postprocessing hypothesis,
+not external proof.
+
+The most aggressive in-dataset diagnostic ranks the expanded LDV grid on the
+same current recordings, ensembles the top 10 conditions by inverse-MAE
+weight, and applies a mild center/edge prior. It reaches 2.36 deg MAE:
+
+```text
+top-K diagnostic: K=10, weighted mean, center deadband 0.15 m,
+                  edge threshold 0.2 m, edge gain 1.35
+x: -1.067 -0.499 +0.000 +0.398 +0.797 | -0.430 +0.000 +0.431 +0.275 +0.749
+MAE: 2.36 deg all, 1.78 deg canonical, 2.94 deg holdout
+```
+
+This average is now close to the paper-facing chirp claim around 1.94 deg, but
+it is explicitly not a clean validation result. A leave-one-recording-out
+stress test of condition ranking collapses badly, because the best-ranked
+conditions change depending on which recording is left out. In plain language:
+ensembling can recover much of the paper-level chirp behavior inside this
+dataset, but we still do not have a reliable blind rule for choosing the
+ensemble from new data.
+
+The next iteration reframed chirp as a calibration signal rather than a blind
+continuous-localization signal. This matters because the experiment itself has
+known discrete calibration positions: -0.8, -0.4, 0.0, +0.4, and +0.8 m. Under
+that interpretation, it is physically reasonable to use the canonical chirp
+rows to learn a monotone raw-x-to-true-x map, then apply that calibrated axis
+to repeat recordings.
+
+The new `canonical_grid_calibration` report does exactly that. It takes a
+fused chirp estimate, learns a piecewise monotone map from the canonical five
+rows, and optionally snaps the calibrated value to the known discrete grid.
+With the dataset-ranked top-K chirp ensemble as input, piecewise grid snapping
+gives the strongest chirp number so far:
+
+```text
+calibration: canonical grid, piecewise map + discrete grid snap
+source:      top-K chirp ensemble, K=10, weighted mean, center/edge prior
+x:           -0.8 -0.4 +0.0 +0.4 +0.8 | -0.4 +0.0 +0.4 +0.4 +0.8
+MAE:         1.01 deg all, 0.00 deg canonical, 2.02 deg holdout
+max error:   10.11 deg
+```
+
+This result is now better than the paper-facing average chirp claim, but it
+has a very specific meaning. It says the current chirp data can support
+paper-level performance if chirp is treated as a discrete calibration task.
+It does not prove a general continuous blind localizer, and the max error
+shows the weakness clearly: the `-0.8m #21` repeat is snapped to -0.4 m. In
+plain language, the method mostly recovers the calibration grid, but one
+left-edge repeat is still too ambiguous.
+
+This calibration-grid result is important because it reconciles otherwise
+contradictory observations. The sliding-window oracle showed that good chirp
+information exists. Fixed blind conditions were too brittle. Fusion recovered
+much of the information but remained biased. Canonical grid calibration then
+converts the biased fused coordinate into the experiment's known discrete
+coordinate system. That sequence is a plausible explanation for how a paper
+pipeline could report strong chirp numbers after substantial preprocessing and
+calibration.
+
 ## Important Caveats
 
 - Results under `results/` are intentionally not committed; they are generated
@@ -863,6 +1048,25 @@ test before treating strict-v14 as a reproduced algorithm.
 - If chirp-derived weights are revisited, regularize them much more strongly
   and test whether high-frequency chirp stability actually predicts speech
   stability before applying them to speech.
+- For chirp specifically, replace fixed-window scoring with a sliding-window
+  selector that looks for physically plausible LDV-Mic peak pairs across
+  adjacent windows. Do not select by raw matched-filter peak height alone.
+- Use the sliding-window oracle only as an upper-bound diagnostic. If a future
+  adaptive selector approaches the 1.05 deg oracle without using labels, then
+  chirp reproduction becomes much more credible.
+- Keep both chirp regimes visible: 1500-4000 Hz currently gives the best
+  canonical chirp result, while 80-800 Hz gives the best non-oracle
+  canonical+holdout result. A future adaptive method may need to switch
+  between these regimes based on detected repeat/stability rather than choose
+  one global band.
+- Treat chirp fusion as the most promising path now. Fixed multi-regime
+  fusion reaches 4.28 deg without row-level label selection, and a simple
+  center/edge prior reaches 3.38 deg. The 2.36 deg top-K result is useful as
+  an in-dataset upper bound, but needs a non-leaky condition-selection rule.
+- If chirp is intended as a calibration signal, canonical-grid calibration is
+  now the best explanation of paper-level chirp performance: it reaches
+  1.01 deg all-trial MAE / 2.02 deg holdout MAE when calibrated on the
+  canonical grid. Keep this separate from blind continuous-localization claims.
 - Before any future chirp-based spatial calibration, first require chirp raw
   estimates to be monotonic with known source position under leave-one-position
   checks.
