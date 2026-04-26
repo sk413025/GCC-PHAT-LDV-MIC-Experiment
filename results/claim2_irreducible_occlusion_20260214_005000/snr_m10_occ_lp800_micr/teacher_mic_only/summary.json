@@ -1,0 +1,42 @@
+{
+  "generated": "2026-02-14T03:17:53.541763",
+  "run_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_occlusion_20260214_005000/snr_m10_occ_lp800_micr/teacher_mic_only",
+  "pooled": {
+    "baseline": {
+      "theta_error_ref_deg": {
+        "count": 1255,
+        "median": 2.989162827038097,
+        "p90": 5.863008377426915,
+        "p95": 6.921708364793657
+      },
+      "theta_error_geo_deg": {
+        "count": 1255,
+        "median": 3.5385045351475597,
+        "p90": 7.188165108331898,
+        "p95": 8.126866077481106
+      },
+      "fail_rate_ref_gt5deg": 0.21115537848605578
+    },
+    "teacher": {
+      "theta_error_ref_deg": {
+        "count": 1255,
+        "median": 0.3611103680270418,
+        "p90": 1.0483287872045677,
+        "p95": 1.3672493207018872
+      },
+      "theta_error_geo_deg": {
+        "count": 1255,
+        "median": 2.181414058128297,
+        "p90": 3.2285050722670383,
+        "p95": 3.5687907999785633
+      },
+      "fail_rate_ref_gt5deg": 0.0
+    }
+  },
+  "teacher_sanity_gate": {
+    "median_not_worse_frac_le_0p05": true,
+    "computed": {
+      "median_worsening_frac": -0.8791934769288771
+    }
+  }
+}

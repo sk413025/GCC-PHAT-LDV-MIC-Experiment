@@ -1,0 +1,294 @@
+{
+  "generated": "2026-02-13T18:28:56.193295",
+  "run_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/extreme_subset_eval_20260213_182849",
+  "thresholds": {
+    "LOW_COH": {
+      "mic_coh_median_500_2000_le": 5.912992451229116e-09,
+      "percent": 10.0
+    },
+    "HIGH_HF_IMB": {
+      "abs_hf_imbalance_db_ge": 6.935356135418392,
+      "percent": 10.0
+    },
+    "CLIPPED": {
+      "clip_frac_max_ge": 0.001
+    },
+    "LOW_RMS": {
+      "speech_rms_db_le": -55.483924330401386,
+      "percent": 10.0
+    }
+  },
+  "subsets": {
+    "LOW_COH": {
+      "pooled": {
+        "baseline": {
+          "count": 32,
+          "median": 2.195240454179337,
+          "p90": 5.861260576457717,
+          "p95": 5.899006169659862,
+          "fail_rate_gt5deg": 0.34375
+        },
+        "student": {
+          "count": 32,
+          "median": 0.3241734313179343,
+          "p90": 0.8477063547231082,
+          "p95": 2.014249442278129,
+          "fail_rate_gt5deg": 0.03125
+        }
+      },
+      "per_speaker": {
+        "18-0.1V": {
+          "baseline": {
+            "count": 11,
+            "median": 4.9607940689358685,
+            "p90": 5.423197237817412,
+            "p95": 5.513880030971698,
+            "fail_rate_gt5deg": 0.2727272727272727
+          },
+          "student": {
+            "count": 11,
+            "median": 0.2531910057390725,
+            "p90": 0.48546605043786784,
+            "p95": 3.2618192843230727,
+            "fail_rate_gt5deg": 0.09090909090909091
+          }
+        },
+        "19-0.1V": {
+          "baseline": {
+            "count": 3,
+            "median": 1.137096674159153,
+            "p90": 1.1739669800920383,
+            "p95": 1.1785757683336489,
+            "fail_rate_gt5deg": 0.0
+          },
+          "student": {
+            "count": 3,
+            "median": 0.9177274182419115,
+            "p90": 2.867099905417412,
+            "p95": 3.1107714663143495,
+            "fail_rate_gt5deg": 0.0
+          }
+        },
+        "20-0.1V": {
+          "baseline": {
+            "count": 4,
+            "median": 2.1881059381790164,
+            "p90": 2.1955524795757824,
+            "p95": 2.195786498623116,
+            "fail_rate_gt5deg": 0.0
+          },
+          "student": {
+            "count": 4,
+            "median": 0.5256590250305799,
+            "p90": 0.828456755883449,
+            "p95": 0.8334363456001709,
+            "fail_rate_gt5deg": 0.0
+          }
+        },
+        "21-0.1V": {
+          "baseline": {
+            "count": 6,
+            "median": 1.0578395510932879,
+            "p90": 1.1837586811767342,
+            "p95": 1.1944899309053325,
+            "fail_rate_gt5deg": 0.0
+          },
+          "student": {
+            "count": 6,
+            "median": 0.2550003739455722,
+            "p90": 0.4863407440425789,
+            "p95": 0.5366672091957918,
+            "fail_rate_gt5deg": 0.0
+          }
+        },
+        "22-0.1V": {
+          "baseline": {
+            "count": 8,
+            "median": 5.819089808520578,
+            "p90": 5.918518962569035,
+            "p95": 5.925970544119027,
+            "fail_rate_gt5deg": 1.0
+          },
+          "student": {
+            "count": 8,
+            "median": 0.314941437836632,
+            "p90": 0.5294203190396694,
+            "p95": 0.6247752371777241,
+            "fail_rate_gt5deg": 0.0
+          }
+        }
+      },
+      "improvements": {
+        "p95_improvement_frac": 0.6585442726542747,
+        "fail_rate_improvement_frac": 0.9090909090909091
+      }
+    },
+    "HIGH_HF_IMB": {
+      "pooled": {
+        "baseline": {
+          "count": 32,
+          "median": 1.1612093312734255,
+          "p90": 4.697421755341369,
+          "p95": 5.3353682668233,
+          "fail_rate_gt5deg": 0.09375
+        },
+        "student": {
+          "count": 32,
+          "median": 0.2978183199347679,
+          "p90": 0.7090280162652097,
+          "p95": 2.564219011005102,
+          "fail_rate_gt5deg": 0.0
+        }
+      },
+      "per_speaker": {
+        "18-0.1V": {
+          "baseline": {
+            "count": 3,
+            "median": 4.957221374031345,
+            "p90": 5.02615600331934,
+            "p95": 5.034772831980339,
+            "fail_rate_gt5deg": 0.3333333333333333
+          },
+          "student": {
+            "count": 3,
+            "median": 0.29713171225334634,
+            "p90": 0.34819552848937574,
+            "p95": 0.3545785055188794,
+            "fail_rate_gt5deg": 0.0
+          }
+        },
+        "19-0.1V": {
+          "baseline": {
+            "count": 3,
+            "median": 1.1605911569954,
+            "p90": 1.1659471124469587,
+            "p95": 1.1666166068784034,
+            "fail_rate_gt5deg": 0.0
+          },
+          "student": {
+            "count": 3,
+            "median": 0.294681437802236,
+            "p90": 0.639306401261495,
+            "p95": 0.6823845216939023,
+            "fail_rate_gt5deg": 0.0
+          }
+        },
+        "20-0.1V": {
+          "baseline": {
+            "count": 8,
+            "median": 2.2765945311980578,
+            "p90": 2.3167917714670487,
+            "p95": 2.33800847929929,
+            "fail_rate_gt5deg": 0.0
+          },
+          "student": {
+            "count": 8,
+            "median": 0.5336122731068671,
+            "p90": 3.5769377791184107,
+            "p95": 3.8200178067326442,
+            "fail_rate_gt5deg": 0.0
+          }
+        },
+        "21-0.1V": {
+          "baseline": {
+            "count": 16,
+            "median": 1.121171408651263,
+            "p90": 1.172095665701296,
+            "p95": 1.1892952285657563,
+            "fail_rate_gt5deg": 0.0
+          },
+          "student": {
+            "count": 16,
+            "median": 0.20773368146558813,
+            "p90": 0.4781678006592349,
+            "p95": 0.5213481172015535,
+            "fail_rate_gt5deg": 0.0
+          }
+        },
+        "22-0.1V": {
+          "baseline": {
+            "count": 2,
+            "median": 5.711344068108627,
+            "p90": 5.726634516425635,
+            "p95": 5.728545822465262,
+            "fail_rate_gt5deg": 1.0
+          },
+          "student": {
+            "count": 2,
+            "median": 0.086056251119496,
+            "p90": 0.12057875059398845,
+            "p95": 0.12489406302830001,
+            "fail_rate_gt5deg": 0.0
+          }
+        }
+      },
+      "improvements": {
+        "p95_improvement_frac": 0.5193923113142762,
+        "fail_rate_improvement_frac": 1.0
+      }
+    },
+    "CLIPPED": {
+      "pooled": {
+        "baseline": {
+          "count": 0,
+          "median": NaN,
+          "p90": NaN,
+          "p95": NaN,
+          "fail_rate_gt5deg": NaN
+        },
+        "student": {
+          "count": 0,
+          "median": NaN,
+          "p90": NaN,
+          "p95": NaN,
+          "fail_rate_gt5deg": NaN
+        }
+      },
+      "per_speaker": {},
+      "improvements": {
+        "p95_improvement_frac": NaN,
+        "fail_rate_improvement_frac": NaN
+      }
+    },
+    "LOW_RMS": {
+      "pooled": {
+        "baseline": {
+          "count": 32,
+          "median": 0.5780792479543511,
+          "p90": 5.108259182261095,
+          "p95": 5.144453235100476,
+          "fail_rate_gt5deg": 0.1875
+        },
+        "student": {
+          "count": 32,
+          "median": 0.2124428806565799,
+          "p90": 1.470155746676958,
+          "p95": 3.197202032654544,
+          "fail_rate_gt5deg": 0.03125
+        }
+      },
+      "per_speaker": {
+        "18-0.1V": {
+          "baseline": {
+            "count": 32,
+            "median": 0.5780792479543511,
+            "p90": 5.108259182261095,
+            "p95": 5.144453235100476,
+            "fail_rate_gt5deg": 0.1875
+          },
+          "student": {
+            "count": 32,
+            "median": 0.2124428806565799,
+            "p90": 1.470155746676958,
+            "p95": 3.197202032654544,
+            "fail_rate_gt5deg": 0.03125
+          }
+        }
+      },
+      "improvements": {
+        "p95_improvement_frac": 0.3785147057339128,
+        "fail_rate_improvement_frac": 0.8333333333333334
+      }
+    }
+  }
+}

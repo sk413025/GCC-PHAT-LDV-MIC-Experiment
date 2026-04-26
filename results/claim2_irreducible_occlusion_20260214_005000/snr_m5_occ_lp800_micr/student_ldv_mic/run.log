@@ -1,0 +1,5 @@
+2026-02-14 03:09:30,417 - INFO - Dataset: N=1255, horizon=6, bands=64
+2026-02-14 03:09:30,417 - INFO - Train: 937 samples, Test: 318 samples
+2026-02-14 03:09:30,420 - INFO - Saved model: /home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_occlusion_20260214_005000/snr_m5_occ_lp800_micr/student_ldv_mic/model_dtmin_band_policy_k6.npz
+2026-02-14 03:11:51,907 - INFO - Done. Results: /home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_occlusion_20260214_005000/snr_m5_occ_lp800_micr/student_ldv_mic
+2026-02-14 03:11:51,907 - INFO - Acceptance overall_pass=True

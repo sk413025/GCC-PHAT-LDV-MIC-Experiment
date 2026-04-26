@@ -1,0 +1,22 @@
+{
+  "cm_snr_db": -5.0,
+  "teacher_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_coherence_trap_sweep_20260214_183626/cm_snr_-5db/teacher_mic_only_control",
+  "n_test_windows": 318,
+  "theta_error_ref_deg": {
+    "p95": 4.625099483103288,
+    "fail_rate_gt4deg": 0.389937106918239,
+    "median": 3.117029134698945
+  },
+  "psr_db": {
+    "median": -9.151175186450377,
+    "frac_gt3db": 0.3522012578616352,
+    "p95": 16.94105407975662
+  },
+  "mic_coh_band_median": {
+    "median": 0.5644021243178202,
+    "p10": 0.5425065442337428,
+    "p90": 0.7906794552374513
+  },
+  "near_fail_pass": false,
+  "coherence_trap_pass": true
+}

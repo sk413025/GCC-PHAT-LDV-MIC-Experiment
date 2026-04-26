@@ -1,0 +1,587 @@
+{
+  "version": 1,
+  "dataset_root": "dataset/0223",
+  "source_origin": "/home/sbplab/jiawei/0222-block",
+  "description": "Canonical in-repo 0223 dataset for paper reproduction via Git LFS.",
+  "summary": {
+    "total_files": 46,
+    "wav_files": 43,
+    "doc_files": 3,
+    "paper_direct_files": 28
+  },
+  "directories": [
+    "0223-block/",
+    "0223-block-1/",
+    "0223-block-6(high)/",
+    "0223-unblock-3(high)/",
+    "0223-unblock-4(high)/",
+    "0223-unblock-5(high)/",
+    "0223-unblock-6(high)/"
+  ],
+  "files": [
+    {
+      "rel_path": "0223-block/0223-LDV-40-boy(+0.4m)-13-block.wav",
+      "kind": "wav",
+      "size_bytes": 2115636,
+      "sha256": "da2e76d385908493b8870aafa73e95ca1c25e7be57b3f4030b227a56021e15ea",
+      "roles": [
+        "blocked"
+      ],
+      "paper_assets": []
+    },
+    {
+      "rel_path": "0223-block/0223-MIC-LEFT-40-boy(+0.4m)-13-block.wav",
+      "kind": "wav",
+      "size_bytes": 2115636,
+      "sha256": "b26612de8b876aca8fcd2af52406739c19a7d274c095e507c35f3af47a9e1e48",
+      "roles": [
+        "blocked"
+      ],
+      "paper_assets": []
+    },
+    {
+      "rel_path": "0223-block/0223-MIC-RIGHT-40-boy(+0.4m)-13-block.wav",
+      "kind": "wav",
+      "size_bytes": 2115636,
+      "sha256": "a3c3bbc507a7b47f9bd7469ed2cfb29a38cac924ca8fef60a61379c489470fff",
+      "roles": [
+        "blocked"
+      ],
+      "paper_assets": []
+    },
+    {
+      "rel_path": "0223-block/0223-block-2/0223-LDV-40-boy(+0.4m)-15-block.wav",
+      "kind": "wav",
+      "size_bytes": 1992756,
+      "sha256": "36cf20ea7f165529a1f2a03a3967834ba1f995208edaec10d81fb7e8af5e91de",
+      "roles": [
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "jammer_curve",
+        "spatial_score"
+      ]
+    },
+    {
+      "rel_path": "0223-block/0223-block-2/0223-MIC-LEFT-40-boy(+0.4m)-15-block.wav",
+      "kind": "wav",
+      "size_bytes": 1992756,
+      "sha256": "83942f4d1f97af2da4b5404f8a74661d67453ee383e43e6036c0a833a73fc371",
+      "roles": [
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "jammer_curve",
+        "spatial_score"
+      ]
+    },
+    {
+      "rel_path": "0223-block/0223-block-2/0223-MIC-RIGHT-40-boy(+0.4m)-15-block.wav",
+      "kind": "wav",
+      "size_bytes": 1992756,
+      "sha256": "a4f2b2564360ea138f861da0a66301778c59f760b4b9880f35e84d5e958ba6b3",
+      "roles": [
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "jammer_curve",
+        "spatial_score"
+      ]
+    },
+    {
+      "rel_path": "0223-block/0223-block-3(high)/0223-LDV-40-boy(+0.4m)-16-block.wav",
+      "kind": "wav",
+      "size_bytes": 1869876,
+      "sha256": "02eb95c4c2116bdc04f85ea5ad1c8e38951cbd76c7d8735ea22026170c1e6b23",
+      "roles": [
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "table1"
+      ]
+    },
+    {
+      "rel_path": "0223-block/0223-block-3(high)/0223-MIC-LEFT-40-boy(+0.4m)-16-block.wav",
+      "kind": "wav",
+      "size_bytes": 1869876,
+      "sha256": "b1c23b59f2c56ea8b44e05a6f7efa1dc5859b3d3c54ae6c9d3ac0f2065ef83ac",
+      "roles": [
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "table1"
+      ]
+    },
+    {
+      "rel_path": "0223-block/0223-block-3(high)/0223-MIC-RIGHT-40-boy(+0.4m)-16-block.wav",
+      "kind": "wav",
+      "size_bytes": 1869876,
+      "sha256": "c60c068a7168488290fd8b9351b63cd558f3e1175e97a593d0a72868b5903406",
+      "roles": [
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "table1"
+      ]
+    },
+    {
+      "rel_path": "0223-block/0223-block-4(high)/0223-LDV-40-boy(+0.8m)-17-block.wav",
+      "kind": "wav",
+      "size_bytes": 1992756,
+      "sha256": "507c76403a4e460feadd11fcf82f8631ca9c48492010a8ffbf0a5be8bb57f9fc",
+      "roles": [
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "table1"
+      ]
+    },
+    {
+      "rel_path": "0223-block/0223-block-4(high)/0223-LDV-40-boy(+0.8m)-21-block.wav",
+      "kind": "wav",
+      "size_bytes": 1968180,
+      "sha256": "a3b325e87da9f0881ad0f7864d4754cff9603c16d946622b6e3ad985b9265da1",
+      "roles": [
+        "blocked"
+      ],
+      "paper_assets": []
+    },
+    {
+      "rel_path": "0223-block/0223-block-4(high)/0223-MIC-LEFT-40-boy(+0.8m)-17-block.wav",
+      "kind": "wav",
+      "size_bytes": 1992756,
+      "sha256": "954713f4b0f5d4a611df93376b5e4487b961f0c4aa42720fd5947d2855a4578b",
+      "roles": [
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "table1"
+      ]
+    },
+    {
+      "rel_path": "0223-block/0223-block-4(high)/0223-MIC-LEFT-40-boy(+0.8m)-21-block.wav",
+      "kind": "wav",
+      "size_bytes": 1968180,
+      "sha256": "48adaaec7c539070dc665b370c4c8871a341a17d3ba4db10d96d7f3b7f13f1aa",
+      "roles": [
+        "blocked"
+      ],
+      "paper_assets": []
+    },
+    {
+      "rel_path": "0223-block/0223-block-4(high)/0223-MIC-RIGHT-40-boy(+0.8m)-17-block.wav",
+      "kind": "wav",
+      "size_bytes": 1992756,
+      "sha256": "38199580bed6309808cd6c6cfc6a86e4552a55f446e0b7e72c04ff2d6edc4f59",
+      "roles": [
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "table1"
+      ]
+    },
+    {
+      "rel_path": "0223-block/0223-block-4(high)/0223-MIC-RIGHT-40-boy(+0.8m)-21-block.wav",
+      "kind": "wav",
+      "size_bytes": 1968180,
+      "sha256": "40b291076d3a0fdf9ba6facedc465d8fc12f6fe59935c8817014b5db84567886",
+      "roles": [
+        "blocked"
+      ],
+      "paper_assets": []
+    },
+    {
+      "rel_path": "0223-block/0223-block-5(high)/0223-LDV-40-boy(+0.0m)-18-block.wav",
+      "kind": "wav",
+      "size_bytes": 1968180,
+      "sha256": "c91776c12e17de5f6035042a4cc0b38107d0d9e7ce232535796bc3bcbd413724",
+      "roles": [
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "table1"
+      ]
+    },
+    {
+      "rel_path": "0223-block/0223-block-5(high)/0223-LDV-40-boy(+0.0m)-22-block.wav",
+      "kind": "wav",
+      "size_bytes": 1968180,
+      "sha256": "43bccec7d94daa13b471992d1a24308403af04273cc755b846f35fae5bc537e3",
+      "roles": [
+        "blocked"
+      ],
+      "paper_assets": []
+    },
+    {
+      "rel_path": "0223-block/0223-block-5(high)/0223-MIC-LEFT-40-boy(+0.0m)-18-block.wav",
+      "kind": "wav",
+      "size_bytes": 1968180,
+      "sha256": "4e4545cc95d762c1af5b97e7f177692f3e77b9971452bfb5849b8c339d5f81d4",
+      "roles": [
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "table1"
+      ]
+    },
+    {
+      "rel_path": "0223-block/0223-block-5(high)/0223-MIC-LEFT-40-boy(+0.0m)-22-block.wav",
+      "kind": "wav",
+      "size_bytes": 1968180,
+      "sha256": "63c85f1e23311d7b6ff371e28ae2662063b7352a4b203328cfbf640820c09dfa",
+      "roles": [
+        "blocked"
+      ],
+      "paper_assets": []
+    },
+    {
+      "rel_path": "0223-block/0223-block-5(high)/0223-MIC-RIGHT-40-boy(+0.0m)-18-block.wav",
+      "kind": "wav",
+      "size_bytes": 1968180,
+      "sha256": "4c38aa1923e688107811389b7ef8edce23cd03114598b214175603044c7cf0c9",
+      "roles": [
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "table1"
+      ]
+    },
+    {
+      "rel_path": "0223-block/0223-block-5(high)/0223-MIC-RIGHT-40-boy(+0.0m)-22-block.wav",
+      "kind": "wav",
+      "size_bytes": 1968180,
+      "sha256": "91d4ad9a1ab74d4e36d5dd4b13c5b12f57324c5a2727be654e7f61f93947d3e3",
+      "roles": [
+        "blocked"
+      ],
+      "paper_assets": []
+    },
+    {
+      "rel_path": "0223-block/0223-block-7(high)/0223-LDV-40-boy(-0.8m)-20-block.wav",
+      "kind": "wav",
+      "size_bytes": 1968180,
+      "sha256": "59fd18199567bf2e6b9b77e1b0a82b97464f729aeaac2221e5d81bcd09db84f4",
+      "roles": [
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "table1"
+      ]
+    },
+    {
+      "rel_path": "0223-block/0223-block-7(high)/0223-LDV-40-boy(-0.8m)-21-block.wav",
+      "kind": "wav",
+      "size_bytes": 1968180,
+      "sha256": "5b4abce285f300c50e68690aed21a8f9e13ddc9cfa92d58d2056fafbae0f448f",
+      "roles": [
+        "blocked"
+      ],
+      "paper_assets": []
+    },
+    {
+      "rel_path": "0223-block/0223-block-7(high)/0223-MIC-LEFT-40-boy(-0.8m)-20-block.wav",
+      "kind": "wav",
+      "size_bytes": 1968180,
+      "sha256": "f099d4b917fa1ed81e28fe71d3b879e7344bd703d305cf4977cb97199822e6d6",
+      "roles": [
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "table1"
+      ]
+    },
+    {
+      "rel_path": "0223-block/0223-block-7(high)/0223-MIC-LEFT-40-boy(-0.8m)-21-block.wav",
+      "kind": "wav",
+      "size_bytes": 1968180,
+      "sha256": "f2686c891cbf2e10a065914a24e21641d78e151226fc2f506eadd5a13f0b9241",
+      "roles": [
+        "blocked"
+      ],
+      "paper_assets": []
+    },
+    {
+      "rel_path": "0223-block/0223-block-7(high)/0223-MIC-RIGHT-40-boy(-0.8m)-20-block.wav",
+      "kind": "wav",
+      "size_bytes": 1968180,
+      "sha256": "76c64aadbd27346951439a3f7856fb799e81e9187a8af378218f81d58443934d",
+      "roles": [
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "table1"
+      ]
+    },
+    {
+      "rel_path": "0223-block/0223-block-7(high)/0223-MIC-RIGHT-40-boy(-0.8m)-21-block.wav",
+      "kind": "wav",
+      "size_bytes": 1968180,
+      "sha256": "9f92e64bd31bc84bc54230711c2b3906ad84d9d3291ada3b9c2cd0191eebe7aa",
+      "roles": [
+        "blocked"
+      ],
+      "paper_assets": []
+    },
+    {
+      "rel_path": "0223-block/0223-unblock-7(high)/0223-MIC-LEFT-40-boy(-0.8m)-20-unblock.wav",
+      "kind": "wav",
+      "size_bytes": 2017332,
+      "sha256": "df9687efde17f912e75f77f428f65c425b33474dc6c3b2217dd2283829adfbf4",
+      "roles": [
+        "unblocked",
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "jammer_curve",
+        "table1"
+      ]
+    },
+    {
+      "rel_path": "0223-block/0223-unblock-7(high)/0223-MIC-RIGHT-40-boy(-0.8m)-20-unblock.wav",
+      "kind": "wav",
+      "size_bytes": 2017332,
+      "sha256": "601f7d4f90381d28e9abc09f0c630c29ccb21fa5ef6348e1a9fb4e5ff1455b1c",
+      "roles": [
+        "unblocked",
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "jammer_curve",
+        "table1"
+      ]
+    },
+    {
+      "rel_path": "0223-block/0223_LDV_MIC_\u7d19\u677f\u906e\u64cb_GCC-PHAT\u89e3\u8026\u9a57\u8b49\u5831\u544a.md",
+      "kind": "doc",
+      "size_bytes": 86016,
+      "sha256": "1373b5b6ff5869a523d29aadc3ae438342eebef668a90f55ae1e5e9a0791e354",
+      "roles": [
+        "blocked",
+        "provenance_note"
+      ],
+      "paper_assets": []
+    },
+    {
+      "rel_path": "0223-block/0223_LDV_MIC_\u7d19\u677f\u906e\u64cb_GCC-PHAT\u89e3\u8026\u9a57\u8b49\u5831\u544a_v2.md",
+      "kind": "doc",
+      "size_bytes": 32545,
+      "sha256": "122c192dfe9e39c8c0048fb937f99b88d885b7e29720464f7e8262096fe08d71",
+      "roles": [
+        "blocked",
+        "provenance_note"
+      ],
+      "paper_assets": []
+    },
+    {
+      "rel_path": "0223-block-1/0223-LDV-40-boy(+0.4m)-14-block.wav",
+      "kind": "wav",
+      "size_bytes": 2017332,
+      "sha256": "c7d768f669fb48998ca3f2ef67811b33782ca5357a8ea000be6048f3b03064dd",
+      "roles": [
+        "blocked",
+        "legacy_variant"
+      ],
+      "paper_assets": []
+    },
+    {
+      "rel_path": "0223-block-1/0223-MIC-far-40-boy(+0.4m)-14-block.wav",
+      "kind": "wav",
+      "size_bytes": 2017332,
+      "sha256": "0086d7c38187fcb7432d9f179a5d2daed8cc7054450f0c251696abdc5b6d476f",
+      "roles": [
+        "blocked",
+        "legacy_variant"
+      ],
+      "paper_assets": []
+    },
+    {
+      "rel_path": "0223-block-1/0223-MIC-near-40-boy(+0.4m)-14-block.wav",
+      "kind": "wav",
+      "size_bytes": 2017332,
+      "sha256": "8ab65820bd0bb33dbef47c6e2127928f2dbd2f0334259ea1280a408b7e80b202",
+      "roles": [
+        "blocked",
+        "legacy_variant"
+      ],
+      "paper_assets": []
+    },
+    {
+      "rel_path": "0223-block-6(high)/0223-LDV-40-boy(-0.4m)-19-block.wav",
+      "kind": "wav",
+      "size_bytes": 1943604,
+      "sha256": "45c72aeb7f1662f9da64de48d862a614ae2293a6fc310aaca731eb1aa5c2730a",
+      "roles": [
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "table1"
+      ]
+    },
+    {
+      "rel_path": "0223-block-6(high)/0223-MIC-LEFT-40-boy(-0.4m)-19-block.wav",
+      "kind": "wav",
+      "size_bytes": 1943604,
+      "sha256": "f67b302f7590e430f0e361003210ee3ea44189ebe2279e5b26b1118f838c20e8",
+      "roles": [
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "table1"
+      ]
+    },
+    {
+      "rel_path": "0223-block-6(high)/0223-MIC-RIGHT-40-boy(-0.4m)-19-block.wav",
+      "kind": "wav",
+      "size_bytes": 1943604,
+      "sha256": "01c130d158d517f98b13ddd590c45e70da9180af39fee44ec2b7b9f9505fdc62",
+      "roles": [
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "table1"
+      ]
+    },
+    {
+      "rel_path": "0223-unblock-3(high)/0223-MIC-LEFT-40-boy(+0.4m)-14-unblock.wav",
+      "kind": "wav",
+      "size_bytes": 1968180,
+      "sha256": "3cc679566c08115b97f111967db75f7ec4855cfa3fd1b27070b8f57da7695038",
+      "roles": [
+        "unblocked",
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "table1"
+      ]
+    },
+    {
+      "rel_path": "0223-unblock-3(high)/0223-MIC-RIGHT-40-boy(+0.4m)-14-unblock.wav",
+      "kind": "wav",
+      "size_bytes": 1968180,
+      "sha256": "0583a5b525ce0e2bf1e1a7b7d1ffbae0312b8b22a1cac5983bdeeba4ef5cee3b",
+      "roles": [
+        "unblocked",
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "table1"
+      ]
+    },
+    {
+      "rel_path": "0223-unblock-4(high)/0223-MIC-LEFT-40-boy(+0.8m)-17-unblock.wav",
+      "kind": "wav",
+      "size_bytes": 1992756,
+      "sha256": "ee36f01422986646fc999656e805fd7ee3d29ca6530d385ef52f05edec5a9212",
+      "roles": [
+        "unblocked",
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "table1"
+      ]
+    },
+    {
+      "rel_path": "0223-unblock-4(high)/0223-MIC-RIGHT-40-boy(+0.8m)-17-unblock.wav",
+      "kind": "wav",
+      "size_bytes": 1992756,
+      "sha256": "4706cbfb5e64a4469baa3ebdfa8750456ab9f9e547af790a63eeaa4fd4d183e6",
+      "roles": [
+        "unblocked",
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "table1"
+      ]
+    },
+    {
+      "rel_path": "0223-unblock-5(high)/0223-MIC-LEFT-40-boy(+0.0m)-18-unblock.wav",
+      "kind": "wav",
+      "size_bytes": 1968180,
+      "sha256": "f5fc69422b59214da2e9d26cea61472dbe25a3727402a43c6389bb2569a1c874",
+      "roles": [
+        "unblocked",
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "table1"
+      ]
+    },
+    {
+      "rel_path": "0223-unblock-5(high)/0223-MIC-RIGHT-40-boy(+0.0m)-18-unblock.wav",
+      "kind": "wav",
+      "size_bytes": 1968180,
+      "sha256": "53bdb3a223b112e105ba43b087e0319835f5010b77cf37b35a0118f949d72699",
+      "roles": [
+        "unblocked",
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "table1"
+      ]
+    },
+    {
+      "rel_path": "0223-unblock-6(high)/0223-MIC-LEFT-40-boy(-0.4m)-19-unblock.wav",
+      "kind": "wav",
+      "size_bytes": 1968180,
+      "sha256": "3c9d4c2761e70149a5d7b29c348c9d5e851b6cba1bf56a19ba6a086cf73962bb",
+      "roles": [
+        "unblocked",
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "table1"
+      ]
+    },
+    {
+      "rel_path": "0223-unblock-6(high)/0223-MIC-RIGHT-40-boy(-0.4m)-19-unblock.wav",
+      "kind": "wav",
+      "size_bytes": 1968180,
+      "sha256": "2279d081e49cb1428cbdc49b8b1e395365f0e0392fe05ed02fb941f0f7361b76",
+      "roles": [
+        "unblocked",
+        "blocked",
+        "paper_direct"
+      ],
+      "paper_assets": [
+        "table1"
+      ]
+    },
+    {
+      "rel_path": "README.md",
+      "kind": "doc",
+      "size_bytes": 1619,
+      "sha256": "462ff692d421f77a3e2f99f93498050b057cfd140df78a2756f9bc03309e506b",
+      "roles": [
+        "provenance_note"
+      ],
+      "paper_assets": []
+    }
+  ]
+}

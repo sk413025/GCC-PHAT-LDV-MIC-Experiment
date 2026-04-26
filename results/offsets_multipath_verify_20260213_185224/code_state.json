@@ -1,0 +1,7 @@
+{
+  "script_path": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/scripts/verify_offsets_and_sparse_multipath.py",
+  "script_sha256": "14da076d485db47ce7b80df75faf800d063247ddd6ebe40a7b9cb9aa9ce1fa82",
+  "git_head": "8d6b5acc7ccbd9579196c653a69c436d57707604",
+  "dirty": true,
+  "timestamp": "2026-02-13T18:52:24.525288"
+}

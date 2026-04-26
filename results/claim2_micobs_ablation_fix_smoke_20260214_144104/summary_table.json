@@ -1,0 +1,195 @@
+{
+  "summary": {
+    "generated": "2026-02-14T14:41:27.705371",
+    "near_fail_precondition": {
+      "baseline_fail_rate_gt5deg": 0.0,
+      "near_fail_ge_0p40": false
+    },
+    "obs_modes": [
+      "ldv_mic",
+      "mic_only_control",
+      "mic_only_coh_only",
+      "mic_only_psd_only"
+    ],
+    "deltas": {
+      "ldv_mic_vs_mic_only_control": {
+        "p95_improvement_frac": 0.0,
+        "fail_rate_improvement_frac": NaN
+      },
+      "mic_only_control_vs_mic_only_coh_only": {
+        "p95_improvement_frac": 0.0,
+        "fail_rate_improvement_frac": NaN
+      },
+      "mic_only_control_vs_mic_only_psd_only": {
+        "p95_improvement_frac": 0.0,
+        "fail_rate_improvement_frac": NaN
+      }
+    }
+  },
+  "metrics": {
+    "generated": "2026-02-14T14:41:27.703264",
+    "out_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_micobs_ablation_fix_smoke_20260214_144104",
+    "variants": {
+      "ldv_mic": {
+        "student_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_micobs_ablation_fix_smoke_20260214_144104/student/ldv_mic",
+        "sha256_test_windows": "29d0dedad0ac44fa9e4a67dc5d1d774a9d95b3ea5289197aaaa4317a4427ceab",
+        "metrics": {
+          "pooled": {
+            "baseline": {
+              "count": 4,
+              "median": 3.102504822958216,
+              "p90": 4.25017868425033,
+              "p95": 4.363899579974227,
+              "fail_rate_gt5deg": 0.0
+            },
+            "student": {
+              "count": 4,
+              "median": 2.0108555589347454,
+              "p90": 4.25017868425033,
+              "p95": 4.363899579974227,
+              "fail_rate_gt5deg": 0.0
+            }
+          },
+          "per_speaker": {
+            "20-0.1V": {
+              "baseline": {
+                "count": 4,
+                "median": 3.102504822958216,
+                "p90": 4.25017868425033,
+                "p95": 4.363899579974227,
+                "fail_rate_gt5deg": 0.0
+              },
+              "student": {
+                "count": 4,
+                "median": 2.0108555589347454,
+                "p90": 4.25017868425033,
+                "p95": 4.363899579974227,
+                "fail_rate_gt5deg": 0.0
+              }
+            }
+          }
+        }
+      },
+      "mic_only_control": {
+        "student_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_micobs_ablation_fix_smoke_20260214_144104/student/mic_only_control",
+        "sha256_test_windows": "29d0dedad0ac44fa9e4a67dc5d1d774a9d95b3ea5289197aaaa4317a4427ceab",
+        "metrics": {
+          "pooled": {
+            "baseline": {
+              "count": 4,
+              "median": 3.102504822958216,
+              "p90": 4.25017868425033,
+              "p95": 4.363899579974227,
+              "fail_rate_gt5deg": 0.0
+            },
+            "student": {
+              "count": 4,
+              "median": 2.0108555589347454,
+              "p90": 4.25017868425033,
+              "p95": 4.363899579974227,
+              "fail_rate_gt5deg": 0.0
+            }
+          },
+          "per_speaker": {
+            "20-0.1V": {
+              "baseline": {
+                "count": 4,
+                "median": 3.102504822958216,
+                "p90": 4.25017868425033,
+                "p95": 4.363899579974227,
+                "fail_rate_gt5deg": 0.0
+              },
+              "student": {
+                "count": 4,
+                "median": 2.0108555589347454,
+                "p90": 4.25017868425033,
+                "p95": 4.363899579974227,
+                "fail_rate_gt5deg": 0.0
+              }
+            }
+          }
+        }
+      },
+      "mic_only_coh_only": {
+        "student_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_micobs_ablation_fix_smoke_20260214_144104/student/mic_only_coh_only",
+        "sha256_test_windows": "29d0dedad0ac44fa9e4a67dc5d1d774a9d95b3ea5289197aaaa4317a4427ceab",
+        "metrics": {
+          "pooled": {
+            "baseline": {
+              "count": 4,
+              "median": 3.102504822958216,
+              "p90": 4.25017868425033,
+              "p95": 4.363899579974227,
+              "fail_rate_gt5deg": 0.0
+            },
+            "student": {
+              "count": 4,
+              "median": 2.0108555589347454,
+              "p90": 4.25017868425033,
+              "p95": 4.363899579974227,
+              "fail_rate_gt5deg": 0.0
+            }
+          },
+          "per_speaker": {
+            "20-0.1V": {
+              "baseline": {
+                "count": 4,
+                "median": 3.102504822958216,
+                "p90": 4.25017868425033,
+                "p95": 4.363899579974227,
+                "fail_rate_gt5deg": 0.0
+              },
+              "student": {
+                "count": 4,
+                "median": 2.0108555589347454,
+                "p90": 4.25017868425033,
+                "p95": 4.363899579974227,
+                "fail_rate_gt5deg": 0.0
+              }
+            }
+          }
+        }
+      },
+      "mic_only_psd_only": {
+        "student_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_micobs_ablation_fix_smoke_20260214_144104/student/mic_only_psd_only",
+        "sha256_test_windows": "e334a28476f0eb72f5a2d44fec338ff776a98d1e00dbd090c4cde66b029396f4",
+        "metrics": {
+          "pooled": {
+            "baseline": {
+              "count": 4,
+              "median": 3.102504822958216,
+              "p90": 4.25017868425033,
+              "p95": 4.363899579974227,
+              "fail_rate_gt5deg": 0.0
+            },
+            "student": {
+              "count": 4,
+              "median": 2.2953393260729387,
+              "p90": 4.25017868425033,
+              "p95": 4.363899579974227,
+              "fail_rate_gt5deg": 0.0
+            }
+          },
+          "per_speaker": {
+            "20-0.1V": {
+              "baseline": {
+                "count": 4,
+                "median": 3.102504822958216,
+                "p90": 4.25017868425033,
+                "p95": 4.363899579974227,
+                "fail_rate_gt5deg": 0.0
+              },
+              "student": {
+                "count": 4,
+                "median": 2.2953393260729387,
+                "p90": 4.25017868425033,
+                "p95": 4.363899579974227,
+                "fail_rate_gt5deg": 0.0
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

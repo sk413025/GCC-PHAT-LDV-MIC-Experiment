@@ -1,0 +1,14 @@
+{
+  "generated": "2026-02-14T16:42:17.368299",
+  "run_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_micobs_ablation_tau_ref_gate_20260214_163851/teacher/mic_only_control",
+  "n_samples": 1255,
+  "k_horizon": 6,
+  "n_bands": 64,
+  "valid_len": {
+    "mean": 2.0087649402390437,
+    "median": 1.0,
+    "p10": 1.0,
+    "p90": 6.0,
+    "frac_zero": 0.0
+  }
+}

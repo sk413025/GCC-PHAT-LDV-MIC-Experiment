@@ -1,0 +1,75 @@
+{
+  "label": "cm_snr_m15",
+  "case_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_coherence_trap_sweep_20260214_183626/cm_snr_-15db/teacher_mic_only_control",
+  "test_min_center_sec": 450.0,
+  "n_analyzed": 318,
+  "guided": {
+    "theta_error_ref_deg": {
+      "count": 318,
+      "median": 2.496066811776794,
+      "p90": 4.060314732617036,
+      "p95": 4.58134677037469
+    },
+    "psr_db": {
+      "count": 318,
+      "median": -9.89819835355717,
+      "p90": 17.321917140143775,
+      "p95": 17.461145204566698
+    },
+    "p_confident_wrong": 0.19811320754716982,
+    "p_confident_right": 0.1540880503144654,
+    "p_uncertain_wrong": 0.09433962264150944
+  },
+  "global": {
+    "tau_ms": {
+      "count": 318,
+      "median": 0.0,
+      "p90": 0.0,
+      "p95": 0.0
+    },
+    "psr_db": {
+      "count": 318,
+      "median": 17.38536716365965,
+      "p90": 17.580384921312795,
+      "p95": 17.641076065159965
+    },
+    "p_near0_psr_gt3": 1.0
+  },
+  "per_speaker": {
+    "18-0.1V": {
+      "n": 78,
+      "p_CW": 0.0,
+      "p_CR": 0.0,
+      "p_UW": 0.0,
+      "p_global_near0_psr_gt3": 1.0
+    },
+    "19-0.1V": {
+      "n": 53,
+      "p_CW": 0.0,
+      "p_CR": 0.0,
+      "p_UW": 0.0,
+      "p_global_near0_psr_gt3": 1.0
+    },
+    "20-0.1V": {
+      "n": 49,
+      "p_CW": 0.0,
+      "p_CR": 1.0,
+      "p_UW": 0.0,
+      "p_global_near0_psr_gt3": 1.0
+    },
+    "21-0.1V": {
+      "n": 63,
+      "p_CW": 1.0,
+      "p_CR": 0.0,
+      "p_UW": 0.0,
+      "p_global_near0_psr_gt3": 1.0
+    },
+    "22-0.1V": {
+      "n": 75,
+      "p_CW": 0.0,
+      "p_CR": 0.0,
+      "p_UW": 0.4,
+      "p_global_near0_psr_gt3": 1.0
+    }
+  }
+}

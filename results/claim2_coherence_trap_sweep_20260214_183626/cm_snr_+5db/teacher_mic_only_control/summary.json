@@ -1,0 +1,42 @@
+{
+  "generated": "2026-02-14T18:44:20.085259",
+  "run_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_coherence_trap_sweep_20260214_183626/cm_snr_+5db/teacher_mic_only_control",
+  "pooled": {
+    "baseline": {
+      "theta_error_ref_deg": {
+        "count": 1255,
+        "median": 3.3924586676419217,
+        "p90": 4.625099483103288,
+        "p95": 4.625099483103288
+      },
+      "theta_error_geo_deg": {
+        "count": 1255,
+        "median": 2.139506588198728,
+        "p90": 5.8786588565820415,
+        "p95": 6.069307678478363
+      },
+      "fail_rate_ref_gt5deg": 0.0
+    },
+    "teacher": {
+      "theta_error_ref_deg": {
+        "count": 1255,
+        "median": 0.14868460291704189,
+        "p90": 0.7228966664909948,
+        "p95": 1.3309079647282562
+      },
+      "theta_error_geo_deg": {
+        "count": 1255,
+        "median": 2.11761417114797,
+        "p90": 3.5091256208292974,
+        "p95": 3.871033388845782
+      },
+      "fail_rate_ref_gt5deg": 0.0
+    }
+  },
+  "teacher_sanity_gate": {
+    "median_not_worse_frac_le_0p05": true,
+    "computed": {
+      "median_worsening_frac": -0.9561720222751164
+    }
+  }
+}

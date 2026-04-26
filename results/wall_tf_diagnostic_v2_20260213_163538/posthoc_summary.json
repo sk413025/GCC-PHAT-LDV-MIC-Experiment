@@ -1,0 +1,20 @@
+{
+  "generated": "2026-02-13T16:38:37.228971",
+  "counts": {
+    "total_band_estimates": 11400,
+    "psr_nan": 0,
+    "tau_boundary_pinned": 236,
+    "tau_near_zero_lt_0p3ms": 429
+  },
+  "psr_db_median": 0.05389358031210311,
+  "tau_corr_median": {
+    "LDV_MicL__vs__MicL_MicR": 0.00834661597684512,
+    "LDV_MicL__vs__LDV_MicR": 0.28978310127320595,
+    "LDV_MicR__vs__MicL_MicR": 0.1406521639778589
+  },
+  "wideband_tau_ms_median": {
+    "LDV_MicL": 3.8511190493765066,
+    "LDV_MicR": 1.96493961061099,
+    "MicL_MicR": -1.690379043560983
+  }
+}

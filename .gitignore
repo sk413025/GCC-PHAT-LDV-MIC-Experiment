@@ -112,17 +112,33 @@ package-lock.json
 *.so
 *.dylib
 # Dataset (large files, stored separately)
-dataset/
+dataset/*
+!dataset/0223/
+!dataset/0223/**
 
 # Audio files (large, use LFS if needed)
 *.wav
 *.mp3
 *.flac
 *.ogg
+!dataset/0223/**/*.wav
+!dataset/0223/**/*.md
+!dataset/0223/**/*.json
 
 # Git worktrees (managed separately)
 worktree/exp-interspeech-GRU2/
 worktree/manuscript-interspeech-2026/
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+paper/generated/*
+!paper/generated/README.md
 
 # Claude Code config
 .claude/

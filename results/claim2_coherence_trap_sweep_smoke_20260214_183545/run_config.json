@@ -1,0 +1,70 @@
+{
+  "generated": "2026-02-14T18:35:51.593670",
+  "data_root": "/home/sbplab/jiawei/data",
+  "truth_ref_root": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/ldv_vs_mic_grid_20260211_093529/micl_micr_chirp_tau2_band500_2000",
+  "speakers": [
+    "20-0.1V"
+  ],
+  "smoke": true,
+  "cm_snr_grid_db": [
+    20.0,
+    10.0,
+    5.0,
+    0.0,
+    -5.0,
+    -10.0,
+    -15.0
+  ],
+  "selection": {
+    "near_fail": {
+      "theta_fail_deg": 4.0,
+      "psr_good_db": 3.0,
+      "min_fail_rate": 0.4,
+      "max_frac_psr_good": 0.1,
+      "test_min_center_sec": -1.0
+    },
+    "coherence_trap": {
+      "min_mic_coh_band_median": 0.2
+    }
+  },
+  "teacher_flags": [
+    "--coupling_mode",
+    "mic_only",
+    "--coupling_hard_forbid_enable",
+    "0",
+    "--dynamic_coh_gate_enable",
+    "1",
+    "--dynamic_coh_min",
+    "0.05",
+    "--tau_ref_gate_enable",
+    "0",
+    "--corrupt_enable",
+    "1",
+    "--corrupt_snr_db",
+    "0.0",
+    "--corrupt_seed",
+    "1337",
+    "--preclip_gain",
+    "100.0",
+    "--clip_limit",
+    "0.99",
+    "--occlusion_enable",
+    "1",
+    "--occlusion_target",
+    "micr",
+    "--occlusion_kind",
+    "lowpass",
+    "--occlusion_lowpass_hz",
+    "800.0",
+    "--occlusion_tilt_k",
+    "2.0",
+    "--occlusion_tilt_pivot_hz",
+    "800.0",
+    "--center_start_sec",
+    "100",
+    "--center_end_sec",
+    "110",
+    "--center_step_sec",
+    "1"
+  ]
+}

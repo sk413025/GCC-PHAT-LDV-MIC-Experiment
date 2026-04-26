@@ -1,0 +1,17 @@
+{
+  "generated": "2026-02-15T02:54:33.451992",
+  "files": [
+    {
+      "path": "/home/sbplab/jiawei/data/20-0.1V/0128-LEFT-MIC-20-boy-320.wav",
+      "sha256": "a2c8df61d4d4f23e4133f811b9ab71e5b5d0682f172fd07106497a04cca958bf"
+    },
+    {
+      "path": "/home/sbplab/jiawei/data/20-0.1V/0128-RIGHT-MIC-20-boy-320.wav",
+      "sha256": "7e4c8e593945b8d8e15cdd4d5601b88fda38bddc28702372c3e667ccfd2f2829"
+    },
+    {
+      "path": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_coherence_trap_sweep_smoke_20260214_183545/cm_snr_-15db/teacher_mic_only_control/per_speaker/20-0.1V/windows.jsonl",
+      "sha256": "ef382adb9096c688208727dced22a4ee2d0cf2086f6fecb1f972bab64e4720cd"
+    }
+  ]
+}

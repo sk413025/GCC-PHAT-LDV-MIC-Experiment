@@ -1,0 +1,18 @@
+{
+  "generated": "2026-02-14T03:26:19.797622",
+  "traj_path": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_occlusion_20260214_005000/snr_p0_occ_lp600_micr/teacher_ldv_mic/teacher_trajectories.npz",
+  "n_samples": 1255,
+  "horizon": 6,
+  "n_actions": 64,
+  "model_type": "nearest_centroid_stepwise",
+  "train_max_center_sec": 450.0,
+  "non_empty_actions_per_step": [
+    26,
+    26,
+    26,
+    25,
+    24,
+    25
+  ],
+  "model_path": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_occlusion_20260214_005000/snr_p0_occ_lp600_micr/student_ldv_mic/model_dtmin_band_policy_k6.npz"
+}

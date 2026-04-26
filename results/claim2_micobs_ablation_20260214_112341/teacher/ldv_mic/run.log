@@ -1,0 +1,12 @@
+2026-02-14 11:23:42,453 - INFO - Speaker 18-0.1V duration: 1043.97 s
+2026-02-14 11:23:43,126 - INFO - 18-0.1V: 501 candidate windows, 251 speech-active (RMS>=1.655e-03), 6 silence windows; forbidden bands raw=39 effective=39
+2026-02-14 11:24:08,441 - INFO - Speaker 19-0.1V duration: 1047.04 s
+2026-02-14 11:24:08,911 - INFO - 19-0.1V: 501 candidate windows, 251 speech-active (RMS>=1.761e-03), 6 silence windows; forbidden bands raw=42 effective=42
+2026-02-14 11:24:29,476 - INFO - Speaker 20-0.1V duration: 1044.65 s
+2026-02-14 11:24:29,783 - INFO - 20-0.1V: 501 candidate windows, 251 speech-active (RMS>=1.760e-03), 6 silence windows; forbidden bands raw=42 effective=42
+2026-02-14 11:24:50,313 - INFO - Speaker 21-0.1V duration: 1043.97 s
+2026-02-14 11:24:50,605 - INFO - 21-0.1V: 501 candidate windows, 251 speech-active (RMS>=1.728e-03), 6 silence windows; forbidden bands raw=44 effective=44
+2026-02-14 11:25:10,143 - INFO - Speaker 22-0.1V duration: 1043.46 s
+2026-02-14 11:25:10,404 - INFO - 22-0.1V: 501 candidate windows, 251 speech-active (RMS>=1.812e-03), 6 silence windows; forbidden bands raw=43 effective=43
+2026-02-14 11:25:31,639 - INFO - Done. Results: /home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_micobs_ablation_20260214_112341/teacher/ldv_mic
+2026-02-14 11:25:31,639 - INFO - Teacher sanity gate pass=True

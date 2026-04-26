@@ -1,0 +1,56 @@
+{
+  "generated": "2026-02-13T18:53:05.053416",
+  "offsets_report": {
+    "generated": "2026-02-13T18:53:05.053053",
+    "run_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/offsets_multipath_verify_20260213_185224",
+    "pairs": {
+      "micl_micr": {
+        "tau_offset_silence_ms": [
+          -1.6500000000000001,
+          -1.6500000000000001,
+          -1.6500000000000001,
+          -1.6500000000000001,
+          -1.6500000000000001
+        ],
+        "across_speaker_mean_ms": -1.65,
+        "across_speaker_std_ms": 2.220446049250313e-16
+      },
+      "ldv_micl": {
+        "tau_offset_silence_ms": [
+          3.85,
+          3.85,
+          7.25,
+          3.85,
+          7.25
+        ],
+        "across_speaker_mean_ms": 5.21,
+        "across_speaker_std_ms": 1.6656530250925612
+      },
+      "ldv_micr": {
+        "tau_offset_silence_ms": [
+          1.9500000000000002,
+          1.9500000000000002,
+          1.9500000000000002,
+          1.9500000000000002,
+          1.9500000000000002
+        ],
+        "across_speaker_mean_ms": 1.95,
+        "across_speaker_std_ms": 2.220446049250313e-16
+      }
+    }
+  },
+  "mic_mic_tauerr_ref": {
+    "median_before_ms": 0.1478442269833273,
+    "median_after_ms": 1.563510189863675,
+    "improve_frac": -9.575388851943439
+  },
+  "acceptance": {
+    "computed": {
+      "offset_std_le_0p3ms_ldv_micl": false,
+      "offset_std_le_0p3ms_ldv_micr": true,
+      "micl_micr_median_abs_tauerr_ref_improve_ge_0p20": false,
+      "sparse_top1_bin_mass_ge_0p6_any_ldv_pair": true
+    },
+    "overall_pass": false
+  }
+}

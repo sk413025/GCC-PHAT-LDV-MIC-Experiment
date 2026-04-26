@@ -1,0 +1,12 @@
+2026-02-13 23:53:06,994 - INFO - Speaker 18-0.1V duration: 1043.97 s
+2026-02-13 23:53:07,668 - INFO - 18-0.1V: 501 candidate windows, 251 speech-active (RMS>=1.655e-03), 6 silence windows; forbidden bands raw=39 effective=39
+2026-02-13 23:53:32,369 - INFO - Speaker 19-0.1V duration: 1047.04 s
+2026-02-13 23:53:32,843 - INFO - 19-0.1V: 501 candidate windows, 251 speech-active (RMS>=1.761e-03), 6 silence windows; forbidden bands raw=42 effective=42
+2026-02-13 23:53:51,877 - INFO - Speaker 20-0.1V duration: 1044.65 s
+2026-02-13 23:53:52,184 - INFO - 20-0.1V: 501 candidate windows, 251 speech-active (RMS>=1.760e-03), 6 silence windows; forbidden bands raw=42 effective=42
+2026-02-13 23:54:11,152 - INFO - Speaker 21-0.1V duration: 1043.97 s
+2026-02-13 23:54:11,444 - INFO - 21-0.1V: 501 candidate windows, 251 speech-active (RMS>=1.728e-03), 6 silence windows; forbidden bands raw=44 effective=44
+2026-02-13 23:54:28,956 - INFO - Speaker 22-0.1V duration: 1043.46 s
+2026-02-13 23:54:29,216 - INFO - 22-0.1V: 501 candidate windows, 251 speech-active (RMS>=1.812e-03), 6 silence windows; forbidden bands raw=43 effective=43
+2026-02-13 23:54:49,122 - INFO - Done. Results: /home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_miclocal_20260213_232300/snr_m5/teacher_ldv_mic
+2026-02-13 23:54:49,122 - INFO - Teacher sanity gate pass=True

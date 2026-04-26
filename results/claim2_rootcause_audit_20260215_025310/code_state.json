@@ -1,0 +1,7 @@
+{
+  "script_path": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/scripts/analyze_claim2_failure_modes.py",
+  "script_sha256": "dc3ed95f5f705cd8f496bd684df122f1a2bbecd24ac3d4bcf6a3a24a2281778c",
+  "git_head": "8438cf25eb481b38b18759572e425f894c1af99f",
+  "dirty": true,
+  "timestamp": "2026-02-15T02:53:35.535966"
+}

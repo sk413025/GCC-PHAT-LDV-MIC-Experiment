@@ -1,0 +1,47 @@
+{
+  "label": "metricfix_smoke",
+  "case_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_coherence_trap_ablation_smoke_20260214_190130/student/mic_only_control",
+  "test_min_center_sec": -1.0,
+  "n_analyzed": 4,
+  "guided": {
+    "theta_error_ref_deg": {
+      "count": 4,
+      "median": 3.1290486339721935,
+      "p90": 3.141179354438902,
+      "p95": 3.142459027680982
+    },
+    "psr_db": {
+      "count": 4,
+      "median": 13.066235744815092,
+      "p90": 16.261450728699597,
+      "p95": 16.382444664625503
+    },
+    "p_confident_wrong": 0.0,
+    "p_confident_right": 1.0,
+    "p_uncertain_wrong": 0.0
+  },
+  "global": {
+    "tau_ms": {
+      "count": 4,
+      "median": 0.0,
+      "p90": 0.0,
+      "p95": 0.0
+    },
+    "psr_db": {
+      "count": 4,
+      "median": 13.066235744815092,
+      "p90": 16.261450728699597,
+      "p95": 16.382444664625503
+    },
+    "p_near0_psr_gt3": 1.0
+  },
+  "per_speaker": {
+    "20-0.1V": {
+      "n": 4,
+      "p_CW": 0.0,
+      "p_CR": 1.0,
+      "p_UW": 0.0,
+      "p_global_near0_psr_gt3": 1.0
+    }
+  }
+}

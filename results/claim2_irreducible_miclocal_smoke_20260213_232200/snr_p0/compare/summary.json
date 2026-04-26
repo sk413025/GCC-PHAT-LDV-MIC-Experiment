@@ -1,0 +1,61 @@
+{
+  "generated": "2026-02-13T23:20:47.149756",
+  "run_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_miclocal_smoke_20260213_232200/snr_p0/compare",
+  "inputs": {
+    "run_a": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_miclocal_smoke_20260213_232200/snr_p0/student_ldv_mic",
+    "run_b": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_miclocal_smoke_20260213_232200/snr_p0/student_mic_only",
+    "sha256": {
+      "run_a/test_windows.jsonl": "8fc4628b06c60d90c3fc0d1f90887c13fa024f911feae952115dbb6114d65e5f",
+      "run_b/test_windows.jsonl": "8fc4628b06c60d90c3fc0d1f90887c13fa024f911feae952115dbb6114d65e5f"
+    }
+  },
+  "pooled": {
+    "run_a": {
+      "count": 4,
+      "median": 2.529721058655886,
+      "p90": 4.609646033113846,
+      "p95": 4.7154559674809775,
+      "fail_rate_gt5deg": 0.0
+    },
+    "run_b": {
+      "count": 4,
+      "median": 2.529721058655886,
+      "p90": 4.609646033113846,
+      "p95": 4.7154559674809775,
+      "fail_rate_gt5deg": 0.0
+    }
+  },
+  "per_speaker": {
+    "20-0.1V": {
+      "run_a": {
+        "count": 4,
+        "median": 2.529721058655886,
+        "p90": 4.609646033113846,
+        "p95": 4.7154559674809775,
+        "fail_rate_gt5deg": 0.0
+      },
+      "run_b": {
+        "count": 4,
+        "median": 2.529721058655886,
+        "p90": 4.609646033113846,
+        "p95": 4.7154559674809775,
+        "fail_rate_gt5deg": 0.0
+      }
+    }
+  },
+  "acceptance": {
+    "p95_ldv_mic_better_by_ge_10pct": false,
+    "fail_rate_ldv_mic_better_by_ge_20pct": false,
+    "overall_pass": false,
+    "computed": {
+      "p95_improvement_frac": 0.0,
+      "fail_rate_improvement_frac": NaN
+    }
+  },
+  "teacher_actions_check": {
+    "teacher_a": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_miclocal_smoke_20260213_232200/snr_p0/teacher_ldv_mic/teacher_trajectories.npz",
+    "teacher_b": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_miclocal_smoke_20260213_232200/snr_p0/teacher_mic_only/teacher_trajectories.npz",
+    "actions_identical": true,
+    "diff_count": 0
+  }
+}

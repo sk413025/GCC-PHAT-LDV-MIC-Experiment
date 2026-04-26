@@ -1,0 +1,42 @@
+{
+  "generated": "2026-02-13T23:22:37.203284",
+  "run_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_miclocal_20260213_232300/snr_p20/teacher_ldv_mic",
+  "pooled": {
+    "baseline": {
+      "theta_error_ref_deg": {
+        "count": 1255,
+        "median": 1.8598612606497085,
+        "p90": 5.825278044262595,
+        "p95": 5.920114900799994
+      },
+      "theta_error_geo_deg": {
+        "count": 1255,
+        "median": 2.032171216554243,
+        "p90": 4.005243159630745,
+        "p95": 7.046798229745699
+      },
+      "fail_rate_ref_gt5deg": 0.24940239043824702
+    },
+    "teacher": {
+      "theta_error_ref_deg": {
+        "count": 1255,
+        "median": 0.24529077975752145,
+        "p90": 0.6527595825020631,
+        "p95": 0.7694221514367371
+      },
+      "theta_error_geo_deg": {
+        "count": 1255,
+        "median": 2.1928882918347163,
+        "p90": 3.26186569130319,
+        "p95": 3.523682835675528
+      },
+      "fail_rate_ref_gt5deg": 0.0
+    }
+  },
+  "teacher_sanity_gate": {
+    "median_not_worse_frac_le_0p05": true,
+    "computed": {
+      "median_worsening_frac": -0.8681133991291899
+    }
+  }
+}

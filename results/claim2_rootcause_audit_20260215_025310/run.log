@@ -1,0 +1,3 @@
+2026-02-15 02:53:35,637 - INFO - Analyzing case metricfix_mic_only: /home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_micobs_ablation_metricfix_20260214_174101/student/mic_only_control
+2026-02-15 02:53:46,903 - INFO - Analyzing case cm_snr_m15: /home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_coherence_trap_sweep_20260214_183626/cm_snr_-15db/teacher_mic_only_control
+2026-02-15 02:53:59,913 - INFO - Wrote report: /home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_rootcause_audit_20260215_025310/report.md

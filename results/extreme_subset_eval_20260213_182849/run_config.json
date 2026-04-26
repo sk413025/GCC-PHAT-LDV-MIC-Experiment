@@ -1,0 +1,30 @@
+{
+  "generated": "2026-02-13T18:28:53.042007",
+  "data_root": "/home/sbplab/jiawei/data",
+  "student_run": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/band_dtmin_student_20260213_175234",
+  "fs_expected": 48000,
+  "window_sec": 5.0,
+  "analysis_band_hz": [
+    500.0,
+    2000.0
+  ],
+  "hf_band_hz": [
+    2000.0,
+    8000.0
+  ],
+  "welch": {
+    "nperseg": 8192,
+    "noverlap": 4096
+  },
+  "extreme_percent": 10.0,
+  "clip": {
+    "clip_thresh": 0.99,
+    "clip_frac_thresh": 0.001
+  },
+  "subsets": [
+    "LOW_COH",
+    "HIGH_HF_IMB",
+    "CLIPPED",
+    "LOW_RMS"
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "timestamp": "2026-02-13T16:35:38.430974",
+  "argv": [
+    "scripts/diagnose_wall_transfer_function.py",
+    "--data_root",
+    "/home/sbplab/jiawei/data",
+    "--speakers",
+    "18-0.1V",
+    "19-0.1V",
+    "20-0.1V",
+    "21-0.1V",
+    "22-0.1V",
+    "--segment_source",
+    "results/stage4_speech_chirp_tau2_band0_20260211_072624",
+    "--output_dir",
+    "results/wall_tf_diagnostic_v2"
+  ],
+  "data_root": "/home/sbplab/jiawei/data",
+  "segment_source": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/stage4_speech_chirp_tau2_band0_20260211_072624",
+  "speakers": [
+    "18-0.1V",
+    "19-0.1V",
+    "20-0.1V",
+    "21-0.1V",
+    "22-0.1V"
+  ],
+  "output_dir_prefix": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/wall_tf_diagnostic_v2",
+  "output_dir": "results/wall_tf_diagnostic_v2_20260213_163538",
+  "constants": {
+    "fs_expected": 48000,
+    "window_sec": 5.0,
+    "band_low_hz": 500.0,
+    "band_high_hz": 2000.0,
+    "welch_nperseg": 8192,
+    "welch_noverlap": 4096,
+    "narrowband_step_hz": 25.0,
+    "narrowband_bw_hz": 50.0,
+    "gcc_max_lag_ms": 7.0
+  },
+  "environment": {
+    "python": "3.12.7 | packaged by Anaconda, Inc. | (main, Oct  4 2024, 13:27:36) [GCC 11.2.0]",
+    "platform": "Linux-6.8.0-94-generic-x86_64-with-glibc2.39",
+    "numpy": "1.26.4"
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "generated": "2026-02-13T18:44:22.916792",
+  "run_dir": "results/ablation_student_ldv_mic_20260213_183424",
+  "acceptance": {
+    "p95_improvement_frac_ge_0p15": true,
+    "fail_rate_improvement_frac_ge_0p20": true,
+    "median_not_worse_frac_le_0p05": true,
+    "overall_pass": true,
+    "computed": {
+      "p95_improvement_frac": 0.35542293485986004,
+      "fail_rate_improvement_frac": 0.9489795918336554,
+      "median_worsening_frac": -0.8650289970812238
+    }
+  },
+  "pooled": {
+    "baseline": {
+      "theta_error_ref_deg": {
+        "count": 318,
+        "median": 2.1791395715870197,
+        "p90": 5.8453222304535855,
+        "p95": 5.9344093137289455
+      },
+      "theta_error_geo_deg": {
+        "count": 318,
+        "median": 2.8303534975032973,
+        "p90": 6.951746115954207,
+        "p95": 7.112372927529384
+      },
+      "fail_rate_ref_gt5deg": 0.3081761006289308
+    },
+    "student": {
+      "theta_error_ref_deg": {
+        "count": 318,
+        "median": 0.2941206534762273,
+        "p90": 1.5736361411374558,
+        "p95": 3.8251841387833605
+      },
+      "theta_error_geo_deg": {
+        "count": 318,
+        "median": 2.1183983762695,
+        "p90": 3.3735920322295816,
+        "p95": 3.6859091419966283
+      },
+      "fail_rate_ref_gt5deg": 0.015723270440251572
+    }
+  }
+}

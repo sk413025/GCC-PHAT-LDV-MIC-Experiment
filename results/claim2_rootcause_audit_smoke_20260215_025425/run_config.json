@@ -1,0 +1,21 @@
+{
+  "generated": "2026-02-15T02:54:32.049202",
+  "data_root": "/home/sbplab/jiawei/data",
+  "truth_ref_root": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/ldv_vs_mic_grid_20260211_093529/micl_micr_chirp_tau2_band500_2000",
+  "window_sec": 5.0,
+  "fs_expected": 48000,
+  "analysis_band_hz": [
+    500.0,
+    2000.0
+  ],
+  "max_lag_ms": 10.0,
+  "guided_radius_ms": 0.3,
+  "theta_fail_deg": 4.0,
+  "psr_good_db": 3.0,
+  "tau_near0_ms": 0.3,
+  "test_min_center_sec": -1.0,
+  "cases": [
+    "metricfix_smoke=results/claim2_coherence_trap_ablation_smoke_20260214_190130/student/mic_only_control",
+    "cm_snr_smoke=results/claim2_coherence_trap_sweep_smoke_20260214_183545/cm_snr_-15db/teacher_mic_only_control"
+  ]
+}

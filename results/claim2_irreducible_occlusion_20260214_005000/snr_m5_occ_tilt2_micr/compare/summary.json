@@ -1,0 +1,125 @@
+{
+  "generated": "2026-02-14T04:04:45.614839",
+  "run_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_occlusion_20260214_005000/snr_m5_occ_tilt2_micr/compare",
+  "inputs": {
+    "run_a": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_occlusion_20260214_005000/snr_m5_occ_tilt2_micr/student_ldv_mic",
+    "run_b": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_occlusion_20260214_005000/snr_m5_occ_tilt2_micr/student_mic_only",
+    "sha256": {
+      "run_a/test_windows.jsonl": "b1f086c0faba6dc0af60c6fa7ca502f950049b01c2f1a3e53fd49f57fc388e3a",
+      "run_b/test_windows.jsonl": "6b47a62a7c3c164d14220575a9e48a5877924098cf5eb605410425979002d5b9"
+    }
+  },
+  "pooled": {
+    "run_a": {
+      "count": 318,
+      "median": 2.832144089686171,
+      "p90": 4.93687593818236,
+      "p95": 5.718820580674358,
+      "fail_rate_gt5deg": 0.10062893081761007
+    },
+    "run_b": {
+      "count": 318,
+      "median": 2.7975866698629384,
+      "p90": 4.938390616158459,
+      "p95": 5.613417539620327,
+      "fail_rate_gt5deg": 0.09748427672955975
+    }
+  },
+  "per_speaker": {
+    "18-0.1V": {
+      "run_a": {
+        "count": 78,
+        "median": 2.5313938647931558,
+        "p90": 4.862133822357251,
+        "p95": 5.15137395319475,
+        "fail_rate_gt5deg": 0.08974358974358974
+      },
+      "run_b": {
+        "count": 78,
+        "median": 2.5962250102046145,
+        "p90": 4.825345137536627,
+        "p95": 5.209879654593658,
+        "fail_rate_gt5deg": 0.10256410256410256
+      }
+    },
+    "19-0.1V": {
+      "run_a": {
+        "count": 53,
+        "median": 3.1671523375990898,
+        "p90": 4.605680144082352,
+        "p95": 4.998993193242839,
+        "fail_rate_gt5deg": 0.05660377358490566
+      },
+      "run_b": {
+        "count": 53,
+        "median": 2.504109071896961,
+        "p90": 4.353466948409904,
+        "p95": 4.6637403964658635,
+        "fail_rate_gt5deg": 0.03773584905660377
+      }
+    },
+    "20-0.1V": {
+      "run_a": {
+        "count": 49,
+        "median": 2.8475488419589303,
+        "p90": 4.528989871570195,
+        "p95": 4.919177380594697,
+        "fail_rate_gt5deg": 0.061224489795918366
+      },
+      "run_b": {
+        "count": 49,
+        "median": 3.6165058184904284,
+        "p90": 4.968858256712654,
+        "p95": 5.1871391406428655,
+        "fail_rate_gt5deg": 0.10204081632653061
+      }
+    },
+    "21-0.1V": {
+      "run_a": {
+        "count": 63,
+        "median": 2.7645438595956637,
+        "p90": 4.6713157271641395,
+        "p95": 5.222179996923029,
+        "fail_rate_gt5deg": 0.06349206349206349
+      },
+      "run_b": {
+        "count": 63,
+        "median": 2.7645438595956637,
+        "p90": 4.5232489789634975,
+        "p95": 4.7250980202271515,
+        "fail_rate_gt5deg": 0.047619047619047616
+      }
+    },
+    "22-0.1V": {
+      "run_a": {
+        "count": 75,
+        "median": 2.8198919826103594,
+        "p90": 5.8130061067123995,
+        "p95": 5.89243925697816,
+        "fail_rate_gt5deg": 0.2
+      },
+      "run_b": {
+        "count": 75,
+        "median": 2.583525998798148,
+        "p90": 5.8000560811030635,
+        "p95": 5.875642107617425,
+        "fail_rate_gt5deg": 0.17333333333333334
+      }
+    }
+  },
+  "acceptance": {
+    "p95_ldv_mic_better_by_ge_10pct": false,
+    "fail_rate_ldv_mic_better_by_ge_20pct": false,
+    "overall_pass": false,
+    "computed": {
+      "p95_improvement_frac": -0.018776982169967052,
+      "fail_rate_improvement_frac": -0.032258064516129024
+    }
+  },
+  "teacher_actions_check": {
+    "teacher_a": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_occlusion_20260214_005000/snr_m5_occ_tilt2_micr/teacher_ldv_mic/teacher_trajectories.npz",
+    "teacher_b": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_occlusion_20260214_005000/snr_m5_occ_tilt2_micr/teacher_mic_only/teacher_trajectories.npz",
+    "actions_identical": true,
+    "diff_count": 0
+  }
+}

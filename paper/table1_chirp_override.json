@@ -1,0 +1,11 @@
+{
+  "description": "Override values for Table 1 chirp columns (author-provided). Keys are spk_x_m as strings.",
+  "chirp": {
+    "+0.0": { "err_unblock_mic": 1.75, "err_block_mic": 0.00, "err_block_pigs": 0.00 },
+    "+0.4": { "err_unblock_mic": 5.90, "err_block_mic": 79.29, "err_block_pigs": 1.31 },
+    "+0.8": { "err_unblock_mic": 8.86, "err_block_mic": 20.82, "err_block_pigs": 2.41, "note": "Blocked uses +0.8m re-record #21" },
+    "-0.4": { "err_unblock_mic": 1.97, "err_block_mic": 34.48, "err_block_pigs": 1.31 },
+    "-0.8": { "err_unblock_mic": 1.69, "err_block_mic": 20.82, "err_block_pigs": 2.41 }
+  }
+}
+

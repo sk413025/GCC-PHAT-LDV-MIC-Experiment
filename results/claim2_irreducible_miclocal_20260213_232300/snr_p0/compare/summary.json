@@ -1,0 +1,125 @@
+{
+  "generated": "2026-02-13T23:53:06.192916",
+  "run_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_miclocal_20260213_232300/snr_p0/compare",
+  "inputs": {
+    "run_a": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_miclocal_20260213_232300/snr_p0/student_ldv_mic",
+    "run_b": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_miclocal_20260213_232300/snr_p0/student_mic_only",
+    "sha256": {
+      "run_a/test_windows.jsonl": "958c3a49ff2f7a45592da38b411563d3d9ed012a759c5c834fb78330a4892464",
+      "run_b/test_windows.jsonl": "2ff69288ae1d0062af7dd5de8a0681e6deff0d99f6285f02b26b74eb07d3b42c"
+    }
+  },
+  "pooled": {
+    "run_a": {
+      "count": 318,
+      "median": 2.3711866085070707,
+      "p90": 4.668174895393837,
+      "p95": 4.893412194876443,
+      "fail_rate_gt5deg": 0.03773584905660377
+    },
+    "run_b": {
+      "count": 318,
+      "median": 2.6123331367128184,
+      "p90": 4.559523332839643,
+      "p95": 4.892960480229219,
+      "fail_rate_gt5deg": 0.0440251572327044
+    }
+  },
+  "per_speaker": {
+    "18-0.1V": {
+      "run_a": {
+        "count": 78,
+        "median": 3.6210944648415406,
+        "p90": 4.762752490688581,
+        "p95": 5.08620063485538,
+        "fail_rate_gt5deg": 0.05128205128205128
+      },
+      "run_b": {
+        "count": 78,
+        "median": 3.3489594600122174,
+        "p90": 5.03374916908037,
+        "p95": 5.506148077147895,
+        "fail_rate_gt5deg": 0.11538461538461539
+      }
+    },
+    "19-0.1V": {
+      "run_a": {
+        "count": 53,
+        "median": 2.1280780733450086,
+        "p90": 4.706305758394793,
+        "p95": 5.059658404486656,
+        "fail_rate_gt5deg": 0.07547169811320754
+      },
+      "run_b": {
+        "count": 53,
+        "median": 2.047010760091611,
+        "p90": 4.785752835499454,
+        "p95": 5.0279758526967715,
+        "fail_rate_gt5deg": 0.05660377358490566
+      }
+    },
+    "20-0.1V": {
+      "run_a": {
+        "count": 49,
+        "median": 1.773867364001715,
+        "p90": 4.20893357613842,
+        "p95": 4.326581897131351,
+        "fail_rate_gt5deg": 0.0
+      },
+      "run_b": {
+        "count": 49,
+        "median": 2.841223771402745,
+        "p90": 4.266472942083227,
+        "p95": 4.297789218981299,
+        "fail_rate_gt5deg": 0.0
+      }
+    },
+    "21-0.1V": {
+      "run_a": {
+        "count": 63,
+        "median": 3.0947641808766306,
+        "p90": 4.510084628582547,
+        "p95": 4.858546601702046,
+        "fail_rate_gt5deg": 0.031746031746031744
+      },
+      "run_b": {
+        "count": 63,
+        "median": 3.0947641808766306,
+        "p90": 4.4607523073463256,
+        "p95": 4.616884680874337,
+        "fail_rate_gt5deg": 0.015873015873015872
+      }
+    },
+    "22-0.1V": {
+      "run_a": {
+        "count": 75,
+        "median": 1.3269630251461635,
+        "p90": 4.2340035785546775,
+        "p95": 4.78578003878841,
+        "fail_rate_gt5deg": 0.02666666666666667
+      },
+      "run_b": {
+        "count": 75,
+        "median": 1.2509746601159613,
+        "p90": 3.91796789343613,
+        "p95": 4.416288494443047,
+        "fail_rate_gt5deg": 0.013333333333333334
+      }
+    }
+  },
+  "acceptance": {
+    "p95_ldv_mic_better_by_ge_10pct": false,
+    "fail_rate_ldv_mic_better_by_ge_20pct": false,
+    "overall_pass": false,
+    "computed": {
+      "p95_improvement_frac": -9.23192919806462e-05,
+      "fail_rate_improvement_frac": 0.14285714285714282
+    }
+  },
+  "teacher_actions_check": {
+    "teacher_a": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_miclocal_20260213_232300/snr_p0/teacher_ldv_mic/teacher_trajectories.npz",
+    "teacher_b": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_miclocal_20260213_232300/snr_p0/teacher_mic_only/teacher_trajectories.npz",
+    "actions_identical": true,
+    "diff_count": 0
+  }
+}

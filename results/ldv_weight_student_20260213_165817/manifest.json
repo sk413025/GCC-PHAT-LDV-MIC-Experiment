@@ -1,0 +1,9 @@
+{
+  "generated": "2026-02-13T16:58:30.020679",
+  "teacher_dataset": {
+    "path": "results/ldv_informed_micmic_20260213_165615/teacher_dataset.npz",
+    "sha256": "3976b7212501ceb22e0a1820d490a1cda99296ef769118d4b57b61a554d1cfc0"
+  },
+  "data_root": "/home/sbplab/jiawei/data",
+  "truth_ref_root": "results/ldv_vs_mic_grid_20260211_093529/micl_micr_chirp_tau2_band500_2000"
+}

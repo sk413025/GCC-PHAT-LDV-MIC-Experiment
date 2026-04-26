@@ -1,0 +1,17 @@
+{
+  "reference": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_micobs_ablation_fix_20260214_144138/teacher/ldv_mic/teacher_trajectories.npz",
+  "checks": {
+    "mic_only_control": {
+      "ok": true,
+      "npz": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_micobs_ablation_fix_20260214_144138/teacher/mic_only_control/teacher_trajectories.npz"
+    },
+    "mic_only_coh_only": {
+      "ok": true,
+      "npz": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_micobs_ablation_fix_20260214_144138/teacher/mic_only_coh_only/teacher_trajectories.npz"
+    },
+    "mic_only_psd_only": {
+      "ok": true,
+      "npz": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_micobs_ablation_fix_20260214_144138/teacher/mic_only_psd_only/teacher_trajectories.npz"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+2026-02-13 18:38:27,251 - INFO - Speaker 18-0.1V duration: 1043.97 s
+2026-02-13 18:38:27,949 - INFO - 18-0.1V: 501 candidate windows, 251 speech-active (RMS>=1.655e-03), 5 silence windows; forbidden bands raw=64 effective=0
+2026-02-13 18:39:19,998 - INFO - Speaker 19-0.1V duration: 1047.04 s
+2026-02-13 18:39:20,364 - INFO - 19-0.1V: 501 candidate windows, 251 speech-active (RMS>=1.761e-03), 5 silence windows; forbidden bands raw=64 effective=0
+2026-02-13 18:40:00,247 - INFO - Speaker 20-0.1V duration: 1044.65 s
+2026-02-13 18:40:00,501 - INFO - 20-0.1V: 501 candidate windows, 251 speech-active (RMS>=1.760e-03), 5 silence windows; forbidden bands raw=64 effective=0
+2026-02-13 18:40:39,624 - INFO - Speaker 21-0.1V duration: 1043.97 s
+2026-02-13 18:40:39,879 - INFO - 21-0.1V: 501 candidate windows, 251 speech-active (RMS>=1.728e-03), 5 silence windows; forbidden bands raw=64 effective=0
+2026-02-13 18:41:19,167 - INFO - Speaker 22-0.1V duration: 1043.46 s
+2026-02-13 18:41:19,427 - INFO - 22-0.1V: 501 candidate windows, 251 speech-active (RMS>=1.812e-03), 5 silence windows; forbidden bands raw=64 effective=0
+2026-02-13 18:41:59,972 - INFO - Done. Results: results/ablation_teacher_mic_only_20260213_183424
+2026-02-13 18:41:59,972 - INFO - Teacher sanity gate pass=True

@@ -1,0 +1,41 @@
+{
+  "generated": "2026-02-14T02:57:18.831186",
+  "run_dir": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_irreducible_occlusion_smoke_20260214_004000",
+  "rows": [
+    {
+      "snr_db": 0.0,
+      "occlusion": {
+        "name": "lp800_micr",
+        "occlusion_enable": 1,
+        "occlusion_target": "micr",
+        "occlusion_kind": "lowpass",
+        "occlusion_lowpass_hz": 800.0,
+        "occlusion_tilt_k": 2.0,
+        "occlusion_tilt_pivot_hz": 800.0
+      },
+      "tag": "snr_p0_occ_lp800_micr",
+      "baseline_fail_rate_ref_gt5deg": 0.0,
+      "ldv_mic_student_fail_rate_ref_gt5deg": 0.0,
+      "compare_acceptance": {
+        "p95_ldv_mic_better_by_ge_10pct": false,
+        "fail_rate_ldv_mic_better_by_ge_20pct": false,
+        "overall_pass": false,
+        "computed": {
+          "p95_improvement_frac": 0.0,
+          "fail_rate_improvement_frac": NaN
+        }
+      },
+      "claim2_checks": {
+        "near_fail": false,
+        "ldv_feasible": true,
+        "ldv_beats_mic_only": false
+      },
+      "claim2_pass": false
+    }
+  ],
+  "final": {
+    "claim2_supported_any": false,
+    "near_fail_observed_any": false,
+    "note": "FAIL: baseline never reached near-fail in this occlusion grid."
+  }
+}

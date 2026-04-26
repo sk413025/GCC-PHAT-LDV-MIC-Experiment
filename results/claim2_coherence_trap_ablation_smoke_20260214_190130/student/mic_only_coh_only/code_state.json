@@ -1,0 +1,7 @@
+{
+  "script_path": "/home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/scripts/train_dtmin_from_band_trajectories.py",
+  "script_sha256": "5e8e8488bcff9080dd916bf6643358ffabdc6790bedf74108a8e1ac9c4f929a1",
+  "git_head": "f4a09765d3eb301c44fcec81e3830970e52a0f6d",
+  "dirty": true,
+  "timestamp": "2026-02-14T19:01:53.233216"
+}

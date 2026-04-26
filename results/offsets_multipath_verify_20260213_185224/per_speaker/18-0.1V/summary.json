@@ -1,0 +1,49 @@
+{
+  "generated": "2026-02-13T18:52:34.649663",
+  "speaker_id": "18-0.1V",
+  "truth_reference": {
+    "tau_ref_ms": 1.585930191304251,
+    "theta_ref_deg": 22.864486344008302,
+    "label": "chirp 29 mic truth-ref (5s)"
+  },
+  "geometry_truth": {
+    "tau_true_ms": 1.450441867492482,
+    "theta_true_deg": 20.815402749359603
+  },
+  "counts": {
+    "n_candidate_windows": 501,
+    "n_speech_windows": 251,
+    "n_silence_windows": 5
+  },
+  "rms_thresholds": {
+    "speech_rms_micl_p50": 0.0016546248325103221
+  },
+  "tau_offset_silence_ms": {
+    "micl_micr": -1.6500000000000001,
+    "ldv_micl": 3.85,
+    "ldv_micr": 1.9500000000000002
+  },
+  "silence_top1_tau_ms": {
+    "micl_micr": [
+      -1.6875,
+      -1.6875,
+      -1.6875,
+      -1.6875,
+      -1.6875
+    ],
+    "ldv_micl": [
+      3.8333333333333335,
+      7.229166666666667,
+      3.8333333333333335,
+      3.8541666666666665,
+      3.8541666666666665
+    ],
+    "ldv_micr": [
+      1.9583333333333333,
+      1.9583333333333333,
+      1.9583333333333333,
+      1.9583333333333333,
+      1.9583333333333333
+    ]
+  }
+}

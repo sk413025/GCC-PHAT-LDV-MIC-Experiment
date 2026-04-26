@@ -1,0 +1,18 @@
+# Band-DTmin Student Report
+
+Generated: 2026-02-14T19:01:57.199445
+Run dir: /home/sbplab/jiawei/data-worktrees/exp-tdoa-cross-correlation/results/claim2_coherence_trap_ablation_smoke_20260214_190130/student/mic_only_psd_only
+
+## Success Criteria (pooled test windows, vs chirp reference)
+
+- p95(theta_error_ref) improvement: -0.016 (>= 0.150)
+- fail_rate_ref(theta_error_ref>5°) improvement: 0.000 (>= 0.200)
+- median(theta_error_ref) worsening: -0.008 (<= 0.050)
+- OVERALL: FAIL
+
+## Test Metrics (vs chirp reference)
+
+| Method | count | median | p90 | p95 | fail_rate(>5°) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| baseline | 4 | 3.129 | 3.141 | 3.142 | 0.000 |
+| student | 4 | 3.105 | 3.185 | 3.192 | 0.000 |
