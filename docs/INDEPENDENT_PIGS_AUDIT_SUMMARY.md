@@ -5,6 +5,10 @@ project's existing research scripts.
 
 ## Research Rationale
 
+For a plain-language explanation of how these experiments relate to the
+paper's final PI-GS objective, including ASCII diagrams and a formula-to-code
+map, see `docs/PIGS_FORMULA_EXPLAINER.md`.
+
 The audit starts from the physical story in the paper but treats the existing
 codebase as untrusted. The only trusted inputs are the WAV recordings, nominal
 sensor geometry, and basic wave-propagation constraints.
