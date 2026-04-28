@@ -20,6 +20,7 @@ import json
 import math
 from dataclasses import asdict, dataclass
 from datetime import datetime
+from itertools import product
 from pathlib import Path
 from typing import Iterable
 
@@ -1934,99 +1935,135 @@ def candidate_configs(profile: str) -> list[Config]:
         aggregator_options = [("curve_mean", 0.0)]
 
     configs: list[Config] = []
-    for band in bands:
-        for beta in betas:
-            for transform in transforms:
-                for geometry, ldv_y in geometries:
-                    for score_mode in score_modes:
-                        for top_k_windows in topk_options:
-                            for local_peak_radius_ms in radius_options:
-                                for gcc_mode, coherence_floor in gcc_modes:
-                                    for estimator in estimators:
-                                        for subbands in subband_options:
-                                            for aggregator, penalty in aggregator_options:
-                                                for selector, min_k, stable_threshold, stable_steps, fallback_k in selector_options:
-                                                    for basin_mode, basin_sigma, basin_gate, basin_power, agreement_gate in basin_options:
-                                                        for subband_weight_mode in subband_weight_options:
-                                                            for lr_weight, lr_gate in lr_options:
-                                                                if recipe_options is not None and (selector, basin_mode, subband_weight_mode, lr_weight) not in recipe_options:
-                                                                    continue
-                                                                for wall_speed_mps in wall_speed_options:
-                                                                    is_wall_wave = geometry.startswith("wall_wave")
-                                                                    if is_wall_wave and wall_speed_mps <= 0.0:
-                                                                        continue
-                                                                    if not is_wall_wave and wall_speed_mps > 0.0:
-                                                                        continue
-                                                                    for common_shift_radius_ms, common_shift_steps in common_shift_options:
-                                                                        for x_calibration in x_calibration_options:
-                                                                            for correlation_polarity in polarity_options:
-                                                                                for edge_threshold, edge_gain, edge_min_k in edge_dilation_options:
-                                                                                    for center_deadband, center_min_k in center_deadband_options:
-                                                                                        band_name = "wide" if band is None else f"{int(band[0])}-{int(band[1])}"
-                                                                                        subband_name = "_sub" if subbands is not None else ""
-                                                                                        penalty_name = f"{penalty:g}" if penalty else ""
-                                                                                        agg_name = "" if aggregator == "curve_mean" else f"_{aggregator}{penalty_name}"
-                                                                                        selector_name = "" if selector == "fixed_top_k" else f"_{selector}_m{min_k}_s{stable_threshold:g}_n{stable_steps}_fb{fallback_k}"
-                                                                                        basin_name = "" if basin_mode == "none" else f"_{basin_mode}_sig{basin_sigma:g}_g{basin_gate:g}_p{basin_power:g}"
-                                                                                        weight_name = "" if subband_weight_mode == "none" else f"_{subband_weight_mode}"
-                                                                                        lr_name = "" if lr_weight <= 0.0 else f"_lrw{lr_weight:g}"
-                                                                                        wall_name = "" if wall_speed_mps <= 0.0 else f"_ws{wall_speed_mps:g}"
-                                                                                        shift_name = "" if common_shift_radius_ms <= 0.0 else f"_cs{common_shift_radius_ms:g}ms"
-                                                                                        xcal_name = "" if x_calibration == "none" else f"_xcal_{x_calibration}"
-                                                                                        polarity_name = "" if correlation_polarity == "abs" else f"_pol_{correlation_polarity}"
-                                                                                        edge_name = "" if edge_gain <= 1.0 else f"_edgeth{edge_threshold:g}_g{edge_gain:g}_mink{edge_min_k}"
-                                                                                        center_name = "" if center_deadband <= 0.0 else f"_centerdb{center_deadband:g}_mink{center_min_k}"
-                                                                                        name = (
-                                                                                            f"{band_name}_b{beta:g}_{transform}_{geometry}_y{ldv_y:g}{wall_name}_{score_mode}"
-                                                                                            f"_k{top_k_windows}_r{local_peak_radius_ms:g}_{gcc_mode}{coherence_floor:g}"
-                                                                                            f"_{estimator}{subband_name}{agg_name}{selector_name}{basin_name}{weight_name}{lr_name}{shift_name}{xcal_name}{polarity_name}{edge_name}{center_name}"
-                                                                                        )
-                                                                                        configs.append(
-                                                                                            Config(
-                                                                                                name=name,
-                                                                                                band_hz=band,
-                                                                                                phat_beta=beta,
-                                                                                                transform=transform,
-                                                                                                geometry=geometry,
-                                                                                                ldv_y_m=ldv_y,
-                                                                                                score_mode=score_mode,
-                                                                                                n_fft=1024,
-                                                                                                hop=256,
-                                                                                                window_sec=0.5,
-                                                                                                window_hop_sec=0.25,
-                                                                                                top_k_windows=top_k_windows,
-                                                                                                local_peak_radius_ms=local_peak_radius_ms,
-                                                                                                gcc_mode=gcc_mode,
-                                                                                                estimator=estimator,
-                                                                                                coherence_floor=coherence_floor,
-                                                                                                subbands=subbands,
-                                                                                                score_aggregator=aggregator,
-                                                                                                subband_penalty=penalty,
-                                                                                                window_selector=selector,
-                                                                                                adaptive_min_k=min_k,
-                                                                                                stability_threshold_m=stable_threshold,
-                                                                                                required_stable_steps=stable_steps,
-                                                                                                fallback_top_k=fallback_k,
-                                                                                                basin_mode=basin_mode,
-                                                                                                basin_sigma_m=basin_sigma,
-                                                                                                basin_gate=basin_gate,
-                                                                                                basin_power=basin_power,
-                                                                                                candidate_agreement_gate_m=agreement_gate,
-                                                                                                subband_weight_mode=subband_weight_mode,
-                                                                                                lr_weight=lr_weight,
-                                                                                                lr_gate=lr_gate,
-                                                                                                wall_speed_mps=wall_speed_mps,
-                                                                                                common_shift_radius_ms=common_shift_radius_ms,
-                                                                                                common_shift_steps=common_shift_steps,
-                                                                                                x_calibration=x_calibration,
-                                                                                                correlation_polarity=correlation_polarity,
-                                                                                                edge_dilation_threshold_m=edge_threshold,
-                                                                                                edge_dilation_gain=edge_gain,
-                                                                                                edge_dilation_min_k=edge_min_k,
-                                                                                                center_deadband_m=center_deadband,
-                                                                                                center_deadband_min_k=center_min_k,
-                                                                                            )
-                                                                                        )
+    for (
+        band,
+        beta,
+        transform,
+        geometry_cfg,
+        score_mode,
+        top_k_windows,
+        local_peak_radius_ms,
+        gcc_cfg,
+        estimator,
+        subbands,
+        aggregator_cfg,
+        selector_cfg,
+        basin_cfg,
+        subband_weight_mode,
+        lr_cfg,
+        wall_speed_mps,
+        common_shift_cfg,
+        x_calibration,
+        correlation_polarity,
+        edge_cfg,
+        center_cfg,
+    ) in product(
+        bands,
+        betas,
+        transforms,
+        geometries,
+        score_modes,
+        topk_options,
+        radius_options,
+        gcc_modes,
+        estimators,
+        subband_options,
+        aggregator_options,
+        selector_options,
+        basin_options,
+        subband_weight_options,
+        lr_options,
+        wall_speed_options,
+        common_shift_options,
+        x_calibration_options,
+        polarity_options,
+        edge_dilation_options,
+        center_deadband_options,
+    ):
+        geometry, ldv_y = geometry_cfg
+        gcc_mode, coherence_floor = gcc_cfg
+        aggregator, penalty = aggregator_cfg
+        selector, min_k, stable_threshold, stable_steps, fallback_k = selector_cfg
+        basin_mode, basin_sigma, basin_gate, basin_power, agreement_gate = basin_cfg
+        lr_weight, lr_gate = lr_cfg
+        common_shift_radius_ms, common_shift_steps = common_shift_cfg
+        edge_threshold, edge_gain, edge_min_k = edge_cfg
+        center_deadband, center_min_k = center_cfg
+
+        if recipe_options is not None and (selector, basin_mode, subband_weight_mode, lr_weight) not in recipe_options:
+            continue
+
+        is_wall_wave = geometry.startswith("wall_wave")
+        if is_wall_wave and wall_speed_mps <= 0.0:
+            continue
+        if not is_wall_wave and wall_speed_mps > 0.0:
+            continue
+
+        band_name = "wide" if band is None else f"{int(band[0])}-{int(band[1])}"
+        subband_name = "_sub" if subbands is not None else ""
+        penalty_name = f"{penalty:g}" if penalty else ""
+        agg_name = "" if aggregator == "curve_mean" else f"_{aggregator}{penalty_name}"
+        selector_name = "" if selector == "fixed_top_k" else f"_{selector}_m{min_k}_s{stable_threshold:g}_n{stable_steps}_fb{fallback_k}"
+        basin_name = "" if basin_mode == "none" else f"_{basin_mode}_sig{basin_sigma:g}_g{basin_gate:g}_p{basin_power:g}"
+        weight_name = "" if subband_weight_mode == "none" else f"_{subband_weight_mode}"
+        lr_name = "" if lr_weight <= 0.0 else f"_lrw{lr_weight:g}"
+        wall_name = "" if wall_speed_mps <= 0.0 else f"_ws{wall_speed_mps:g}"
+        shift_name = "" if common_shift_radius_ms <= 0.0 else f"_cs{common_shift_radius_ms:g}ms"
+        xcal_name = "" if x_calibration == "none" else f"_xcal_{x_calibration}"
+        polarity_name = "" if correlation_polarity == "abs" else f"_pol_{correlation_polarity}"
+        edge_name = "" if edge_gain <= 1.0 else f"_edgeth{edge_threshold:g}_g{edge_gain:g}_mink{edge_min_k}"
+        center_name = "" if center_deadband <= 0.0 else f"_centerdb{center_deadband:g}_mink{center_min_k}"
+        name = (
+            f"{band_name}_b{beta:g}_{transform}_{geometry}_y{ldv_y:g}{wall_name}_{score_mode}"
+            f"_k{top_k_windows}_r{local_peak_radius_ms:g}_{gcc_mode}{coherence_floor:g}"
+            f"_{estimator}{subband_name}{agg_name}{selector_name}{basin_name}{weight_name}{lr_name}{shift_name}{xcal_name}{polarity_name}{edge_name}{center_name}"
+        )
+        configs.append(
+            Config(
+                name=name,
+                band_hz=band,
+                phat_beta=beta,
+                transform=transform,
+                geometry=geometry,
+                ldv_y_m=ldv_y,
+                score_mode=score_mode,
+                n_fft=1024,
+                hop=256,
+                window_sec=0.5,
+                window_hop_sec=0.25,
+                top_k_windows=top_k_windows,
+                local_peak_radius_ms=local_peak_radius_ms,
+                gcc_mode=gcc_mode,
+                estimator=estimator,
+                coherence_floor=coherence_floor,
+                subbands=subbands,
+                score_aggregator=aggregator,
+                subband_penalty=penalty,
+                window_selector=selector,
+                adaptive_min_k=min_k,
+                stability_threshold_m=stable_threshold,
+                required_stable_steps=stable_steps,
+                fallback_top_k=fallback_k,
+                basin_mode=basin_mode,
+                basin_sigma_m=basin_sigma,
+                basin_gate=basin_gate,
+                basin_power=basin_power,
+                candidate_agreement_gate_m=agreement_gate,
+                subband_weight_mode=subband_weight_mode,
+                lr_weight=lr_weight,
+                lr_gate=lr_gate,
+                wall_speed_mps=wall_speed_mps,
+                common_shift_radius_ms=common_shift_radius_ms,
+                common_shift_steps=common_shift_steps,
+                x_calibration=x_calibration,
+                correlation_polarity=correlation_polarity,
+                edge_dilation_threshold_m=edge_threshold,
+                edge_dilation_gain=edge_gain,
+                edge_dilation_min_k=edge_min_k,
+                center_deadband_m=center_deadband,
+                center_deadband_min_k=center_min_k,
+            )
+        )
     return configs
 
 
